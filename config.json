@@ -1,0 +1,23 @@
+{
+    "location_override": "Agartala, Tripura",
+    "channels": {
+        "live": [
+            "https://www.youtube.com/@DDnews/videos",
+            "https://www.youtube.com/@ZeeNews/videos"
+        ],
+        "breaking": [
+            "https://www.youtube.com/@RepublicBharat/shorts"
+        ],
+        "sports": [
+            "https://www.youtube.com/@SportsTak/videos",
+            "https://www.youtube.com/@WWE/videos"
+        ],
+        "tech": [],
+        "entertainment": [
+            "https://www.youtube.com/@tseries/videos",
+            "https://www.youtube.com/@sangeetbangla/videos"
+        ],
+        "weather": [],
+        "viral": []
+    }
+}

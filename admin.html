@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <title>LPBS Admin Panel</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body { background: #121212; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; padding: 20px; margin: 0; }
+        
+        /* SECURITY LOCK */
+        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .login-box { background: #1e1e1e; padding: 40px; border-radius: 12px; border: 2px solid #d32f2f; text-align: center; width: 300px; box-shadow: 0 0 30px rgba(211, 47, 47, 0.3); }
+        .login-input { width: 100%; padding: 15px; margin: 15px 0; background: #333; border: 1px solid #555; color: white; font-size: 18px; text-align: center; border-radius: 6px; }
+        .btn-unlock { background: #d32f2f; color: white; width: 100%; padding: 12px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 6px; }
+
+        /* MAIN PANEL */
+        .container { max-width: 900px; margin: 0 auto; background: #1e1e1e; padding: 25px; border-radius: 12px; display: none; }
+        h2 { border-bottom: 3px solid #d32f2f; padding-bottom: 10px; color: white; }
+        
+        /* SECTIONS */
+        .section { margin-bottom: 25px; padding: 20px; background: #252525; border-radius: 10px; border: 1px solid #333; }
+        .section-title { font-size: 18px; font-weight: bold; color: #bbb; margin-bottom: 15px; display: block; border-left: 4px solid #d32f2f; padding-left: 10px; text-transform: uppercase; }
+        
+        /* INPUTS & LISTS */
+        input[type="text"], select { width: 100%; padding: 12px; background: #333; border: 1px solid #444; color: white; margin-bottom: 10px; border-radius: 6px; box-sizing: border-box; }
+        
+        .channel-list { max-height: 200px; overflow-y: auto; background: #111; padding: 10px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #333; }
+        .channel-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #222; font-size: 13px; background: #1a1a1a; margin-bottom: 5px; border-radius: 4px; }
+        .channel-item:last-child { margin-bottom: 0; }
+        
+        /* STATUS LIGHTS */
+        .status-dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; margin-right: 8px; box-shadow: 0 0 5px rgba(255,255,255,0.2); }
+        .status-green { background-color: #00ff00; box-shadow: 0 0 8px #00ff00; } /* Online/Link */
+        .status-blue { background-color: #00ccff; box-shadow: 0 0 8px #00ccff; } /* API Key */
+        .status-red { background-color: #ff0000; box-shadow: 0 0 8px #ff0000; } /* Error */
+
+        /* BUTTONS */
+        .btn { padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-left: 5px; }
+        .btn-add { background: #1976d2; color: white; width: 100%; margin-top: 5px; }
+        .btn-del { background: #d32f2f; color: white; padding: 5px 10px; }
+        .btn-test { background: #444; color: white; padding: 5px 10px; }
+        .btn-test:hover { background: #fff; color: black; }
+        .btn-save { background: #2e7d32; color: white; width: 100%; padding: 15px; font-size: 18px; margin-top: 20px; position: sticky; bottom: 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.5); z-index: 100; }
+        
+        /* PROMO BOX */
+        .promo-box { border: 2px dashed #d32f2f; background: #1a0505; }
+        .preview-area { display: none; margin-top: 15px; background: #000; padding: 15px; border-radius: 8px; }
+        .preview-img { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; }
+        textarea { width: 100%; background: #222; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 6px; box-sizing: border-box; }
+        .btn-magic { background: linear-gradient(45deg, #d32f2f, #ff6f00); color: white; width: 100%; padding: 12px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+
+    <div id="login-overlay">
+        <div class="login-box">
+            <h2 style="justify-content:center; border:none; color:#d32f2f;"><i class="fa-solid fa-lock"></i> SECURE ACCESS</h2>
+            <input type="password" id="pass-input" class="login-input" placeholder="Enter Code">
+            <button class="btn-unlock" onclick="checkPass()">UNLOCK</button>
+            <p id="err-msg" style="color:red; margin-top:10px; display:none;">❌ Wrong Code!</p>
+        </div>
+    </div>
+
+    <div class="container" id="main-panel">
+        <h2>🛠️ LPBS CONTROL CENTER</h2>
+
+        <div class="section" style="background: linear-gradient(45deg, #004d40, #00695c); border: 1px solid #00ffcc;">
+            <span class="section-title" style="border-color: #00ffcc; color: #00ffcc;">👥 Visitor Traffic</span>
+            <div style="display: flex; justify-content: space-around; text-align: center; margin-top: 10px;">
+                <div>
+                    <div style="font-size: 30px; font-weight: bold; color: white;" id="count-today">0</div>
+                    <div style="color: #ccc; font-size: 14px;">Today's Visitors</div>
+                </div>
+                <div style="border-left: 1px solid #ccc;"></div>
+                <div>
+                    <div style="font-size: 30px; font-weight: bold; color: yellow;" id="count-total">0</div>
+                    <div style="color: #ccc; font-size: 14px;">Total Lifetime</div>
+                </div>
+            </div>
+            <button onclick="loadStats()" style="background:none; border:none; color:#00ffcc; width:100%; margin-top:10px; cursor:pointer;">🔄 Refresh Stats</button>
+        </div>
+
+        <div class="section promo-box">
+            <span class="section-title">📢 AI Social Manager</span>
+            <label>Select News:</label>
+            <select id="promo-news-list"><option>Loading...</option></select>
+            <label>Language:</label>
+            <select id="promo-lang">
+                <option value="bn">Bangla (বাংলা)</option>
+                <option value="hi">Hindi (हिंदी)</option>
+                <option value="en">English</option>
+            </select>
+            <button class="btn btn-magic" onclick="generatePromo()">✨ Create Viral Post</button>
+            
+            <div id="preview-box" class="preview-area">
+                <img id="prev-img" class="preview-img" src="">
+                <textarea id="prev-text" rows="6"></textarea>
+                <button class="btn" style="background:white; color:black; width:100%; margin-top:5px;" onclick="copyText()">Copy Text</button>
+            </div>
+        </div>
+
+        <div class="section">
+            <span class="section-title">📍 Force Location</span>
+            <input type="text" id="loc-input" placeholder="e.g. Agartala, Tripura">
+        </div>
+
+        <div id="category-container"></div>
+
+        <button class="btn-save" onclick="saveConfig()">💾 SAVE ALL CHANGES</button>
+        <p id="msg" style="text-align:center; color:#0f0; margin-top:10px;"></p>
+    </div>
+
+    <script>
+        // --- CONFIGURATION ---
+        const categories = [
+            { id: 'live', name: '🔴 Live TV & API Keys' },
+            { id: 'breaking', name: '🚨 Breaking News Sources' },
+            { id: 'sports', name: '🏏 Sports Channels' },
+            { id: 'tech', name: '📱 Tech & Gadgets' },
+            { id: 'entertainment', name: '🎬 Cinema / Entertainment' },
+            { id: 'weather', name: '☁️ Weather Updates' },
+            { id: 'viral', name: '⚡ Viral & Trending' }
+        ];
+
+        let config = { channels: {} }; // Fixed Initialization
+        let newsData = [];
+
+        // --- SECURITY ---
+        if(sessionStorage.getItem('admin_unlocked') === 'true') {
+            document.getElementById('login-overlay').style.display = 'none';
+            document.getElementById('main-panel').style.display = 'block';
+        }
+        function checkPass() {
+            if(document.getElementById('pass-input').value === '33982625') {
+                sessionStorage.setItem('admin_unlocked', 'true');
+                document.getElementById('login-overlay').style.display = 'none';
+                document.getElementById('main-panel').style.display = 'block';
+            } else {
+                document.getElementById('err-msg').style.display = 'block';
+            }
+        }
+
+        // --- DYNAMIC RENDER ---
+        function initCategories() {
+            const container = document.getElementById('category-container');
+            container.innerHTML = '';
+            categories.forEach(cat => {
+                container.innerHTML += `
+                <div class="section">
+                    <span class="section-title">${cat.name}</span>
+                    <div id="list-${cat.id}" class="channel-list"></div>
+                    <input type="text" id="new-${cat.id}" placeholder="Paste YouTube Link or API Key...">
+                    <button class="btn btn-add" onclick="addLink('${cat.id}')">+ Add Source / Key</button>
+                </div>`;
+            });
+        }
+
+        // --- DATA LOGIC (FIXED) ---
+        async function loadSettings() {
+            try {
+                const res = await fetch('config.json?v=' + Date.now());
+                if(res.ok) {
+                    config = await res.json();
+                }
+            } catch(e) { console.log("Config not found, creating new."); }
+
+            // Safety check: ensure channels object exists
+            if (!config.channels) config.channels = {};
+
+            document.getElementById('loc-input').value = config.location_override || "";
+            categories.forEach(cat => { renderList(cat.id); });
+        }
+
+        // --- SMART LIST RENDER ---
+        function renderList(catId) {
+            const listDiv = document.getElementById('list-' + catId);
+            listDiv.innerHTML = "";
+            
+            // Safety check
+            if(!config.channels[catId]) config.channels[catId] = [];
+            
+            config.channels[catId].forEach((url, index) => {
+                let statusClass = "status-red";
+                let isLink = false;
+                
+                if(url.startsWith("http")) {
+                    statusClass = "status-green";
+                    isLink = true;
+                } else if(url.length > 10) {
+                    statusClass = "status-blue";
+                }
+
+                listDiv.innerHTML += `
+                <div class="channel-item">
+                    <div style="display:flex; align-items:center; overflow:hidden;">
+                        <span class="status-dot ${statusClass}" title="${isLink ? 'Online Link' : 'API Key / Code'}"></span>
+                        <span title="${url}" style="font-family:monospace; margin-left:5px;">
+                            ${url.length > 40 ? url.substring(0, 35) + '...' : url}
+                        </span>
+                    </div>
+                    <div style="flex-shrink:0;">
+                        ${isLink ? `<button class="btn btn-test" onclick="window.open('${url}', '_blank')"><i class="fa-solid fa-eye"></i></button>` : ''}
+                        <button class="btn btn-del" onclick="removeLink('${catId}', ${index})"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                </div>`;
+            });
+        }
+
+        window.addLink = function(catId) {
+            const inp = document.getElementById('new-' + catId);
+            if(inp.value) { 
+                if(!config.channels) config.channels = {}; // Double Safety
+                if(!config.channels[catId]) config.channels[catId] = [];
+                
+                config.channels[catId].push(inp.value.trim()); 
+                inp.value = ""; 
+                renderList(catId); 
+            }
+        }
+
+        window.removeLink = function(catId, index) {
+            config.channels[catId].splice(index, 1);
+            renderList(catId);
+        }
+
+        window.saveConfig = async function() {
+            config.location_override = document.getElementById('loc-input').value;
+            await fetch('/save_config', {
+                method: 'POST', headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(config)
+            });
+            document.getElementById('msg').innerText = "✅ Saved Successfully!";
+            setTimeout(() => document.getElementById('msg').innerText = "", 3000);
+        }
+
+        // --- PROMO LOGIC ---
+        async function loadNewsForPromo() {
+            try {
+                const res = await fetch('news_db.json?v=' + Date.now());
+                const data = await res.json();
+                newsData = data.news;
+                const select = document.getElementById('promo-news-list');
+                select.innerHTML = '<option value="">-- Select a News Item --</option>';
+                newsData.slice(0, 15).forEach((n, index) => {
+                    const opt = document.createElement('option');
+                    opt.value = index;
+                    opt.innerText = `[${n.category}] ${n.title.substring(0, 50)}...`;
+                    select.appendChild(opt);
+                });
+            } catch(e) {}
+        }
+
+        window.generatePromo = function() {
+            const index = document.getElementById('promo-news-list').value;
+            const lang = document.getElementById('promo-lang').value;
+            if(index === "") return;
+            const news = newsData[index];
+            const link = `https://lpbs.in/article.html?id=${news.id}`;
+            let text = "";
+            if(lang === 'bn') text = `🔥 ${news.title}\n\nভিডিও দেখুন 👇\n${link}\n\n#LPBSNews #${news.category}`;
+            else if(lang === 'hi') text = `⚡ ${news.title}\n\nवीडियो देखें 👇\n${link}\n\n#LPBSNews #${news.category}`;
+            else text = `🚨 ${news.title}\n\nWatch Now 👇\n${link}\n\n#LPBSNews #${news.category}`;
+            document.getElementById('prev-img').src = news.thumb;
+            document.getElementById('prev-text').value = text;
+            document.getElementById('preview-box').style.display = 'block';
+        }
+
+        window.copyText = function() {
+            document.getElementById('prev-text').select();
+            document.execCommand('copy');
+            alert("Copied!");
+        }
+
+        // --- VISITOR STATS ---
+        async function loadStats() {
+            try {
+                const res = await fetch('/get_stats');
+                const data = await res.json();
+                document.getElementById('count-today').innerText = data.today;
+                document.getElementById('count-total').innerText = data.total;
+            } catch(e) {}
+        }
+        setInterval(loadStats, 5000);
+
+        // Init Sequence
+        initCategories();
+        loadSettings(); 
+        loadNewsForPromo();
+        loadStats();
+    </script>
+</body>
+</html>

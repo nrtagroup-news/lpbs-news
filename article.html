@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LPBS News Reader</title>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXX" crossorigin="anonymous"></script>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root { --primary: #ff0000; --dark: #000000; --text: #e0e0e0; }
+        body { margin:0; background: var(--dark); color: var(--text); font-family:'Segoe UI', sans-serif; padding-bottom: 80px; -webkit-font-smoothing: antialiased; }
+        
+        /* HEADER (Consistent with Index) */
+        header { background: #050505; padding: 10px 20px; border-bottom: 3px solid var(--primary); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 99; }
+        .brand { font-size: 24px; font-weight: 900; margin: 0; text-transform: uppercase; color: white; }
+        .slogan { font-size: 11px; color: #ffeb3b; font-style: italic; font-weight: 700; display: block; }
+        
+        /* TRANSLATOR */
+        #google_translate_element { border: 1px solid #333; padding: 2px; border-radius: 4px; background: #222; }
+        .goog-te-combo { background: #333; color: white; border: none; outline: none; width: 100px; }
+        .goog-logo-link { display: none !important; } .goog-te-gadget { color: transparent !important; }
+
+        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
+        
+        /* BACK BUTTON */
+        .back-btn { color: #aaa; text-decoration: none; display: flex; align-items: center; gap: 8px; margin-bottom: 20px; font-weight: bold; font-size: 14px; transition: 0.3s; }
+        .back-btn:hover { color: var(--primary); }
+
+        /* VIDEO PLAYER */
+        .player-wrapper { position:relative; padding-bottom:56.25%; height:0; background:#111; border-radius: 12px; overflow:hidden; border: 1px solid #333; margin-bottom: 20px; box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
+        .player-wrapper iframe { position:absolute; top:0; left:0; width:100%; height:100%; border:none; }
+        
+        /* AD SPACE */
+        .ad-box { background: #111; border: 1px dashed #444; color: #555; text-align: center; padding: 15px; margin-bottom: 20px; font-size: 12px; border-radius: 8px; }
+
+        /* CONTENT */
+        h1 { font-size: 24px; line-height: 1.4; margin-bottom: 10px; color: #fff; font-weight: 800; }
+        .meta { color: var(--primary); font-size: 13px; font-weight: bold; margin-bottom: 20px; text-transform: uppercase; border-bottom: 1px solid #333; padding-bottom: 15px; display: flex; justify-content: space-between; }
+        
+        .desc-box { 
+            background: #151515; padding: 20px; border-radius: 10px; 
+            font-size: 18px; line-height: 1.8; color: #ddd; 
+            border-left: 5px solid var(--primary); 
+        }
+
+        /* FLOATING READER BUTTON */
+        .reader-fab {
+            position: fixed; bottom: 30px; right: 30px;
+            background: var(--primary); color: white;
+            width: 60px; height: 60px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; box-shadow: 0 5px 20px rgba(255,0,0,0.5);
+            cursor: pointer; z-index: 1000; transition: transform 0.3s;
+        }
+        .reader-fab:active { transform: scale(0.9); }
+        .reader-fab.speaking { background: white; color: red; animation: pulse 1.5s infinite; border: 2px solid red; }
+        @keyframes pulse { 0% {box-shadow: 0 0 0 0 rgba(255,0,0,0.7);} 70% {box-shadow: 0 0 0 15px rgba(255,0,0,0);} 100% {box-shadow: 0 0 0 0 rgba(255,0,0,0);} }
+
+        /* FOOTER */
+        footer { margin-top: 50px; border-top: 1px solid #333; padding-top: 20px; text-align: center; color: #666; font-size: 12px; }
+        .contact-mail { color: var(--primary); text-decoration: none; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div>
+            <div class="brand">LPBS <span style="color:var(--primary)">NEWS</span></div>
+            <span class="slogan">SABSE AAGE, SABSE TEJ ⚡</span>
+        </div>
+        <div id="google_translate_element"></div>
+    </header>
+
+    <div class="container">
+        <a href="index.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Back to All News</a>
+        
+        <div class="player-wrapper" id="video-box"></div>
+
+        <div class="ad-box">
+            📢 Advertisement Space (Google Ads)
+        </div>
+
+        <h1 id="title">Loading News...</h1>
+        <div class="meta">
+            <span id="source">LPBS AI</span>
+            <span id="time">Just Now</span>
+        </div>
+        
+        <div class="desc-box" id="desc">
+            Fetching detailed report from AI Robot...
+        </div>
+
+        <footer>
+            <p><strong>DISCLAIMER:</strong> Content is automated by AI. We do not claim ownership of videos.</p>
+            <p>Contact: <a href="mailto:nrtagroup@gmail.com" class="contact-mail">nrtagroup@gmail.com</a></p>
+            <p>© 2026 LPBS NEWS</p>
+        </footer>
+    </div>
+
+    <div class="reader-fab" onclick="toggleReader()" id="fab-btn" title="Listen to News">
+        <i class="fa-solid fa-headphones"></i>
+    </div>
+
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+          new google.translate.TranslateElement({
+            pageLanguage: 'en', 
+            includedLanguages: 'bn,hi,en,ta,te', 
+            layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+          }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+    <script>
+        const params = new URLSearchParams(window.location.search);
+        const id = params.get('id');
+        let fullText = "";
+        let isSpeaking = false;
+        let utterance = null;
+
+        // ডাটা লোড
+        fetch('news_db.json')
+            .then(res => res.json())
+            .then(data => {
+                const news = data.news.find(n => n.id === id);
+                if(news) {
+                    document.getElementById('title').innerText = news.title;
+                    document.getElementById('source').innerText = news.source;
+                    document.getElementById('time').innerText = news.time;
+                    document.getElementById('desc').innerText = news.desc;
+                    
+                    // ভিডিও সেট করা
+                    const embedUrl = news.video_url || `https://www.youtube.com/embed?listType=search&list=${news.title}`;
+                    document.getElementById('video-box').innerHTML = `<iframe src="${embedUrl}" allowfullscreen></iframe>`;
+
+                    // পড়ার জন্য টেক্সট রেডি করা
+                    fullText = news.title + ". " + news.desc;
+                } else {
+                    document.getElementById('title').innerText = "News not found!";
+                    document.getElementById('desc').innerText = "This news might have been expired (48h limit).";
+                }
+            });
+
+        // স্মার্ট রিডার (Smart Reader)
+        function toggleReader() {
+            const fab = document.getElementById('fab-btn');
+            const icon = fab.querySelector('i');
+
+            if (isSpeaking) {
+                // থামালে
+                window.speechSynthesis.cancel();
+                isSpeaking = false;
+                fab.classList.remove('speaking');
+                icon.className = "fa-solid fa-headphones";
+            } else {
+                // শুরু করলে
+                window.speechSynthesis.cancel(); 
+                
+                // গুগল ট্রান্সলেট করা থাকলেও, আমরা অরিজিনাল টেক্সট পড়ার চেষ্টা করব, 
+                // তবে ব্রাউজার সাপোর্ট করলে ডিটেক্ট করা ল্যাঙ্গুয়েজ ব্যবহার করব।
+                utterance = new SpeechSynthesisUtterance(fullText);
+                
+                // বাংলা ডিটেকশন (লজিক)
+                if(fullText.match(/[\u0980-\u09FF]/)) {
+                    utterance.lang = 'bn-IN'; // বাংলা ভয়েস
+                } else if(fullText.match(/[\u0900-\u097F]/)) {
+                    utterance.lang = 'hi-IN'; // হিন্দি ভয়েস
+                } else {
+                    utterance.lang = 'en-US'; // ইংলিশ ভয়েস
+                }
+
+                // কথা শেষ হলে
+                utterance.onend = function() {
+                    isSpeaking = false;
+                    fab.classList.remove('speaking');
+                    icon.className = "fa-solid fa-headphones";
+                };
+
+                window.speechSynthesis.speak(utterance);
+                isSpeaking = true;
+                fab.classList.add('speaking');
+                icon.className = "fa-solid fa-stop";
+            }
+        }
+    </script>
+</body>
+</html>
