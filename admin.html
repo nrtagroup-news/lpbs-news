@@ -2,292 +2,347 @@
 <html lang="bn">
 <head>
     <meta charset="UTF-8">
-    <title>LPBS Admin Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LPBS Super Admin</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { background: #121212; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; padding: 20px; margin: 0; }
+        body { background: #0f0f0f; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; padding: 15px; margin: 0; }
         
-        /* SECURITY LOCK */
-        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: black; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .login-box { background: #1e1e1e; padding: 40px; border-radius: 12px; border: 2px solid #d32f2f; text-align: center; width: 300px; box-shadow: 0 0 30px rgba(211, 47, 47, 0.3); }
-        .login-input { width: 100%; padding: 15px; margin: 15px 0; background: #333; border: 1px solid #555; color: white; font-size: 18px; text-align: center; border-radius: 6px; }
-        .btn-unlock { background: #d32f2f; color: white; width: 100%; padding: 12px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 6px; }
+        /* SECURITY LAYER */
+        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .login-box { background: #1a1a1a; padding: 30px; border-radius: 15px; border: 1px solid #d32f2f; text-align: center; width: 85%; max-width: 320px; box-shadow: 0 0 40px rgba(211, 47, 47, 0.4); }
+        .login-input { width: 100%; padding: 15px; margin: 15px 0; background: #222; border: 1px solid #444; color: white; font-size: 20px; text-align: center; border-radius: 8px; letter-spacing: 5px; font-weight: bold; }
+        .btn-unlock { background: #d32f2f; color: white; width: 100%; padding: 12px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 8px; transition: 0.3s; }
+        
+        /* MAIN LAYOUT */
+        .container { max-width: 800px; margin: 0 auto; display: none; padding-bottom: 80px; }
+        h2 { border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+        
+        /* CARDS */
+        .card { background: #1e1e1e; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #333; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .card-header { font-size: 16px; font-weight: bold; color: #aaa; margin-bottom: 15px; display: flex; align-items: center; text-transform: uppercase; letter-spacing: 1px; }
+        .card-icon { margin-right: 10px; color: #d32f2f; }
 
-        /* MAIN PANEL */
-        .container { max-width: 900px; margin: 0 auto; background: #1e1e1e; padding: 25px; border-radius: 12px; display: none; }
-        h2 { border-bottom: 3px solid #d32f2f; padding-bottom: 10px; color: white; }
-        
-        /* SECTIONS */
-        .section { margin-bottom: 25px; padding: 20px; background: #252525; border-radius: 10px; border: 1px solid #333; }
-        .section-title { font-size: 18px; font-weight: bold; color: #bbb; margin-bottom: 15px; display: block; border-left: 4px solid #d32f2f; padding-left: 10px; text-transform: uppercase; }
-        
-        /* INPUTS & LISTS */
-        input[type="text"], select { width: 100%; padding: 12px; background: #333; border: 1px solid #444; color: white; margin-bottom: 10px; border-radius: 6px; box-sizing: border-box; }
-        
-        .channel-list { max-height: 200px; overflow-y: auto; background: #111; padding: 10px; margin-bottom: 10px; border-radius: 6px; border: 1px solid #333; }
-        .channel-item { display: flex; justify-content: space-between; align-items: center; padding: 10px; border-bottom: 1px solid #222; font-size: 13px; background: #1a1a1a; margin-bottom: 5px; border-radius: 4px; }
-        .channel-item:last-child { margin-bottom: 0; }
-        
-        /* STATUS LIGHTS */
-        .status-dot { height: 10px; width: 10px; border-radius: 50%; display: inline-block; margin-right: 8px; box-shadow: 0 0 5px rgba(255,255,255,0.2); }
-        .status-green { background-color: #00ff00; box-shadow: 0 0 8px #00ff00; } /* Online/Link */
-        .status-blue { background-color: #00ccff; box-shadow: 0 0 8px #00ccff; } /* API Key */
-        .status-red { background-color: #ff0000; box-shadow: 0 0 8px #ff0000; } /* Error */
+        /* LIVE STATS */
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center; }
+        .stat-box { background: #252525; padding: 15px; border-radius: 10px; border: 1px solid #333; }
+        .stat-num { font-size: 24px; font-weight: bold; color: #fff; }
+        .stat-label { font-size: 12px; color: #888; margin-top: 5px; }
+        .pulse { animation: pulse-green 2s infinite; }
+        @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(0, 255, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0); } }
 
+        /* VIRAL PROMO MAKER */
+        .promo-box { border: 1px dashed #ff6f00; background: #1a1005; }
+        .preview-area { display: none; margin-top: 15px; background: #000; padding: 10px; border-radius: 8px; border: 1px solid #444; }
+        .preview-img { width: 100%; border-radius: 8px; margin-bottom: 10px; border: 1px solid #333; }
+        
+        /* FORMS */
+        select, input[type="text"], textarea { width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px; box-sizing: border-box; margin-bottom: 10px; font-size: 14px; }
+        
+        /* CHANNEL LIST */
+        .channel-list { max-height: 250px; overflow-y: auto; background: #151515; border-radius: 6px; margin-bottom: 10px; }
+        .channel-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #2a2a2a; font-size: 13px; }
+        .channel-item:last-child { border-bottom: none; }
+        
         /* BUTTONS */
-        .btn { padding: 8px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-left: 5px; }
-        .btn-add { background: #1976d2; color: white; width: 100%; margin-top: 5px; }
-        .btn-del { background: #d32f2f; color: white; padding: 5px 10px; }
-        .btn-test { background: #444; color: white; padding: 5px 10px; }
-        .btn-test:hover { background: #fff; color: black; }
-        .btn-save { background: #2e7d32; color: white; width: 100%; padding: 15px; font-size: 18px; margin-top: 20px; position: sticky; bottom: 20px; box-shadow: 0 -5px 20px rgba(0,0,0,0.5); z-index: 100; }
-        
-        /* PROMO BOX */
-        .promo-box { border: 2px dashed #d32f2f; background: #1a0505; }
-        .preview-area { display: none; margin-top: 15px; background: #000; padding: 15px; border-radius: 8px; }
-        .preview-img { width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; }
-        textarea { width: 100%; background: #222; color: #fff; border: 1px solid #444; padding: 10px; border-radius: 6px; box-sizing: border-box; }
-        .btn-magic { background: linear-gradient(45deg, #d32f2f, #ff6f00); color: white; width: 100%; padding: 12px; margin-top: 10px; }
+        .btn { border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; }
+        .btn-add { background: #1565c0; color: white; width: 100%; }
+        .btn-del { background: #c62828; color: white; padding: 5px 10px; border-radius: 4px; }
+        .btn-magic { background: linear-gradient(135deg, #d32f2f, #ff6f00); color: white; width: 100%; font-size: 16px; padding: 12px; margin-top: 5px; box-shadow: 0 4px 15px rgba(211, 47, 47, 0.3); }
+        .btn-save { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 600px; background: #2e7d32; color: white; padding: 15px; font-size: 18px; border-radius: 50px; box-shadow: 0 5px 20px rgba(0,0,0,0.5); z-index: 100; display: flex; align-items: center; justify-content: center; gap: 10px; }
+
+        /* LOADING SPINNER */
+        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #d32f2f; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; margin-right: 10px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
     <div id="login-overlay">
         <div class="login-box">
-            <h2 style="justify-content:center; border:none; color:#d32f2f;"><i class="fa-solid fa-lock"></i> SECURE ACCESS</h2>
-            <input type="password" id="pass-input" class="login-input" placeholder="Enter Code">
-            <button class="btn-unlock" onclick="checkPass()">UNLOCK</button>
-            <p id="err-msg" style="color:red; margin-top:10px; display:none;">❌ Wrong Code!</p>
+            <h2 style="justify-content:center; border:none; color:#d32f2f; margin:0;"><i class="fa-solid fa-user-secret"></i> ADMIN</h2>
+            <p style="color:#666; font-size:12px; margin-top:5px;">System Security Active</p>
+            <input type="password" id="pass-input" class="login-input" placeholder="CODE">
+            <button class="btn-unlock" onclick="checkPass()">ACCESS PANEL</button>
+            <p id="err-msg" style="color:#ff3333; margin-top:15px; display:none; font-weight:bold;">⛔ ACCESS DENIED</p>
         </div>
     </div>
 
     <div class="container" id="main-panel">
-        <h2>🛠️ LPBS CONTROL CENTER</h2>
+        <h2 style="color:white;">
+            <span><i class="fa-solid fa-robot" style="color:#00e676;"></i> LPBS AI CONTROL</span>
+            <span style="font-size:12px; background:#333; padding:5px 10px; border-radius:20px;">v2.0</span>
+        </h2>
 
-        <div class="section" style="background: linear-gradient(45deg, #004d40, #00695c); border: 1px solid #00ffcc;">
-            <span class="section-title" style="border-color: #00ffcc; color: #00ffcc;">👥 Visitor Traffic</span>
-            <div style="display: flex; justify-content: space-around; text-align: center; margin-top: 10px;">
-                <div>
-                    <div style="font-size: 30px; font-weight: bold; color: white;" id="count-today">0</div>
-                    <div style="color: #ccc; font-size: 14px;">Today's Visitors</div>
+        <div class="card" style="border-top: 4px solid #00e676;">
+            <div class="card-header"><i class="fa-solid fa-chart-line card-icon"></i> Live Traffic</div>
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-num" style="color:#00e676;" id="count-today">0</div>
+                    <div class="stat-label">TODAY</div>
                 </div>
-                <div style="border-left: 1px solid #ccc;"></div>
-                <div>
-                    <div style="font-size: 30px; font-weight: bold; color: yellow;" id="count-total">0</div>
-                    <div style="color: #ccc; font-size: 14px;">Total Lifetime</div>
+                <div class="stat-box">
+                    <div class="stat-num" style="color:#ffea00;" id="count-total">0</div>
+                    <div class="stat-label">LIFETIME</div>
                 </div>
             </div>
-            <button onclick="loadStats()" style="background:none; border:none; color:#00ffcc; width:100%; margin-top:10px; cursor:pointer;">🔄 Refresh Stats</button>
+            <div style="text-align:center; margin-top:10px; font-size:12px; color:#555;">
+                <i class="fa-solid fa-circle pulse" style="color:#00e676; font-size:8px;"></i> System is Online
+            </div>
         </div>
 
-        <div class="section promo-box">
-            <span class="section-title">📢 AI Social Manager</span>
-            <label>Select News:</label>
-            <select id="promo-news-list"><option>Loading...</option></select>
-            <label>Language:</label>
-            <select id="promo-lang">
-                <option value="bn">Bangla (বাংলা)</option>
-                <option value="hi">Hindi (हिंदी)</option>
-                <option value="en">English</option>
-            </select>
-            <button class="btn btn-magic" onclick="generatePromo()">✨ Create Viral Post</button>
+        <div class="card promo-box">
+            <div class="card-header" style="color:#ff9800;"><i class="fa-solid fa-fire card-icon"></i> Viral Post Maker</div>
+            
+            <label style="font-size:12px; color:#aaa;">Select Trending News:</label>
+            <select id="promo-news-list" onchange="resetPreview()"><option>Loading News...</option></select>
+            
+            <div style="display:flex; gap:10px;">
+                <select id="promo-lang">
+                    <option value="bn">Bangla (বাংলা)</option>
+                    <option value="hi">Hindi (हिंदी)</option>
+                    <option value="en">English</option>
+                </select>
+            </div>
+
+            <button class="btn btn-magic" id="gen-btn" onclick="generatePromo()">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> GENERATE VIRAL IMAGE
+            </button>
             
             <div id="preview-box" class="preview-area">
+                <p style="color:#ccc; font-size:12px; text-align:center; margin:0 0 5px 0;">Preview:</p>
                 <img id="prev-img" class="preview-img" src="">
-                <textarea id="prev-text" rows="6"></textarea>
-                <button class="btn" style="background:white; color:black; width:100%; margin-top:5px;" onclick="copyText()">Copy Text</button>
+                <textarea id="prev-text" rows="5"></textarea>
+                <button class="btn" style="background:white; color:black; width:100%; margin-top:5px;" onclick="copyText()">
+                    <i class="fa-solid fa-copy"></i> Copy Text & Download
+                </button>
             </div>
         </div>
 
-        <div class="section">
-            <span class="section-title">📍 Force Location</span>
-            <input type="text" id="loc-input" placeholder="e.g. Agartala, Tripura">
+        <div class="card">
+            <div class="card-header"><i class="fa-solid fa-map-location-dot card-icon"></i> Location Override</div>
+            <input type="text" id="loc-input" placeholder="e.g. Kolkata, West Bengal">
         </div>
 
         <div id="category-container"></div>
 
-        <button class="btn-save" onclick="saveConfig()">💾 SAVE ALL CHANGES</button>
-        <p id="msg" style="text-align:center; color:#0f0; margin-top:10px;"></p>
+        <button class="btn-save" onclick="saveConfig()">
+            <i class="fa-solid fa-floppy-disk"></i> SAVE CHANGES
+        </button>
+        <div id="msg" style="text-align:center; color:#00e676; margin-top:10px; display:none; position:fixed; bottom:80px; left:0; width:100%; background:rgba(0,0,0,0.8); padding:5px;"></div>
     </div>
 
     <script>
-        // --- CONFIGURATION ---
+        // --- DATA & CONFIG ---
         const categories = [
-            { id: 'live', name: '🔴 Live TV & API Keys' },
-            { id: 'breaking', name: '🚨 Breaking News Sources' },
-            { id: 'sports', name: '🏏 Sports Channels' },
-            { id: 'tech', name: '📱 Tech & Gadgets' },
-            { id: 'entertainment', name: '🎬 Entertainment' },
-            { id: 'movie', name: '☁️ full movie' },
-            { id: 'viral', name: '⚡ Viral & Trending' }
+            { id: 'live', name: '🔴 Live Channels' },
+            { id: 'breaking', name: '🚨 Breaking News' },
+            { id: 'sports', name: '🏏 Sports' },
+            { id: 'entertainment', name: '🎬 Cinema' },
+            { id: 'viral', name: '⚡ Viral' }
         ];
 
-        let config = { channels: {} }; // Fixed Initialization
+        let config = { channels: {} };
         let newsData = [];
 
-        // --- SECURITY ---
-        if(sessionStorage.getItem('admin_unlocked') === 'true') {
+        // --- AUTHENTICATION ---
+        // Checks if previously unlocked in this session
+        if(sessionStorage.getItem('lpbs_admin') === 'ok') {
             document.getElementById('login-overlay').style.display = 'none';
             document.getElementById('main-panel').style.display = 'block';
         }
+
         function checkPass() {
-            if(document.getElementById('pass-input').value === '33982625') {
-                sessionStorage.setItem('admin_unlocked', 'true');
+            const pass = document.getElementById('pass-input').value;
+            if(pass === '33982625') { // YOUR PASSWORD
+                sessionStorage.setItem('lpbs_admin', 'ok');
                 document.getElementById('login-overlay').style.display = 'none';
                 document.getElementById('main-panel').style.display = 'block';
             } else {
                 document.getElementById('err-msg').style.display = 'block';
+                document.getElementById('pass-input').value = "";
             }
         }
 
-        // --- DYNAMIC RENDER ---
+        // --- INITIALIZATION ---
         function initCategories() {
             const container = document.getElementById('category-container');
             container.innerHTML = '';
             categories.forEach(cat => {
                 container.innerHTML += `
-                <div class="section">
-                    <span class="section-title">${cat.name}</span>
+                <div class="card">
+                    <div class="card-header">${cat.name}</div>
                     <div id="list-${cat.id}" class="channel-list"></div>
-                    <input type="text" id="new-${cat.id}" placeholder="Paste YouTube Link or API Key...">
-                    <button class="btn btn-add" onclick="addLink('${cat.id}')">+ Add Source / Key</button>
+                    <div style="display:flex; gap:5px; margin-top:10px;">
+                        <input type="text" id="new-${cat.id}" placeholder="Paste Link here..." style="margin-bottom:0;">
+                        <button class="btn btn-add" style="width:auto; padding:0 20px;" onclick="addLink('${cat.id}')">ADD</button>
+                    </div>
                 </div>`;
             });
         }
 
-        // --- DATA LOGIC (FIXED) ---
-        async function loadSettings() {
+        // --- CORE FUNCTIONS ---
+        async function loadData() {
+            // 1. Load Config
             try {
                 const res = await fetch('config.json?v=' + Date.now());
-                if(res.ok) {
-                    config = await res.json();
-                }
-            } catch(e) { console.log("Config not found, creating new."); }
-
-            // Safety check: ensure channels object exists
-            if (!config.channels) config.channels = {};
-
-            document.getElementById('loc-input').value = config.location_override || "";
-            categories.forEach(cat => { renderList(cat.id); });
-        }
-
-        // --- SMART LIST RENDER ---
-        function renderList(catId) {
-            const listDiv = document.getElementById('list-' + catId);
-            listDiv.innerHTML = "";
-            
-            // Safety check
-            if(!config.channels[catId]) config.channels[catId] = [];
-            
-            config.channels[catId].forEach((url, index) => {
-                let statusClass = "status-red";
-                let isLink = false;
+                if(res.ok) config = await res.json();
+                if(!config.channels) config.channels = {};
                 
-                if(url.startsWith("http")) {
-                    statusClass = "status-green";
-                    isLink = true;
-                } else if(url.length > 10) {
-                    statusClass = "status-blue";
-                }
+                document.getElementById('loc-input').value = config.location_override || "";
+                categories.forEach(cat => renderList(cat.id));
+            } catch(e) { console.error("Config Load Error", e); }
 
-                listDiv.innerHTML += `
-                <div class="channel-item">
-                    <div style="display:flex; align-items:center; overflow:hidden;">
-                        <span class="status-dot ${statusClass}" title="${isLink ? 'Online Link' : 'API Key / Code'}"></span>
-                        <span title="${url}" style="font-family:monospace; margin-left:5px;">
-                            ${url.length > 40 ? url.substring(0, 35) + '...' : url}
-                        </span>
-                    </div>
-                    <div style="flex-shrink:0;">
-                        ${isLink ? `<button class="btn btn-test" onclick="window.open('${url}', '_blank')"><i class="fa-solid fa-eye"></i></button>` : ''}
-                        <button class="btn btn-del" onclick="removeLink('${catId}', ${index})"><i class="fa-solid fa-trash"></i></button>
-                    </div>
-                </div>`;
-            });
-        }
-
-        window.addLink = function(catId) {
-            const inp = document.getElementById('new-' + catId);
-            if(inp.value) { 
-                if(!config.channels) config.channels = {}; // Double Safety
-                if(!config.channels[catId]) config.channels[catId] = [];
-                
-                config.channels[catId].push(inp.value.trim()); 
-                inp.value = ""; 
-                renderList(catId); 
-            }
-        }
-
-        window.removeLink = function(catId, index) {
-            config.channels[catId].splice(index, 1);
-            renderList(catId);
-        }
-
-        window.saveConfig = async function() {
-            config.location_override = document.getElementById('loc-input').value;
-            await fetch('/save_config', {
-                method: 'POST', headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(config)
-            });
-            document.getElementById('msg').innerText = "✅ Saved Successfully!";
-            setTimeout(() => document.getElementById('msg').innerText = "", 3000);
-        }
-
-        // --- PROMO LOGIC ---
-        async function loadNewsForPromo() {
-            try {
-                const res = await fetch('news_db.json?v=' + Date.now());
-                const data = await res.json();
-                newsData = data.news;
-                const select = document.getElementById('promo-news-list');
-                select.innerHTML = '<option value="">-- Select a News Item --</option>';
-                newsData.slice(0, 15).forEach((n, index) => {
-                    const opt = document.createElement('option');
-                    opt.value = index;
-                    opt.innerText = `[${n.category}] ${n.title.substring(0, 50)}...`;
-                    select.appendChild(opt);
-                });
-            } catch(e) {}
-        }
-
-        window.generatePromo = function() {
-            const index = document.getElementById('promo-news-list').value;
-            const lang = document.getElementById('promo-lang').value;
-            if(index === "") return;
-            const news = newsData[index];
-            const link = `https://lpbs.in/article.html?id=${news.id}`;
-            let text = "";
-            if(lang === 'bn') text = `🔥 ${news.title}\n\nভিডিও দেখুন 👇\n${link}\n\n#LPBSNews #${news.category}`;
-            else if(lang === 'hi') text = `⚡ ${news.title}\n\nवीडियो देखें 👇\n${link}\n\n#LPBSNews #${news.category}`;
-            else text = `🚨 ${news.title}\n\nWatch Now 👇\n${link}\n\n#LPBSNews #${news.category}`;
-            document.getElementById('prev-img').src = news.thumb;
-            document.getElementById('prev-text').value = text;
-            document.getElementById('preview-box').style.display = 'block';
-        }
-
-        window.copyText = function() {
-            document.getElementById('prev-text').select();
-            document.execCommand('copy');
-            alert("Copied!");
-        }
-
-        // --- VISITOR STATS ---
-        async function loadStats() {
+            // 2. Load Stats
             try {
                 const res = await fetch('/get_stats');
                 const data = await res.json();
                 document.getElementById('count-today').innerText = data.today;
                 document.getElementById('count-total').innerText = data.total;
             } catch(e) {}
-        }
-        setInterval(loadStats, 5000);
 
-        // Init Sequence
+            // 3. Load News for Promo
+            try {
+                const res = await fetch('news_db.json?v=' + Date.now());
+                const data = await res.json();
+                newsData = data.news || [];
+                const select = document.getElementById('promo-news-list');
+                select.innerHTML = '<option value="">-- Select a News to Viral --</option>';
+                newsData.slice(0, 20).forEach((n, idx) => {
+                    const opt = document.createElement('option');
+                    opt.value = idx;
+                    opt.innerText = `[${n.time}] ${n.title.substring(0, 60)}...`;
+                    select.appendChild(opt);
+                });
+            } catch(e) {}
+        }
+
+        function renderList(catId) {
+            const listDiv = document.getElementById('list-' + catId);
+            listDiv.innerHTML = "";
+            const links = config.channels[catId] || [];
+            
+            if(links.length === 0) {
+                listDiv.innerHTML = '<div style="padding:10px; color:#555; text-align:center;">No links added</div>';
+                return;
+            }
+
+            links.forEach((url, idx) => {
+                listDiv.innerHTML += `
+                <div class="channel-item">
+                    <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:80%;">
+                        <i class="fa-brands fa-youtube" style="color:red; margin-right:5px;"></i> ${url}
+                    </span>
+                    <button class="btn btn-del" onclick="removeLink('${catId}', ${idx})"><i class="fa-solid fa-trash"></i></button>
+                </div>`;
+            });
+        }
+
+        // --- ACTIONS ---
+        window.addLink = function(catId) {
+            const inp = document.getElementById('new-' + catId);
+            const val = inp.value.trim();
+            if(val) {
+                if(!config.channels[catId]) config.channels[catId] = [];
+                config.channels[catId].push(val);
+                inp.value = "";
+                renderList(catId);
+            }
+        }
+
+        window.removeLink = function(catId, idx) {
+            config.channels[catId].splice(idx, 1);
+            renderList(catId);
+        }
+
+        window.saveConfig = async function() {
+            const btn = document.querySelector('.btn-save');
+            btn.innerHTML = '<div class="loader"></div> SAVING...';
+            
+            config.location_override = document.getElementById('loc-input').value;
+            
+            await fetch('/save_config', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(config)
+            });
+
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> SAVED!';
+                btn.style.background = '#00e676';
+                setTimeout(() => {
+                    btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> SAVE CHANGES';
+                    btn.style.background = '#2e7d32';
+                }, 2000);
+            }, 1000);
+        }
+
+        // --- VIRAL PROMO LOGIC (NEW) ---
+        function resetPreview() {
+            document.getElementById('preview-box').style.display = 'none';
+        }
+
+        window.generatePromo = async function() {
+            const idx = document.getElementById('promo-news-list').value;
+            const lang = document.getElementById('promo-lang').value;
+            
+            if(idx === "") { alert("Please select a news first!"); return; }
+            
+            const btn = document.getElementById('gen-btn');
+            btn.innerHTML = '<div class="loader"></div> Processing Image...';
+            btn.disabled = true;
+
+            const news = newsData[idx];
+
+            // 1. Send Request to Server
+            try {
+                const res = await fetch('/create_promo', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        title: news.title,
+                        thumb: news.thumb,
+                        lang: lang
+                    })
+                });
+                
+                const result = await res.json();
+                
+                if(result.status === 'success') {
+                    // 2. Show Generated Image
+                    const imgUrl = result.image_url; // From Python
+                    const link = `https://news.lpbs.in/article.html?id=${news.id}`;
+                    const hashtags = result.hashtags;
+                    
+                    let caption = "";
+                    if(lang === 'bn') caption = `🔥 ব্রেকিং নিউজ: ${news.title}\n\nভিডিওটি দেখুন 👇\n${link}\n\n${hashtags}`;
+                    else if(lang === 'hi') caption = `⚡ ब्रेकिंग न्यूज़: ${news.title}\n\nवीडियो देखें 👇\n${link}\n\n${hashtags}`;
+                    else caption = `🚨 BREAKING: ${news.title}\n\nWatch Video 👇\n${link}\n\n${hashtags}`;
+
+                    document.getElementById('prev-img').src = imgUrl;
+                    document.getElementById('prev-text').value = caption;
+                    document.getElementById('preview-box').style.display = 'block';
+                } else {
+                    alert("Error: Could not generate image. Check server logs.");
+                }
+            } catch(e) {
+                alert("Server Error! Is the robot running?");
+            }
+
+            btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> GENERATE VIRAL IMAGE';
+            btn.disabled = false;
+        }
+
+        window.copyText = function() {
+            const textArea = document.getElementById('prev-text');
+            textArea.select();
+            document.execCommand('copy');
+            alert("Caption Copied! Now save the image and post on Facebook.");
+        }
+
+        // Start
         initCategories();
-        loadSettings(); 
-        loadNewsForPromo();
-        loadStats();
+        loadData();
     </script>
 </body>
-
 </html>
