@@ -49,6 +49,9 @@
         .btn-add { background: #1565c0; color: white; width: 100%; }
         .btn-del { background: #c62828; color: white; padding: 5px 10px; border-radius: 4px; }
         .btn-magic { background: linear-gradient(135deg, #d32f2f, #ff6f00); color: white; width: 100%; font-size: 16px; padding: 12px; margin-top: 5px; box-shadow: 0 4px 15px rgba(211, 47, 47, 0.3); }
+        .btn-copy { background: #333; color: white; width: 100%; margin-top: 5px; border: 1px solid #555; }
+        .btn-copy:active { background: #00e676; border-color: #00e676; }
+        
         .btn-save { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 600px; background: #2e7d32; color: white; padding: 15px; font-size: 18px; border-radius: 50px; box-shadow: 0 5px 20px rgba(0,0,0,0.5); z-index: 100; display: flex; align-items: center; justify-content: center; gap: 10px; }
 
         /* LOADING SPINNER */
@@ -71,7 +74,7 @@
     <div class="container" id="main-panel">
         <h2 style="color:white;">
             <span><i class="fa-solid fa-robot" style="color:#00e676;"></i> LPBS AI CONTROL</span>
-            <span style="font-size:12px; background:#333; padding:5px 10px; border-radius:20px;">v2.0</span>
+            <span style="font-size:12px; background:#333; padding:5px 10px; border-radius:20px;">v2.5 (FB Logic)</span>
         </h2>
 
         <div class="card" style="border-top: 4px solid #00e676;">
@@ -110,11 +113,18 @@
             </button>
             
             <div id="preview-box" class="preview-area">
-                <p style="color:#ccc; font-size:12px; text-align:center; margin:0 0 5px 0;">Preview:</p>
                 <img id="prev-img" class="preview-img" src="">
-                <textarea id="prev-text" rows="5"></textarea>
-                <button class="btn" style="background:white; color:black; width:100%; margin-top:5px;" onclick="copyText()">
-                    <i class="fa-solid fa-copy"></i> Copy Text & Download
+                
+                <label style="color:#aaa; font-size:12px;">1. Post Caption (Copy This):</label>
+                <textarea id="prev-caption" rows="5"></textarea>
+                <button class="btn btn-copy" onclick="copyCaption()">
+                    <i class="fa-solid fa-copy"></i> Copy Caption
+                </button>
+
+                <label style="color:#00e676; font-size:12px; margin-top:10px; display:block;">2. Link for First Comment:</label>
+                <input type="text" id="prev-link" style="border-color:#00e676; color:#00e676; font-weight:bold;">
+                <button class="btn btn-copy" onclick="copyLink()">
+                    <i class="fa-solid fa-link"></i> Copy Link
                 </button>
             </div>
         </div>
@@ -133,20 +143,20 @@
     </div>
 
     <script>
-        // --- DATA & CONFIG ---
+        // --- UPDATED CATEGORIES (YOUR REQUEST) ---
         const categories = [
             { id: 'live', name: '🔴 Live Channels' },
             { id: 'breaking', name: '🚨 Breaking News' },
             { id: 'sports', name: '🏏 Sports' },
-            { id: 'entertainment', name: '🎬 Cinema' },
-            { id: 'viral', name: '⚡ Viral' }
+            { id: 'entertainment', name: '🎭 Entertainment' },  // Renamed
+            { id: 'movies', name: '🍿 Movies' },            // New Category
+            { id: 'viral', name: '⚡ Viral (FB/YouTube)' }   // Facebook Supported
         ];
 
         let config = { channels: {} };
         let newsData = [];
 
         // --- AUTHENTICATION ---
-        // Checks if previously unlocked in this session
         if(sessionStorage.getItem('lpbs_admin') === 'ok') {
             document.getElementById('login-overlay').style.display = 'none';
             document.getElementById('main-panel').style.display = 'block';
@@ -154,7 +164,7 @@
 
         function checkPass() {
             const pass = document.getElementById('pass-input').value;
-            if(pass === '33982625') { // YOUR PASSWORD
+            if(pass === '33982625') { 
                 sessionStorage.setItem('lpbs_admin', 'ok');
                 document.getElementById('login-overlay').style.display = 'none';
                 document.getElementById('main-panel').style.display = 'block';
@@ -169,12 +179,15 @@
             const container = document.getElementById('category-container');
             container.innerHTML = '';
             categories.forEach(cat => {
+                let placeholder = "Paste YouTube Link...";
+                if(cat.id === 'viral') placeholder = "Paste Facebook or YouTube Link...";
+                
                 container.innerHTML += `
                 <div class="card">
                     <div class="card-header">${cat.name}</div>
                     <div id="list-${cat.id}" class="channel-list"></div>
                     <div style="display:flex; gap:5px; margin-top:10px;">
-                        <input type="text" id="new-${cat.id}" placeholder="Paste Link here..." style="margin-bottom:0;">
+                        <input type="text" id="new-${cat.id}" placeholder="${placeholder}" style="margin-bottom:0;">
                         <button class="btn btn-add" style="width:auto; padding:0 20px;" onclick="addLink('${cat.id}')">ADD</button>
                     </div>
                 </div>`;
@@ -183,7 +196,6 @@
 
         // --- CORE FUNCTIONS ---
         async function loadData() {
-            // 1. Load Config
             try {
                 const res = await fetch('config.json?v=' + Date.now());
                 if(res.ok) config = await res.json();
@@ -193,7 +205,6 @@
                 categories.forEach(cat => renderList(cat.id));
             } catch(e) { console.error("Config Load Error", e); }
 
-            // 2. Load Stats
             try {
                 const res = await fetch('/get_stats');
                 const data = await res.json();
@@ -201,7 +212,6 @@
                 document.getElementById('count-total').innerText = data.total;
             } catch(e) {}
 
-            // 3. Load News for Promo
             try {
                 const res = await fetch('news_db.json?v=' + Date.now());
                 const data = await res.json();
@@ -228,10 +238,15 @@
             }
 
             links.forEach((url, idx) => {
+                let icon = '<i class="fa-brands fa-youtube" style="color:red; margin-right:5px;"></i>';
+                if(url.includes('facebook') || url.includes('fb.watch')) {
+                    icon = '<i class="fa-brands fa-facebook" style="color:#1877F2; margin-right:5px;"></i>';
+                }
+
                 listDiv.innerHTML += `
                 <div class="channel-item">
                     <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:80%;">
-                        <i class="fa-brands fa-youtube" style="color:red; margin-right:5px;"></i> ${url}
+                        ${icon} ${url}
                     </span>
                     <button class="btn btn-del" onclick="removeLink('${catId}', ${idx})"><i class="fa-solid fa-trash"></i></button>
                 </div>`;
@@ -277,7 +292,7 @@
             }, 1000);
         }
 
-        // --- VIRAL PROMO LOGIC (NEW) ---
+        // --- VIRAL PROMO LOGIC (FIRST COMMENT SYSTEM) ---
         function resetPreview() {
             document.getElementById('preview-box').style.display = 'none';
         }
@@ -289,12 +304,11 @@
             if(idx === "") { alert("Please select a news first!"); return; }
             
             const btn = document.getElementById('gen-btn');
-            btn.innerHTML = '<div class="loader"></div> Processing Image...';
+            btn.innerHTML = '<div class="loader"></div> Processing...';
             btn.disabled = true;
 
             const news = newsData[idx];
 
-            // 1. Send Request to Server
             try {
                 const res = await fetch('/create_promo', {
                     method: 'POST',
@@ -309,35 +323,46 @@
                 const result = await res.json();
                 
                 if(result.status === 'success') {
-                    // 2. Show Generated Image
-                    const imgUrl = result.image_url; // From Python
+                    const imgUrl = result.image_url; 
                     const link = `https://news.lpbs.in/article.html?id=${news.id}`;
                     const hashtags = result.hashtags;
                     
+                    // SMART CAPTION LOGIC (Text points to First Comment)
                     let caption = "";
-                    if(lang === 'bn') caption = `🔥 ব্রেকিং নিউজ: ${news.title}\n\nভিডিওটি দেখুন 👇\n${link}\n\n${hashtags}`;
-                    else if(lang === 'hi') caption = `⚡ ब्रेकिंग न्यूज़: ${news.title}\n\nवीडियो देखें 👇\n${link}\n\n${hashtags}`;
-                    else caption = `🚨 BREAKING: ${news.title}\n\nWatch Video 👇\n${link}\n\n${hashtags}`;
+                    if(lang === 'bn') {
+                        caption = `🔥 ব্রেকিং: ${news.title}\n\nভিডিওটি দেখতে নিচের প্রথম কমেন্টে দেওয়া লিংকে ক্লিক করুন 👇👇\n(Link in First Comment)\n\n${hashtags}`;
+                    } else if(lang === 'hi') {
+                        caption = `⚡ ब्रेकिंग: ${news.title}\n\nवीडियो देखने के लिए नीचे दिए गए पहले कमेंट पर क्लिक करें 👇👇\n(Link in First Comment)\n\n${hashtags}`;
+                    } else {
+                        caption = `🚨 BREAKING: ${news.title}\n\nWatch Full Video Here (Check First Comment) 👇👇\n\n${hashtags}`;
+                    }
 
                     document.getElementById('prev-img').src = imgUrl;
-                    document.getElementById('prev-text').value = caption;
+                    document.getElementById('prev-caption').value = caption;
+                    document.getElementById('prev-link').value = link;
+                    
                     document.getElementById('preview-box').style.display = 'block';
-                } else {
-                    alert("Error: Could not generate image. Check server logs.");
                 }
             } catch(e) {
-                alert("Server Error! Is the robot running?");
+                alert("Server Error! Robot might be sleeping.");
             }
 
             btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> GENERATE VIRAL IMAGE';
             btn.disabled = false;
         }
 
-        window.copyText = function() {
-            const textArea = document.getElementById('prev-text');
-            textArea.select();
+        window.copyCaption = function() {
+            const el = document.getElementById('prev-caption');
+            el.select();
             document.execCommand('copy');
-            alert("Caption Copied! Now save the image and post on Facebook.");
+            alert("Caption Copied! Now Paste on Facebook.");
+        }
+
+        window.copyLink = function() {
+            const el = document.getElementById('prev-link');
+            el.select();
+            document.execCommand('copy');
+            alert("Link Copied! Paste this in the First Comment.");
         }
 
         // Start
