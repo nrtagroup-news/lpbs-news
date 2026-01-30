@@ -7,13 +7,24 @@ import time
 import requests
 import yt_dlp
 from datetime import datetime, timedelta
+import io
+
+# --- ম্যাজিক লাইব্রেরি (Pillow) ---
+# যদি Pillow না থাকে, কোড যাতে বন্ধ না হয় তাই try-except রাখা হলো
+try:
+    from PIL import Image, ImageDraw, ImageFont
+    PILLOW_AVAILABLE = True
+except ImportError:
+    PILLOW_AVAILABLE = False
+    print("⚠️ WARNING: Pillow library not found! Run 'pip install Pillow' inside requirements.txt")
 
 # --- কনফিগারেশন ---
-PORT = 8080 # Replit এই পোর্টে চলে
+PORT = 8080
 CONFIG_FILE = "config.json"
 DB_FILE = "news_db.json"
 NEWS_API_KEY = "pub_102fa773efa04ad2871534886e425eab"
 RETENTION_HOURS = 48
+PROMO_IMAGE_FILE = "promo_image.jpg"
 
 # ==========================================
 # 🧠 PART 1: THE ROBOT BRAIN (News Hunter)
@@ -86,13 +97,12 @@ def fetch_youtube_videos(channels):
                         v_date = video.get('upload_date')
                         is_live = video.get('live_status') == 'is_live'
                         
-                        # Logic: Live > Today > Yesterday > Latest
                         tag = "Recent"
                         if is_live: tag = "🔴 LIVE"
                         elif v_date == today_str: tag = "Today"
                         elif v_date == yesterday_str: tag = "Yesterday"
-                        elif not found: tag = "Latest" # Fallback
-                        else: continue # Skip old videos if we already found one
+                        elif not found: tag = "Latest"
+                        else: continue
 
                         video_news.append({
                             "id": video['id'],
@@ -126,25 +136,86 @@ def robot_loop():
             new_videos = fetch_youtube_videos(channels)
             fresh = new_text + new_videos
             
-            # Merge
             for item in fresh:
                 if not any(ex['id'] == item['id'] for ex in existing_db):
                     existing_db.insert(0, item)
             
-            # Save
             with open(DB_FILE, 'w', encoding='utf-8') as f:
                 json.dump({"news": existing_db, "updated_at": datetime.now().strftime("%I:%M %p"), "location": location}, f, indent=4, ensure_ascii=False)
             
             print(f"✅ ROBOT: Cycle Complete. Active News: {len(existing_db)}")
             print("💤 Robot sleeping for 15 minutes...")
-            time.sleep(900) # প্রতি ১৫ মিনিটে একবার চেক করবে (দিনে ৯৬ বার!)
+            time.sleep(900)
             
         except Exception as e:
             print(f"❌ ROBOT ERROR: {e}")
             time.sleep(60)
 
 # ==========================================
-# 🌐 PART 2: THE SERVER (Website Host)
+# 🎨 PART 2: PROMO GENERATOR (Viral Engine)
+# ==========================================
+
+def get_hashtags(title, lang):
+    tags = ["#LPBSNews", "#Breaking", "#NewsUpdate"]
+    title_lower = title.lower()
+    
+    # Smart Keyword Detection
+    keywords = {
+        "bangladesh": "#Bangladesh", "dhaka": "#Dhaka", "india": "#India", 
+        "west bengal": "#WestBengal", "kolkata": "#Kolkata", "politics": "#Politics",
+        "cricket": "#Cricket", "viral": "#ViralVideo", "accident": "#Accident",
+        "weather": "#WeatherUpdate"
+    }
+    
+    for key, tag in keywords.items():
+        if key in title_lower:
+            tags.append(tag)
+            
+    return " ".join(tags)
+
+def create_viral_thumbnail(image_url, title):
+    if not PILLOW_AVAILABLE: return False
+    
+    try:
+        # 1. Download Image
+        response = requests.get(image_url)
+        img = Image.open(io.BytesIO(response.content))
+        img = img.convert("RGB")
+        
+        # 2. Resize for Facebook (1280x720 standard)
+        img = img.resize((1280, 720))
+        draw = ImageDraw.Draw(img)
+        
+        # 3. Add Dark Overlay at Bottom for Text
+        overlay = Image.new('RGBA', img.size, (0,0,0,0))
+        draw_overlay = ImageDraw.Draw(overlay)
+        draw_overlay.rectangle([(0, 550), (1280, 720)], fill=(0, 0, 0, 200)) # Black strip
+        img = Image.alpha_composite(img.convert('RGBA'), overlay)
+        img = img.convert('RGB')
+        draw = ImageDraw.Draw(img)
+
+        # 4. Add Title Text (Try to find a font, else default)
+        try:
+            # Linux/Render usually has DejaVuSans
+            font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 40)
+        except:
+            font = ImageFont.load_default() # Fallback
+
+        # Draw Title in Yellow
+        draw.text((30, 570), title[:60]+"...", font=font, fill=(255, 255, 0))
+        
+        # Draw "CLICK TO WATCH" in Red
+        draw.text((30, 630), "▶ WATCH FULL VIDEO ON LPBS NEWS", font=font, fill=(255, 0, 0))
+
+        # 5. Save locally
+        img.save(PROMO_IMAGE_FILE)
+        return True
+    except Exception as e:
+        print(f"Thumbnail Error: {e}")
+        return False
+
+# ==========================================
+# 🌐 PART 3: THE SERVER (Website Host)
 # ==========================================
 
 class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
@@ -155,6 +226,30 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
             with open(CONFIG_FILE, 'w', encoding='utf-8') as f:
                 json.dump(data, f, indent=4, ensure_ascii=False)
             self.send_response(200); self.end_headers(); self.wfile.write(b"Saved")
+        
+        elif self.path == '/create_promo':
+            length = int(self.headers['Content-Length'])
+            data = json.loads(self.rfile.read(length))
+            
+            title = data.get('title', '')
+            thumb_url = data.get('thumb', '')
+            lang = data.get('lang', 'bn')
+            
+            # Generate Assets
+            hashtags = get_hashtags(title, lang)
+            thumb_success = create_viral_thumbnail(thumb_url, title)
+            
+            response_data = {
+                "hashtags": hashtags,
+                "status": "success" if thumb_success else "error",
+                "image_url": f"/get_promo_image?t={int(time.time())}" # Cache buster
+            }
+            
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps(response_data).encode())
+
         else: self.send_error(404)
 
     def do_GET(self):
@@ -167,6 +262,16 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
                     self.send_response(200); self.send_header('Content-type', 'application/json'); self.end_headers(); self.wfile.write(f.read().encode())
             else:
                 self.send_response(200); self.wfile.write(b'{"total":0,"today":0}')
+        
+        elif self.path.startswith('/get_promo_image'):
+            if os.path.exists(PROMO_IMAGE_FILE):
+                self.send_response(200)
+                self.send_header('Content-type', 'image/jpeg')
+                self.end_headers()
+                with open(PROMO_IMAGE_FILE, 'rb') as f:
+                    self.wfile.write(f.read())
+            else:
+                self.send_error(404)
         else:
             super().do_GET()
 
@@ -184,17 +289,11 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
         data["total"] += 1; data["today"] += 1
         with open(s_file, 'w') as f: json.dump(data, f)
 
-# ==========================================
-# 🚀 PART 3: LAUNCHPAD (Run Both)
-# ==========================================
-
 if __name__ == "__main__":
-    # ১. রোবটকে ব্যাকগ্রাউন্ডে চালু করা
     robot_thread = threading.Thread(target=robot_loop)
     robot_thread.daemon = True
     robot_thread.start()
     
-    # ২. ওয়েবসাইট সার্ভার চালু করা
     print(f"🔥 SERVER STARTED ON PORT {PORT}")
     with socketserver.TCPServer(("0.0.0.0", PORT), MyRequestHandler) as httpd:
         httpd.serve_forever()
