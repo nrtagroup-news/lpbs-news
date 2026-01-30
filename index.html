@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<head><script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
+<script>
+  window.OneSignalDeferred = window.OneSignalDeferred || [];
+  OneSignalDeferred.push(async function(OneSignal) {
+    await OneSignal.init({
+      appId: "a2089b57-b359-48e9-b4f5-9ba54f0f44c5",
+    });
+  });
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LPBS AI NEWS</title>
@@ -258,4 +266,5 @@
 </body>
 
 </html>
+
 
