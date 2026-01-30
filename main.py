@@ -10,13 +10,12 @@ from datetime import datetime, timedelta
 import io
 
 # --- ম্যাজিক লাইব্রেরি (Pillow) ---
-# যদি Pillow না থাকে, কোড যাতে বন্ধ না হয় তাই try-except রাখা হলো
 try:
-    from PIL import Image, ImageDraw, ImageFont
+    from PIL import Image, ImageDraw, ImageFont, ImageFilter
     PILLOW_AVAILABLE = True
 except ImportError:
     PILLOW_AVAILABLE = False
-    print("⚠️ WARNING: Pillow library not found! Run 'pip install Pillow' inside requirements.txt")
+    print("⚠️ WARNING: Pillow library not found!")
 
 # --- কনফিগারেশন ---
 PORT = 8080
@@ -25,6 +24,14 @@ DB_FILE = "news_db.json"
 NEWS_API_KEY = "pub_102fa773efa04ad2871534886e425eab"
 RETENTION_HOURS = 48
 PROMO_IMAGE_FILE = "promo_image.jpg"
+
+# ফন্ট কনফিগারেশন (আপনার আপলোড করা ফাইলের নামের সাথে মিল থাকতে হবে)
+FONTS = {
+    'bn': 'bn.ttf',  # বাংলার জন্য
+    'hi': 'hi.ttf',  # হিন্দির জন্য
+    'en': 'en.ttf',  # ইংলিশ বা ডিফল্ট
+    'tm': 'en.ttf'   # তামিলের জন্য 
+}
 
 # ==========================================
 # 🧠 PART 1: THE ROBOT BRAIN (News Hunter)
@@ -53,6 +60,19 @@ def clean_old_news(news_list):
     retention_seconds = RETENTION_HOURS * 3600
     return [n for n in news_list if (current_time - n.get('timestamp', 0)) < retention_seconds]
 
+# --- ইউনিভার্সাল ভিডিও ডিটেক্টর (YouTube + Facebook + Insta) ---
+def get_embed_code(url, video_id):
+    # প্ল্যাটফর্ম চিনে সঠিক এম্বেড লিংক তৈরি করা
+    if "facebook.com" in url or "fb.watch" in url:
+        # ফেসবুকের জন্য
+        return f"https://www.facebook.com/plugins/video.php?href={url}&show_text=0&width=560"
+    elif "instagram.com" in url:
+        # ইন্সটাগ্রামের জন্য
+        return f"https://www.instagram.com/p/{video_id}/embed"
+    else:
+        # ইউটিউব (ডিফল্ট)
+        return f"https://www.youtube-nocookie.com/embed/{video_id}?autoplay=0&rel=0"
+
 def fetch_text_news():
     print("   📰 Robot: Reading Newspapers...")
     articles = []
@@ -68,19 +88,27 @@ def fetch_text_news():
                     "desc": item.get('description') or "Click to read full story...",
                     "thumb": item.get('image_url'),
                     "source": item.get('source_id'),
-                    "video_url": "",
+                    "video_url": "", # টেক্সট নিউজে ভিডিও নেই
                     "time": "Today",
                     "timestamp": time.time(),
-                    "type": "image"
+                    "type": "image",
+                    "platform": "news"
                 })
     except: pass
     return articles
 
-def fetch_youtube_videos(channels):
+def fetch_social_videos(channels):
     video_news = []
     today_str, yesterday_str = get_smart_date()
     
-    ydl_opts = {'quiet': True, 'ignoreerrors': True, 'extract_flat': True, 'playlistend': 5, 'socket_timeout': 10}
+    # yt_dlp অপশন (ফাস্ট স্ক্যানিংয়ের জন্য)
+    ydl_opts = {
+        'quiet': True, 
+        'ignoreerrors': True, 
+        'extract_flat': True, # পুরো ভিডিও ডাউনলোড না করে শুধু ইনফো নেবে
+        'playlistend': 5, 
+        'socket_timeout': 15
+    }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         for category, urls in channels.items():
@@ -89,35 +117,45 @@ def fetch_youtube_videos(channels):
                 if not url.startswith("http"): continue
                 try:
                     info = ydl.extract_info(url, download=False)
+                    
+                    # যদি প্লেলিস্ট বা চ্যানেল হয়
                     entries = list(info['entries']) if 'entries' in info else [info]
                     
                     found = False
                     for video in entries:
                         if not video: continue
-                        v_date = video.get('upload_date')
-                        is_live = video.get('live_status') == 'is_live'
                         
-                        tag = "Recent"
-                        if is_live: tag = "🔴 LIVE"
-                        elif v_date == today_str: tag = "Today"
-                        elif v_date == yesterday_str: tag = "Yesterday"
-                        elif not found: tag = "Latest"
-                        else: continue
+                        # ভিডিওর ধরণ চেক (Shorts/Landscape)
+                        duration = video.get('duration', 0)
+                        is_short = (duration > 0 and duration < 60) # ৬০ সেকেন্ডের কম হলে শর্টস ধরতে পারে
+                        
+                        video_id = video['id']
+                        original_url = video.get('webpage_url', url) # আসল ভিডিও লিংক
+                        
+                        # এম্বেড লিংক জেনারেট
+                        embed_link = get_embed_code(original_url, video_id)
+
+                        # থাম্বনেইল হ্যান্ডেলিং
+                        thumb = video.get('thumbnail')
+                        if not thumb:
+                            thumb = f"https://i.ytimg.com/vi/{video_id}/hqdefault.jpg" # ইউটিউব ব্যাকআপ
 
                         video_news.append({
-                            "id": video['id'],
+                            "id": video_id,
                             "category": category,
                             "title": video.get('title'),
                             "desc": video.get('title'),
-                            "thumb": f"https://i.ytimg.com/vi/{video['id']}/hqdefault.jpg",
-                            "video_url": f"https://www.youtube-nocookie.com/embed/{video['id']}",
-                            "source": info.get('uploader') or "YouTube",
-                            "time": tag,
+                            "thumb": thumb,
+                            "video_url": embed_link, # স্মার্ট এম্বেড লিংক
+                            "original_link": original_url, # আসল লিংক (ফেসবুক বা ইউটিব)
+                            "source": info.get('uploader') or "Social Media",
+                            "time": "Latest",
                             "timestamp": time.time(),
-                            "type": "video"
+                            "type": "video",
+                            "platform": "facebook" if "facebook" in original_url else "youtube"
                         })
                         found = True
-                        break 
+                        if found: break # প্রতি লিংক থেকে ১টা ভিডিও
                 except: pass
     return video_news
 
@@ -133,9 +171,10 @@ def robot_loop():
             existing_db = clean_old_news(existing_db)
             
             new_text = fetch_text_news()
-            new_videos = fetch_youtube_videos(channels)
+            new_videos = fetch_social_videos(channels) # নাম পরিবর্তন করা হয়েছে
             fresh = new_text + new_videos
             
+            # ডুপ্লিকেট চেক
             for item in fresh:
                 if not any(ex['id'] == item['id'] for ex in existing_db):
                     existing_db.insert(0, item)
@@ -144,78 +183,119 @@ def robot_loop():
                 json.dump({"news": existing_db, "updated_at": datetime.now().strftime("%I:%M %p"), "location": location}, f, indent=4, ensure_ascii=False)
             
             print(f"✅ ROBOT: Cycle Complete. Active News: {len(existing_db)}")
-            print("💤 Robot sleeping for 15 minutes...")
-            time.sleep(900)
+            time.sleep(900) # ১৫ মিনিট ঘুম
             
         except Exception as e:
             print(f"❌ ROBOT ERROR: {e}")
             time.sleep(60)
 
 # ==========================================
-# 🎨 PART 2: PROMO GENERATOR (Viral Engine)
+# 🎨 PART 2: PROMO GENERATOR (Multi-Language Fix)
 # ==========================================
 
 def get_hashtags(title, lang):
-    tags = ["#LPBSNews", "#Breaking", "#NewsUpdate"]
+    tags = ["#LPBSNews", "#Breaking"]
     title_lower = title.lower()
     
-    # Smart Keyword Detection
+    # ভাইরাল কিওয়ার্ড
     keywords = {
-        "bangladesh": "#Bangladesh", "dhaka": "#Dhaka", "india": "#India", 
-        "west bengal": "#WestBengal", "kolkata": "#Kolkata", "politics": "#Politics",
-        "cricket": "#Cricket", "viral": "#ViralVideo", "accident": "#Accident",
-        "weather": "#WeatherUpdate"
+        "bangladesh": "#Bangladesh", "india": "#India", "politics": "#Politics",
+        "cricket": "#Cricket", "viral": "#Viral", "accident": "#News"
     }
-    
     for key, tag in keywords.items():
-        if key in title_lower:
-            tags.append(tag)
-            
+        if key in title_lower: tags.append(tag)
     return " ".join(tags)
 
-def create_viral_thumbnail(image_url, title):
+def create_viral_thumbnail(image_url, title, lang):
     if not PILLOW_AVAILABLE: return False
     
     try:
-        # 1. Download Image
+        # ১. ছবি ডাউনলোড
         response = requests.get(image_url)
         img = Image.open(io.BytesIO(response.content))
         img = img.convert("RGB")
         
-        # 2. Resize for Facebook (1280x720 standard)
-        img = img.resize((1280, 720))
-        draw = ImageDraw.Draw(img)
+        # ২. সাইজ ঠিক করা (1280x720)
+        # যদি ছবি লম্বা হয় (Shorts/Reels), তাহলে ব্লার ব্যাকগ্রাউন্ড দেওয়া হবে
+        base_width = 1280
+        base_height = 720
+        canvas = Image.new("RGB", (base_width, base_height), (0,0,0))
         
-        # 3. Add Dark Overlay at Bottom for Text
-        overlay = Image.new('RGBA', img.size, (0,0,0,0))
-        draw_overlay = ImageDraw.Draw(overlay)
-        draw_overlay.rectangle([(0, 550), (1280, 720)], fill=(0, 0, 0, 200)) # Black strip
-        img = Image.alpha_composite(img.convert('RGBA'), overlay)
-        img = img.convert('RGB')
-        draw = ImageDraw.Draw(img)
+        img_ratio = img.width / img.height
+        target_ratio = base_width / base_height
+        
+        if img_ratio < target_ratio: 
+            # এটা ভার্টিকাল (লম্বা) ভিডিও - মাঝখানে বসবে
+            new_height = base_height
+            new_width = int(new_height * img_ratio)
+            img_resized = img.resize((new_width, new_height))
+            
+            # ব্যাকগ্রাউন্ডে ব্লার ইফেক্ট
+            bg_blur = img.resize((base_width, base_height))
+            bg_blur = bg_blur.filter(ImageFilter.GaussianBlur(radius=20))
+            canvas.paste(bg_blur, (0,0))
+            
+            # আসল ছবি মাঝখানে
+            x_pos = (base_width - new_width) // 2
+            canvas.paste(img_resized, (x_pos, 0))
+            final_img = canvas
+        else:
+            # এটা নরমাল ভিডিও - ফুল স্ক্রিন হবে
+            final_img = img.resize((base_width, base_height))
 
-        # 4. Add Title Text (Try to find a font, else default)
+        # ৩. ড্রয়িং টুল
+        draw = ImageDraw.Draw(final_img)
+        
+        # ৪. ফন্ট সিলেকশন (ল্যাঙ্গুয়েজ অনুযায়ী)
+        font_filename = FONTS.get(lang, FONTS['en']) # ডিফল্ট ইংলিশ
+        
         try:
-            # Linux/Render usually has DejaVuSans
-            font = ImageFont.truetype("/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 40)
+            if os.path.exists(font_filename):
+                title_font = ImageFont.truetype(font_filename, 50)
+                sub_font = ImageFont.truetype(font_filename, 35)
+            else:
+                # যদি ফন্ট না পায়, ডিফল্ট লোড হবে (বক্স আসতে পারে)
+                print(f"⚠️ Font {font_filename} not found!")
+                title_font = ImageFont.load_default()
+                sub_font = ImageFont.load_default()
         except:
-            font = ImageFont.load_default() # Fallback
+            title_font = ImageFont.load_default()
+            sub_font = ImageFont.load_default()
 
-        # Draw Title in Yellow
-        draw.text((30, 570), title[:60]+"...", font=font, fill=(255, 255, 0))
+        # ৫. ট্রান্সপারেন্ট কালো শেড (নিচে)
+        overlay = Image.new('RGBA', final_img.size, (0,0,0,0))
+        draw_overlay = ImageDraw.Draw(overlay)
+        draw_overlay.rectangle([(0, 500), (1280, 720)], fill=(0, 0, 0, 180)) # 180 = একটু গাঢ় কালো
+        final_img = Image.alpha_composite(final_img.convert('RGBA'), overlay)
+        final_img = final_img.convert('RGB')
+        draw = ImageDraw.Draw(final_img)
+
+        # ৬. লেখা বসানো
+        short_title = title[:60] + "..." if len(title) > 60 else title
         
-        # Draw "CLICK TO WATCH" in Red
-        draw.text((30, 630), "▶ WATCH FULL VIDEO ON LPBS NEWS", font=font, fill=(255, 0, 0))
+        # টাইটেল (হলুদ)
+        draw.text((30, 520), short_title, font=title_font, fill=(255, 235, 59)) 
+        
+        # সাবটাইটেল (সাদা) - ভাষা অনুযায়ী
+        if lang == 'bn':
+            subtitle = "▶ ভিডিওর লিংক প্রথম কমেন্টে 👇"
+        elif lang == 'hi':
+            subtitle = "▶ वीडियो का लिंक पहले कमेंट में 👇"
+        else:
+            subtitle = "▶ Video Link in First Comment 👇"
+            
+        draw.text((30, 600), subtitle, font=sub_font, fill=(255, 255, 255))
 
-        # 5. Save locally
-        img.save(PROMO_IMAGE_FILE)
+        # ৭. সেভ
+        final_img.save(PROMO_IMAGE_FILE)
         return True
+        
     except Exception as e:
         print(f"Thumbnail Error: {e}")
         return False
 
 # ==========================================
-# 🌐 PART 3: THE SERVER (Website Host)
+# 🌐 PART 3: THE SERVER
 # ==========================================
 
 class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
@@ -233,16 +313,16 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
             
             title = data.get('title', '')
             thumb_url = data.get('thumb', '')
-            lang = data.get('lang', 'bn')
+            lang = data.get('lang', 'bn') # অ্যাডমিন প্যানেল থেকে আসা ভাষা
             
-            # Generate Assets
             hashtags = get_hashtags(title, lang)
-            thumb_success = create_viral_thumbnail(thumb_url, title)
+            # এখানে 'lang' পাঠানো হচ্ছে যাতে সঠিক ফন্ট লোড হয়
+            thumb_success = create_viral_thumbnail(thumb_url, title, lang)
             
             response_data = {
                 "hashtags": hashtags,
                 "status": "success" if thumb_success else "error",
-                "image_url": f"/get_promo_image?t={int(time.time())}" # Cache buster
+                "image_url": f"/get_promo_image?t={int(time.time())}"
             }
             
             self.send_response(200)
@@ -279,13 +359,10 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
         s_file = "stats.json"
         data = {"total": 0, "today": 0, "date": ""}
         if os.path.exists(s_file):
-            try: 
-                with open(s_file, 'r') as f: data = json.load(f)
+            try: with open(s_file, 'r') as f: data = json.load(f)
             except: pass
-        
         today = datetime.now().strftime("%Y-%m-%d")
-        if data["date"] != today:
-            data["date"] = today; data["today"] = 0
+        if data["date"] != today: data["date"] = today; data["today"] = 0
         data["total"] += 1; data["today"] += 1
         with open(s_file, 'w') as f: json.dump(data, f)
 
@@ -293,7 +370,6 @@ if __name__ == "__main__":
     robot_thread = threading.Thread(target=robot_loop)
     robot_thread.daemon = True
     robot_thread.start()
-    
     print(f"🔥 SERVER STARTED ON PORT {PORT}")
     with socketserver.TCPServer(("0.0.0.0", PORT), MyRequestHandler) as httpd:
         httpd.serve_forever()
