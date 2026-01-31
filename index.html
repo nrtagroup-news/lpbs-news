@@ -55,21 +55,20 @@
         .container { padding: 10px; max-width: 1400px; margin: 0 auto; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; padding-top: 15px; }
         
-        /* VIDEO CARD DESIGN */
+        /* CARD DESIGN */
         .card { background: var(--card-bg); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); position: relative; }
         
         /* VIDEO CONTAINER & LOGO */
-        .video-wrapper { position: relative; width: 100%; padding-top: 56.25%; /* 16:9 Aspect Ratio */ background: black; }
+        .video-wrapper { position: relative; width: 100%; padding-top: 56.25%; /* 16:9 */ background: black; }
         .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
         
-        /* LPBS LOGO WATERMARK */
         .watermark { position: absolute; top: 10px; right: 10px; background: rgba(255,0,0,0.8); color: white; padding: 2px 6px; font-size: 10px; font-weight: bold; border-radius: 3px; z-index: 10; pointer-events: none; }
 
         .content { padding: 15px; }
         .title { font-size: 18px; font-weight: 700; margin-bottom: 8px; line-height: 1.4; color: var(--text); }
         .meta { font-size: 12px; color: #888; display: flex; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 10px; margin-top: 5px; }
 
-        /* ADS BUTTON (Adsterra Smartlink) */
+        /* ADS BUTTON */
         .ad-btn {
             display: block; width: 100%; text-align: center; background: #ffcc00; color: black; 
             font-weight: bold; padding: 10px; text-decoration: none; margin-top: 10px; border-radius: 5px;
@@ -102,11 +101,12 @@
         </div>
         
         <div class="nav-scroller">
-            <button class="nav-btn active" onclick="filterNews('all')">📰 LPBS News Paper</button> <button class="nav-btn" onclick="filterNews('live')">🔴 Live TV</button>
+            <button class="nav-btn active" onclick="filterNews('all')">📰 LPBS News Paper</button>
+            <button class="nav-btn" onclick="filterNews('live')">🔴 Live TV</button>
             <button class="nav-btn" onclick="filterNews('breaking')">🚨 Breaking</button>
             <button class="nav-btn" onclick="filterNews('sports')">🏏 Sports</button>
             <button class="nav-btn" onclick="filterNews('tech')">📱 Tech</button>
-            <button class="nav-btn" onclick="filterNews('movie')">🎬 Movies</button>
+            <button class="nav-btn" onclick="filterNews('entertainment')">🎭 Entertainment</button> <button class="nav-btn" onclick="filterNews('movie')">🎬 Movies</button>
             <button class="nav-btn" onclick="filterNews('viral')">⚡ Viral</button>
         </div>
     </header>
@@ -150,22 +150,21 @@
         }
 
         let allData = [];
-        // Auto-Play Observer
+        
+        // Auto-Play Logic
         let observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 let iframe = entry.target.querySelector('iframe');
                 if(iframe) {
                     let src = iframe.getAttribute('src');
                     if(entry.isIntersecting) {
-                        // Play Video
                         if(!src.includes('autoplay=1')) iframe.src = src + "&autoplay=1&mute=1"; 
                     } else {
-                        // Pause Video
                         iframe.src = src.replace("&autoplay=1", "").replace("&mute=1", "");
                     }
                 }
             });
-        }, { threshold: 0.5 }); // 50% visible holei play hobe
+        }, { threshold: 0.5 });
 
         async function loadNewsData() {
             try {
@@ -173,42 +172,54 @@
                 const data = await res.json();
                 allData = data.news;
                 
-                // Get User Location
                 try {
                     const ipRes = await fetch('https://ipapi.co/json/');
                     const ipData = await ipRes.json();
                     document.getElementById('footer-loc').innerText = ipData.city || "India";
                 } catch(e){}
 
-                // Default Load
+                // Refresh Current View
                 const activeBtn = document.querySelector('.nav-btn.active');
                 if(activeBtn) {
-                    const cat = activeBtn.innerText.includes('Paper') ? 'all' : activeBtn.innerText.toLowerCase().split(' ')[1];
-                    renderNews(cat || 'all');
-                } else {
-                    renderNews('all');
+                    let cat = 'all';
+                    if(!activeBtn.innerText.includes('Paper')) {
+                        // Extract simple category name
+                        const text = activeBtn.innerText.toLowerCase(); 
+                        if(text.includes('live')) cat = 'live';
+                        else if(text.includes('breaking')) cat = 'breaking';
+                        else if(text.includes('sports')) cat = 'sports';
+                        else if(text.includes('tech')) cat = 'tech';
+                        else if(text.includes('entertainment')) cat = 'entertainment';
+                        else if(text.includes('movie')) cat = 'movie';
+                        else if(text.includes('viral')) cat = 'viral';
+                    }
+                    renderNews(cat);
                 }
-
             } catch(e) {}
         }
 
         function renderNews(cat) {
             const grid = document.getElementById('news-grid');
+            const cricBox = document.getElementById('cricket-box');
+            
             grid.innerHTML = '';
             
+            // Show Cricket only on Home & Live
+            if(cat === 'all' || cat === 'live') cricBox.style.display = 'block';
+            else cricBox.style.display = 'none';
+
             // Filter Logic
             let filtered = [];
-            if(cat === 'all') filtered = [...allData]; // Newspaper Mode (All Mix)
+            if(cat === 'all') filtered = [...allData]; 
             else filtered = allData.filter(n => n.category.toLowerCase().includes(cat));
 
             if(filtered.length === 0) {
-                grid.innerHTML = "<p style='text-align:center;'>No news found.</p>";
+                grid.innerHTML = "<p style='text-align:center;'>No news found in this category.</p>";
                 return;
             }
 
             filtered.forEach(n => {
                 let mediaHTML = '';
-                // Video vs Image Logic
                 if(n.type === 'video') {
                     mediaHTML = `
                     <div class="video-wrapper">
@@ -219,7 +230,6 @@
                     mediaHTML = `<img src="${n.thumb}" style="width:100%; height:200px; object-fit:cover;">`;
                 }
 
-                // Create Card
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
@@ -235,18 +245,25 @@
                 `;
                 
                 grid.appendChild(card);
-                if(n.type === 'video') observer.observe(card); // Enable Auto-Play
+                if(n.type === 'video') observer.observe(card);
             });
         }
 
         window.filterNews = function(cat) {
+            // Update Active Button
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            event.target.classList.add('active');
+            // Find correct button to highlight
+            const buttons = document.querySelectorAll('.nav-btn');
+            buttons.forEach(btn => {
+                if(btn.innerText.toLowerCase().includes(cat === 'all' ? 'paper' : cat)) {
+                    btn.classList.add('active');
+                }
+            });
             renderNews(cat);
         }
 
         loadNewsData();
-        setInterval(loadNewsData, 60000); // Check update every 1 min
+        setInterval(loadNewsData, 60000); 
     </script>
 </body>
 </html>
