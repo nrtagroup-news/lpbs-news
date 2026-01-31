@@ -305,7 +305,7 @@
             
             // Logic: Breaking = Video Only
             if (cat === 'all') filtered = [...allData];
-            else if (cat === 'breaking') filtered = allData.filter(n => n.type === 'video' && n.category !== 'entertainment' && n.category !== 'movie'); 
+            else if (cat === 'breaking') filtered = allData.filter(n => n.category === 'breaking' && n.type === 'video'); 
             else filtered = allData.filter(n => n.category.toLowerCase().includes(cat));
 
             // Sorting: Location First
@@ -408,4 +408,5 @@
     </script>
 </body>
 </html>
+
 
