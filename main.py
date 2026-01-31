@@ -17,8 +17,10 @@ except ImportError:
     PILLOW_AVAILABLE = False
     print("⚠️ WARNING: Pillow library not found! requirements.txt এ Pillow যুক্ত করুন।")
 
-# --- কনফিগারেশন ---
-PORT = 8080
+# --- কনফিগারেশন (Render Port Fix) ---
+# রেন্ডার অটোমেটিক যে পোর্ট দেবে সেটা নেবে, না পেলে 8080
+PORT = int(os.environ.get("PORT", 8080))
+
 CONFIG_FILE = "config.json"
 DB_FILE = "news_db.json"
 NEWS_API_KEY = "pub_102fa773efa04ad2871534886e425eab"
@@ -162,7 +164,7 @@ def robot_loop():
             time.sleep(60)
 
 # ==========================================
-# 🎨 PART 2: PROMO GENERATOR (Logo + Stroke + Bold)
+# 🎨 PART 2: PROMO GENERATOR
 # ==========================================
 
 def get_hashtags(title, lang):
@@ -181,7 +183,6 @@ def create_viral_thumbnail(image_url, title, lang):
         base_width, base_height = 1280, 720
         canvas = Image.new("RGB", (base_width, base_height), (0,0,0))
         
-        # ইমেজ সাইজ হ্যান্ডলিং
         img_ratio = img.width / img.height
         target_ratio = base_width / base_height
         
@@ -199,12 +200,11 @@ def create_viral_thumbnail(image_url, title, lang):
         draw = ImageDraw.Draw(final_img)
         font_filename = FONTS.get(lang, 'en.ttf')
         
-        # ফন্ট লোডিং
         try:
             if os.path.exists(font_filename):
-                title_font = ImageFont.truetype(font_filename, 70) # ফন্ট সাইজ বড় করা হয়েছে (৭০)
-                sub_font = ImageFont.truetype(font_filename, 45)   # সাবটাইটেলও বড় (৪৫)
-                logo_font = ImageFont.truetype(font_filename, 40)  # লোগো ফন্ট
+                title_font = ImageFont.truetype(font_filename, 70)
+                sub_font = ImageFont.truetype(font_filename, 45)
+                logo_font = ImageFont.truetype(font_filename, 40)
             else:
                 title_font = ImageFont.load_default()
                 sub_font = ImageFont.load_default()
@@ -212,23 +212,19 @@ def create_viral_thumbnail(image_url, title, lang):
         except:
             title_font = ImageFont.load_default(); sub_font = ImageFont.load_default(); logo_font = ImageFont.load_default()
 
-        # শেড বা ওভারলে
         overlay = Image.new('RGBA', final_img.size, (0,0,0,0))
         draw_overlay = ImageDraw.Draw(overlay)
-        draw_overlay.rectangle([(0, 480), (1280, 720)], fill=(0, 0, 0, 180)) # একটু উপরে তোলা হলো যাতে বড় লেখা ধরে
+        draw_overlay.rectangle([(0, 480), (1280, 720)], fill=(0, 0, 0, 180)) 
         final_img = Image.alpha_composite(final_img.convert('RGBA'), overlay).convert('RGB')
         draw = ImageDraw.Draw(final_img)
 
-        # 1. লোগো বসানো (Top Left)
-        draw.rectangle([(30, 30), (280, 90)], fill="#cc0000") # লাল বক্স
+        # লোগো এবং টেক্সট
+        draw.rectangle([(30, 30), (280, 90)], fill="#cc0000")
         draw.text((45, 40), "LPBS NEWS", font=logo_font, fill="white", stroke_width=2, stroke_fill="black")
 
-        # 2. টাইটেল (বড় + বোল্ড + স্ট্রোক)
         short_title = title[:60] + "..." if len(title) > 60 else title
-        # stroke_width=4 দিয়ে লেখা বোল্ড ও আউটলাইন দেওয়া হলো
         draw.text((30, 500), short_title, font=title_font, fill=(255, 255, 0), stroke_width=4, stroke_fill="black") 
         
-        # 3. সাবটাইটেল (স্ট্রোক সহ)
         if lang == 'bn': subtitle = "▶ ভিডিও দেখতে এখানে ক্লিক করুন 👇"
         elif lang == 'hi': subtitle = "▶ वीडियो देखने के लिए यहाँ क्लिक करें 👇"
         else: subtitle = "▶ Watch Full Video (Click Here) 👇"
@@ -296,12 +292,17 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
         else:
             super().do_GET()
 
+    # --- এখানে Syntax Error ছিল, ঠিক করে দিলাম ---
     def update_stats(self):
         s_file = "stats.json"
         data = {"total": 0, "today": 0, "date": ""}
         if os.path.exists(s_file):
-            try: with open(s_file, 'r') as f: data = json.load(f)
-            except: pass
+            try:
+                with open(s_file, 'r') as f:
+                    data = json.load(f)
+            except:
+                pass
+        
         today = datetime.now().strftime("%Y-%m-%d")
         if data["date"] != today: data["date"] = today; data["today"] = 0
         data["total"] += 1; data["today"] += 1
