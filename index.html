@@ -6,6 +6,7 @@
     <meta name="description" content="LPBS NEWS - Sabse Aage, Sabse Tej. The best AI-powered digital newspaper providing latest news, breaking updates, live TV, sports, and tech news based on your location.">
     <meta name="keywords" content="LPBS News, AI News, Live TV, Breaking News, Bengali News, Hindi News, Sports Update, Tech News, Viral Video">
     <meta name="author" content="NRTA Group">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
     
     <title>LPBS NEWS - Sabse Aage, Sabse Tej</title>
     
@@ -16,86 +17,115 @@
         await OneSignal.init({ appId: "a2089b57-b359-48e9-b4f5-9ba54f0f44c5" });
       });
     </script>
+    
     <script src="https://pl28611418.effectivegatecpm.com/35/31/b2/3531b2e932ccfe8beb37c64390437ab8.js"></script>
 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
     <style>
-        :root { --primary: #ff0000; --bg: #000000; --card-bg: #111; --text: #e0e0e0; --border: #222; }
-        body.theme-medium { --bg: #222; --card-bg: #333; --text: #ddd; --border: #444; }
-        body.theme-light { --bg: #f4f4f4; --card-bg: #fff; --text: #111; --border: #ddd; }
+        /* CSS VARIABLES */
+        :root { --primary: #ff0000; --bg: #000000; --card-bg: #111; --text: #e0e0e0; --border: #222; --hover: #1a1a1a; }
         
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; padding-bottom: 20px; transition: 0.3s; }
+        /* THEMES */
+        body.theme-medium { --bg: #222; --card-bg: #333; --text: #f0f0f0; --border: #444; --hover: #444; }
+        body.theme-light { --bg: #f4f4f4; --card-bg: #ffffff; --text: #111; --border: #ddd; --hover: #f9f9f9; }
+        
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; padding-bottom: 20px; transition: background 0.3s, color 0.3s; }
 
-        /* HEADER */
-        header { background: var(--card-bg); padding: 10px 15px; position: sticky; top:0; z-index:999; border-bottom: 3px solid var(--primary); }
+        /* HEADER STRUCTURE */
+        header { background: var(--card-bg); padding: 10px 15px; position: sticky; top:0; z-index:999; border-bottom: 3px solid var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
         .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         
         .brand-box { display: flex; flex-direction: column; }
         .brand { font-size: 28px; font-weight: 900; margin: 0; text-transform: uppercase; color: var(--text); line-height: 1; }
         .slogan { font-size: 11px; color: #ffeb3b; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-top: 3px; }
 
-        /* CONTROLS (Translator + Grid + Theme) */
+        /* CONTROLS SECTION */
         .controls { display: flex; align-items: center; gap: 10px; }
         
-        /* Translator Fix */
-        #google_translate_element { overflow: hidden; height: 25px; border: 1px solid #555; border-radius: 4px; }
-        .goog-te-combo { margin: 0 !important; height: 25px !important; font-size: 12px; }
-        
-        /* Grid Toggle Button (Mobile) */
-        .grid-btn { background: none; border: 1px solid #555; color: var(--text); padding: 5px 8px; border-radius: 4px; cursor: pointer; display: none; }
+        /* Theme Switcher Dots */
+        .theme-dots { display: flex; gap: 5px; background: rgba(255,255,255,0.1); padding: 3px; border-radius: 10px; }
+        .dot { width: 15px; height: 15px; border-radius: 50%; cursor: pointer; border: 1px solid #555; }
+        .dot.dark { background: #000; }
+        .dot.medium { background: #333; }
+        .dot.light { background: #fff; }
+
+        /* Grid Toggle */
+        .grid-btn { background: none; border: 1px solid var(--border); color: var(--text); padding: 5px 8px; border-radius: 4px; cursor: pointer; display: none; }
         @media(max-width: 768px) { .grid-btn { display: block; } }
+
+        /* Google Translator */
+        #google_translate_element { overflow: hidden; height: 26px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); }
+        .goog-te-combo { margin: 0 !important; height: 26px !important; font-size: 12px; background: var(--bg); color: var(--text); border: none; }
+        .goog-logo-link, .goog-te-banner-frame { display: none !important; } 
+        body { top: 0px !important; }
 
         /* NAV SCROLLER */
         .nav-scroller { display: flex; gap: 10px; overflow-x: auto; padding: 5px 0; scrollbar-width: none; border-top: 1px solid var(--border); }
-        .nav-btn { background: transparent; color: #aaa; border: none; padding: 8px 10px; cursor: pointer; white-space: nowrap; font-size: 14px; font-weight: 600; }
-        .nav-btn:hover, .nav-btn.active { color: var(--primary); font-weight: 800; border-bottom: 2px solid var(--primary); }
+        .nav-btn { background: transparent; color: #aaa; border: none; padding: 8px 10px; cursor: pointer; white-space: nowrap; font-size: 14px; font-weight: 600; transition: 0.2s; }
+        .nav-btn:hover { color: var(--primary); }
+        .nav-btn.active { color: var(--primary); font-weight: 800; border-bottom: 2px solid var(--primary); }
 
-        /* NEWS GRID */
+        /* MAIN GRID */
         .container { padding: 10px; max-width: 1400px; margin: 0 auto; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; padding-top: 15px; }
         
-        /* Mobile Grid View Classes */
-        .grid.mobile-list { grid-template-columns: 1fr; } /* 1 per row */
-        .grid.mobile-grid { grid-template-columns: 1fr 1fr; } /* 2 per row */
+        /* Mobile Layout Classes */
+        .grid.mobile-list { grid-template-columns: 1fr; } 
+        .grid.mobile-grid { grid-template-columns: 1fr 1fr; } 
 
-        /* CARD DESIGN (Newspaper Style) */
-        .card { background: var(--card-bg); border-radius: 6px; overflow: hidden; border: 1px solid var(--border); display: flex; flex-direction: column; }
-        
-        /* Featured Card (First Item) */
+        /* CARD DESIGN */
+        .card { background: var(--card-bg); border-radius: 8px; overflow: hidden; border: 1px solid var(--border); display: flex; flex-direction: column; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+
+        /* Featured Card (Layout) */
         .card.featured { grid-column: 1 / -1; flex-direction: row; border-bottom: 4px solid var(--primary); background: rgba(255, 0, 0, 0.05); }
         .card.featured .media { width: 60%; height: 350px; }
-        .card.featured .info { width: 40%; padding: 20px; justify-content: center; display: flex; flex-direction: column; }
-        .card.featured .title { font-size: 24px; line-height: 1.3; }
+        .card.featured .info { width: 40%; padding: 25px; justify-content: center; display: flex; flex-direction: column; }
+        .card.featured .title { font-size: 26px; line-height: 1.3; }
+
+        /* Media Container (Lite Load Optimization) */
+        .media { width: 100%; height: 200px; position: relative; background: #000; cursor: pointer; overflow: hidden; }
+        .media img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; transition: 0.3s; }
+        .media:hover img { opacity: 0.7; transform: scale(1.05); }
         
-        /* Standard Card */
-        .media { width: 100%; height: 200px; position: relative; background: #000; }
-        .media img, .media iframe { width: 100%; height: 100%; object-fit: cover; border: none; }
-        .info { padding: 12px; }
-        .title { font-size: 16px; font-weight: 700; margin-bottom: 5px; color: var(--text); line-height: 1.4; }
-        .meta { font-size: 11px; color: #888; display: flex; justify-content: space-between; margin-top: 8px; }
+        /* Play Button Overlay */
+        .play-btn { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 50px; height: 50px; background: rgba(255,0,0,0.8); border-radius: 50%;
+            display: flex; justify-content: center; align-items: center; color: white;
+            font-size: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.5); z-index: 5; pointer-events: none;
+        }
+        
+        .media iframe { width: 100%; height: 100%; position: absolute; top:0; left:0; border: none; z-index: 10; }
 
-        /* Watermark & Badges */
-        .watermark { position: absolute; top: 8px; right: 8px; background: red; color: white; padding: 2px 5px; font-size: 10px; font-weight: bold; border-radius: 3px; pointer-events: none; }
-        .loc-badge { background: #ffeb3b; color: black; padding: 2px 5px; font-size: 10px; font-weight: bold; border-radius: 3px; margin-right: 5px; display:none; }
+        .info { padding: 15px; }
+        .title { font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--text); line-height: 1.4; }
+        .meta { font-size: 12px; color: #888; display: flex; justify-content: space-between; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px; }
 
+        .watermark { position: absolute; top: 10px; right: 10px; background: var(--primary); color: white; padding: 3px 6px; font-size: 10px; font-weight: bold; border-radius: 3px; z-index: 6; pointer-events: none; }
+        .loc-badge { background: #ffeb3b; color: black; padding: 2px 6px; font-size: 11px; font-weight: bold; border-radius: 3px; display:inline-block; margin-bottom: 5px; }
+
+        /* Mobile Adjustments */
         @media(max-width: 768px) {
             .card.featured { flex-direction: column; }
-            .card.featured .media { width: 100%; height: 200px; }
-            .card.featured .info { width: 100%; }
-            .card.featured .title { font-size: 18px; }
+            .card.featured .media { width: 100%; height: 220px; }
+            .card.featured .info { width: 100%; padding: 15px; }
+            .card.featured .title { font-size: 20px; }
         }
 
         /* LIVE SCORE */
-        .live-score { background: linear-gradient(90deg, #111, #330000); padding: 10px; border-radius: 8px; margin-bottom: 15px; border-left: 5px solid red; display: none; }
+        .live-score { background: linear-gradient(90deg, #111, #330000); padding: 12px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid red; display: none; color: white; }
 
         /* FOOTER */
-        footer { background: var(--card-bg); padding: 30px 10px; margin-top: 40px; text-align: center; border-top: 1px solid var(--border); }
-        .footer-links a { color: #888; margin: 0 10px; text-decoration: none; cursor: pointer; }
-        
-        /* MODAL (About/Contact) */
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; }
-        .modal-content { background: var(--card-bg); padding: 20px; border-radius: 10px; max-width: 500px; width: 90%; border: 1px solid var(--primary); text-align: left; position: relative; }
-        .close-btn { position: absolute; top: 10px; right: 15px; font-size: 25px; cursor: pointer; color: red; }
+        footer { background: var(--card-bg); padding: 40px 10px; margin-top: 50px; text-align: center; border-top: 1px solid var(--border); }
+        .footer-links a { color: #888; margin: 0 15px; text-decoration: none; cursor: pointer; transition: 0.3s; }
+        .footer-links a:hover { color: var(--primary); }
+
+        /* MODAL */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .modal-content { background: var(--card-bg); padding: 25px; border-radius: 12px; max-width: 500px; width: 90%; border: 1px solid var(--border); text-align: left; position: relative; color: var(--text); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: var(--primary); }
     </style>
 </head>
 <body class="theme-dark">
@@ -108,13 +138,19 @@
             </div>
             
             <div class="controls">
+                <div class="theme-dots" title="Change Theme">
+                    <div class="dot dark" onclick="setTheme('dark')"></div>
+                    <div class="dot medium" onclick="setTheme('medium')"></div>
+                    <div class="dot light" onclick="setTheme('light')"></div>
+                </div>
+
                 <button class="grid-btn" onclick="toggleGrid()" title="Change Layout">
                     <i class="fa-solid fa-list"></i>
                 </button>
 
                 <div id="google_translate_element"></div>
 
-                <a href="admin.html" style="color:var(--text); text-decoration:none;">🔒</a>
+                <a href="admin.html" style="color:var(--text); text-decoration:none; font-size:18px;">🔒</a>
             </div>
         </div>
         
@@ -132,28 +168,28 @@
 
     <div class="container">
         <div id="cricket-box" class="live-score">
-            <h4 style="margin:0; color:white;"><i class="fa-solid fa-satellite-dish"></i> LIVE CRICKET</h4>
-            <div id="match-info" style="font-size:12px; color:#ccc;">Connecting...</div>
+            <h4 style="margin:0;"><i class="fa-solid fa-satellite-dish"></i> LIVE CRICKET UPDATE</h4>
+            <div id="match-info" style="font-size:13px; color:#ccc; margin-top:5px;">Connecting to Live Feed...</div>
         </div>
 
-        <h3 id="feed-title" style="border-left: 4px solid var(--primary); padding-left: 10px; margin: 15px 0;">TOP STORIES</h3>
+        <h3 id="feed-title" style="border-left: 5px solid var(--primary); padding-left: 12px; margin: 20px 0; text-transform: uppercase;">TOP STORIES</h3>
         
         <div class="grid mobile-list" id="news-grid">
             <p style="text-align:center; padding:50px; color:#666;">
-                <i class="fa-solid fa-spin fa-circle-notch"></i> Loading News...
+                <i class="fa-solid fa-circle-notch fa-spin fa-2x"></i><br><br>Loading Latest News...
             </p>
         </div>
     </div>
 
     <footer>
-        <h3 style="margin:0; color:white;">LPBS NEWS</h3>
-        <p style="font-size:12px; color:#666;">SABSE AAGE, SABSE TEJ</p>
+        <h2 style="margin:0; color:var(--text);">LPBS NEWS</h2>
+        <p style="font-size:12px; color:#666; letter-spacing:1px;">SABSE AAGE, SABSE TEJ</p>
         <div class="footer-links">
             <a onclick="location.reload()">Home</a>
             <a onclick="openModal('about')">About</a>
             <a onclick="openModal('contact')">Contact</a>
         </div>
-        <p style="margin-top:20px; font-size:11px; color:#555;">
+        <p style="margin-top:25px; font-size:11px; color:#555;">
             Location: <span id="footer-loc">Detecting...</span> | © 2026 NRTA Group
         </p>
     </footer>
@@ -170,7 +206,7 @@
         let userCity = "";
         let userRegion = "";
 
-        // --- TRANSLATOR CONFIG ---
+        // --- GOOGLE TRANSLATOR ---
         function googleTranslateElementInit() {
             new google.translate.TranslateElement({
                 pageLanguage: 'en',
@@ -183,15 +219,22 @@
     <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
     <script>
-        // --- LOGIC ---
         let allData = [];
-        let currentLayout = 'list'; // list or grid
+        let currentLayout = 'list';
 
-        // 1. Grid Toggle
+        // --- 1. THEME MANAGER ---
+        function setTheme(theme) {
+            document.body.className = '';
+            if (theme === 'medium') document.body.classList.add('theme-medium');
+            else if (theme === 'light') document.body.classList.add('theme-light');
+            // 'dark' is default
+        }
+
+        // --- 2. LAYOUT MANAGER ---
         function toggleGrid() {
             const grid = document.getElementById('news-grid');
             const btn = document.querySelector('.grid-btn i');
-            if(currentLayout === 'list') {
+            if (currentLayout === 'list') {
                 grid.className = 'grid mobile-grid';
                 btn.className = 'fa-solid fa-border-all';
                 currentLayout = 'grid';
@@ -202,40 +245,53 @@
             }
         }
 
-        // 2. Observer for AutoPlay
-        let observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                let iframe = entry.target.querySelector('iframe');
-                if(iframe) {
-                    let src = iframe.getAttribute('src');
-                    if(entry.isIntersecting) {
-                        if(!src.includes('autoplay=1')) iframe.src = src + "&autoplay=1&mute=1";
-                    } else {
-                        iframe.src = src.replace("&autoplay=1", "").replace("&mute=1", "");
-                    }
-                }
-            });
-        }, { threshold: 0.5 });
+        // --- 3. LITE VIDEO PLAYER (SPEED BOOSTER) ---
+        function loadVideo(element, url) {
+            // Replace Image with Iframe on Click
+            element.innerHTML = `<iframe src="${url}&autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+            element.style.cursor = 'default';
+        }
 
-        // 3. Load Data & Location
+        // --- 4. DATA SECURITY (XSS Prevention) ---
+        function sanitizeHTML(str) {
+            if (!str) return "";
+            return str.replace(/[&<>"']/g, function(m) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+            });
+        }
+
+        // --- 5. SYSTEM LOADER ---
         async function loadSystem() {
             try {
-                // Get Location
+                // Get IP Location
                 const ipRes = await fetch('https://ipapi.co/json/');
                 const ipData = await ipRes.json();
                 userCity = ipData.city || "";
                 userRegion = ipData.region || "";
                 document.getElementById('footer-loc').innerText = `${userCity}, ${userRegion}`;
 
-                // Get News
-                const res = await fetch('news_db.json?v=' + Date.now());
+                // Fetch News (With Cache Buster for Instant Update)
+                const res = await fetch('news_db.json?nocache=' + new Date().getTime());
                 const data = await res.json();
                 allData = data.news;
                 
-                // Initial Render
-                renderNews('all');
-
-            } catch(e) { console.log(e); }
+                // Refresh Active Tab
+                const activeBtn = document.querySelector('.nav-btn.active');
+                if (activeBtn) {
+                    let cat = 'all';
+                    const txt = activeBtn.innerText.toLowerCase();
+                    if(!txt.includes('paper')) {
+                         if(txt.includes('live')) cat = 'live';
+                        else if(txt.includes('breaking')) cat = 'breaking';
+                        else if(txt.includes('sports')) cat = 'sports';
+                        else if(txt.includes('tech')) cat = 'tech';
+                        else if(txt.includes('entertainment')) cat = 'entertainment';
+                        else if(txt.includes('movie')) cat = 'movie';
+                        else if(txt.includes('viral')) cat = 'viral';
+                    }
+                    renderNews(cat);
+                }
+            } catch(e) { console.error("Data Load Error", e); }
         }
 
         function renderNews(cat) {
@@ -245,78 +301,73 @@
             grid.innerHTML = '';
             cricBox.style.display = (cat === 'all' || cat === 'live') ? 'block' : 'none';
 
-            // --- FILTER LOGIC ---
             let filtered = [];
+            
+            // Logic: Breaking = Video Only
+            if (cat === 'all') filtered = [...allData];
+            else if (cat === 'breaking') filtered = allData.filter(n => n.type === 'video'); 
+            else filtered = allData.filter(n => n.category.toLowerCase().includes(cat));
 
-            if (cat === 'all') {
-                filtered = [...allData]; // Show everything in Paper
-            } else if (cat === 'breaking') {
-                // ONLY VIDEOS in Breaking
-                filtered = allData.filter(n => n.type === 'video'); 
-            } else {
-                filtered = allData.filter(n => n.category.toLowerCase().includes(cat));
-            }
-
-            // --- SORT LOGIC (Location First) ---
+            // Sorting: Location First
             filtered.sort((a, b) => {
                 const textA = (a.title + a.desc).toLowerCase();
                 const textB = (b.title + b.desc).toLowerCase();
-                const locMatchA = textA.includes(userCity.toLowerCase()) || textA.includes(userRegion.toLowerCase());
-                const locMatchB = textB.includes(userCity.toLowerCase()) || textB.includes(userRegion.toLowerCase());
-                return locMatchB - locMatchA; // Match comes first
+                const matchA = textA.includes(userCity.toLowerCase());
+                const matchB = textB.includes(userCity.toLowerCase());
+                return matchB - matchA;
             });
 
-            if(filtered.length === 0) {
-                grid.innerHTML = "<p style='text-align:center; width:100%; color:#888;'>No updates available.</p>";
+            if (filtered.length === 0) {
+                grid.innerHTML = "<p style='text-align:center; width:100%; color:#888; padding:20px;'>No news updates available.</p>";
                 return;
             }
 
-            // --- RENDER CARDS ---
             filtered.forEach((n, index) => {
                 let mediaHTML = '';
-                if(n.type === 'video') {
+                const safeTitle = sanitizeHTML(n.title);
+                
+                // Optimized Video Rendering
+                if (n.type === 'video') {
                     mediaHTML = `
-                    <div class="media">
+                    <div class="media" onclick="loadVideo(this, '${n.video_url}')">
                         <div class="watermark">LPBS NEWS</div>
-                        <iframe src="${n.video_url}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                        <div class="play-btn"><i class="fa-solid fa-play"></i></div>
+                        <img src="${n.thumb}" alt="News Video" loading="lazy">
                     </div>`;
                 } else {
-                    mediaHTML = `<div class="media"><img src="${n.thumb}"></div>`;
+                    mediaHTML = `<div class="media" style="cursor:default"><img src="${n.thumb}" loading="lazy"></div>`;
                 }
 
-                // Featured Logic (Only for Paper tab, 1st item)
+                // Featured Card Logic
                 const isFeatured = (cat === 'all' && index === 0);
-                const cardClass = isFeatured ? 'card featured' : 'card';
-                
-                // Location Badge
-                const isLocal = (n.title + n.desc).toLowerCase().includes(userCity.toLowerCase());
-                const locBadge = isLocal ? `<span class="loc-badge" style="display:inline-block">📍 ${userCity}</span>` : '';
+                const locBadge = (n.title + n.desc).toLowerCase().includes(userCity.toLowerCase()) ? 
+                                `<span class="loc-badge"><i class="fa-solid fa-location-dot"></i> ${userCity}</span>` : '';
 
                 const div = document.createElement('div');
-                div.className = cardClass;
+                div.className = isFeatured ? 'card featured' : 'card';
                 div.innerHTML = `
                     ${mediaHTML}
                     <div class="info">
                         ${locBadge}
-                        <div class="title">${n.title}</div>
-                        ${isFeatured ? `<div style="color:#aaa; margin:10px 0; font-size:14px;">${n.desc}</div>` : ''}
+                        <div class="title">${safeTitle}</div>
+                        ${isFeatured ? `<div style="color:var(--text); opacity:0.8; margin-bottom:10px; font-size:14px;">${sanitizeHTML(n.desc)}</div>` : ''}
                         <div class="meta">
                             <span>${n.time}</span>
-                            <span>${n.source || 'LPBS Bureau'}</span>
+                            <span>${sanitizeHTML(n.source) || 'LPBS Bureau'}</span>
                         </div>
-                        <a href="${SMARTLINK}" target="_blank" style="display:block; text-align:center; background:#ffcc00; color:black; padding:8px; margin-top:10px; text-decoration:none; font-weight:bold; border-radius:4px;">
+                        <a href="${SMARTLINK}" target="_blank" style="display:block; text-align:center; background:var(--primary); color:white; padding:10px; margin-top:12px; text-decoration:none; font-weight:bold; border-radius:4px; font-size:13px; text-transform:uppercase; letter-spacing:0.5px;">
                             ${n.type === 'video' ? '▶ Watch Video' : '📄 Read Full Story'}
                         </a>
                     </div>
                 `;
                 grid.appendChild(div);
-                if(n.type === 'video') observer.observe(div);
             });
         }
 
+        // --- 6. NAVIGATION HANDLER ---
         window.filterNews = function(cat) {
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            // Highlight Logic
+            // Smart Active State
             const buttons = document.querySelectorAll('.nav-btn');
             buttons.forEach(btn => {
                 let txt = btn.innerText.toLowerCase();
@@ -326,34 +377,34 @@
             renderNews(cat);
         }
 
-        // --- MODAL FUNCTIONS ---
+        // --- 7. MODALS ---
         function openModal(type) {
             const modal = document.getElementById('infoModal');
             const body = document.getElementById('modalBody');
             modal.style.display = 'flex';
             
-            if(type === 'about') {
+            if (type === 'about') {
                 body.innerHTML = `
-                    <h2 style="color:var(--primary)">ABOUT LPBS NEWS</h2>
-                    <p>LPBS News is an automated AI-powered news aggregator that brings you the latest stories from around the globe.</p>
+                    <h2 style="color:var(--primary); border-bottom:1px solid #333; padding-bottom:10px;">ABOUT LPBS NEWS</h2>
                     <p><strong>Mission:</strong> Sabse Aage, Sabse Tej.</p>
-                    <p>This platform curates content from various verified sources including YouTube, News API, and Live feeds to provide a seamless newspaper-like experience.</p>
-                    <hr style="border-color:#333">
-                    <small>Powered by NRTA Group AI Technology.</small>
+                    <p>LPBS News is an advanced AI-powered news aggregator designed to bring you real-time updates from trusted sources globally.</p>
+                    <p>We combine Technology with Journalism to provide a seamless reading experience.</p>
+                    <div style="margin-top:15px; font-size:12px; color:#888;">Powered by NRTA Group AI Tech.</div>
                 `;
             } else {
                 body.innerHTML = `
-                    <h2 style="color:var(--primary)">CONTACT US</h2>
-                    <p>For copyright removal, business inquiries, or feedback:</p>
-                    <p><i class="fa-solid fa-envelope"></i> <strong>nrtagroup@gmail.com</strong></p>
-                    <p>We respect copyright laws. If any content violates policy, please email us for immediate removal.</p>
+                    <h2 style="color:var(--primary); border-bottom:1px solid #333; padding-bottom:10px;">CONTACT US</h2>
+                    <p>For copyright issues, removal requests, or business inquiries:</p>
+                    <p style="font-size:18px; color:var(--text);"><i class="fa-solid fa-envelope"></i> <strong>nrtagroup@gmail.com</strong></p>
+                    <p style="font-size:12px; color:#888;">We strictly adhere to copyright policies. Any reported content will be reviewed within 24 hours.</p>
                 `;
             }
         }
         function closeModal() { document.getElementById('infoModal').style.display = 'none'; }
 
+        // Start System
         loadSystem();
-        setInterval(loadSystem, 60000);
+        setInterval(loadSystem, 60000); // Check for updates every 1 minute
     </script>
 </body>
 </html>
