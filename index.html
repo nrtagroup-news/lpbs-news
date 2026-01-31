@@ -30,13 +30,19 @@
         body.theme-medium { --bg: #222; --card-bg: #333; --text: #ddd; --border: #444; }
         body.theme-light { --bg: #f4f4f4; --card-bg: #fff; --text: #111; --border: #ddd; }
 
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; -webkit-font-smoothing: antialiased; padding-bottom: 20px; transition: background 0.3s, color 0.3s; }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Georgia', serif; -webkit-font-smoothing: antialiased; padding-bottom: 20px; transition: background 0.3s, color 0.3s; }
         
         /* HEADER */
         header { background: var(--card-bg); padding: 15px 20px; position: sticky; top:0; z-index:99; border-bottom: 3px solid var(--primary); box-shadow: 0 5px 20px rgba(0,0,0,0.3); }
-        .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .brand { font-size: 32px; font-weight: 900; margin: 0; text-transform: uppercase; letter-spacing: 1px; color: var(--text); }
+        .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px; }
+        .brand { font-size: 32px; font-weight: 900; margin: 0; text-transform: uppercase; letter-spacing: 1px; color: var(--text); font-family: 'Segoe UI', sans-serif; }
         .slogan { font-size: 14px; color: #ffeb3b; font-style: italic; display: block; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; }
+
+        /* TRANSLATOR STYLE */
+        #google_translate_element { margin-right: 10px; border: 1px solid var(--border); padding: 2px; border-radius: 5px; background: var(--card-bg); }
+        .goog-te-combo { background: var(--bg); color: var(--text); border: none; outline: none; padding: 3px; border-radius: 4px; }
+        .goog-logo-link, .goog-te-banner-frame { display: none !important; } 
+        body { top: 0px !important; }
 
         /* THEME SWITCHER */
         .theme-switch { display: flex; gap: 10px; margin-right: 15px; }
@@ -47,38 +53,59 @@
 
         /* NAV SCROLLER */
         .nav-scroller { display: flex; gap: 15px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; border-top: 1px solid var(--border); }
-        .nav-btn { background: transparent; color: #aaa; border: none; padding: 10px 5px; cursor: pointer; white-space: nowrap; transition: 0.3s; font-size: 15px; font-weight: 600; position: relative; }
+        .nav-btn { background: transparent; color: #aaa; border: none; padding: 10px 5px; cursor: pointer; white-space: nowrap; transition: 0.3s; font-size: 16px; font-weight: 600; font-family: 'Segoe UI', sans-serif; }
         .nav-btn:hover { color: var(--primary); }
         .nav-btn.active { color: var(--primary); font-weight: 800; border-bottom: 3px solid var(--primary); }
 
-        /* NEWSPAPER GRID (3 Columns) */
+        /* GRID SYSTEM */
         .container { padding: 10px; max-width: 1400px; margin: 0 auto; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; padding-top: 15px; }
         
-        /* CARD DESIGN */
-        .card { background: var(--card-bg); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); position: relative; }
+        /* --- NEWSPAPER LAYOUT (FEATURED CARD) --- */
+        .card { background: var(--card-bg); border-radius: 8px; overflow: hidden; border: 1px solid var(--border); position: relative; display: flex; flex-direction: column; }
         
-        /* VIDEO CONTAINER & LOGO */
-        .video-wrapper { position: relative; width: 100%; padding-top: 56.25%; /* 16:9 */ background: black; }
-        .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        /* Featured Card (Big News) */
+        .card.featured { 
+            grid-column: 1 / -1; /* Full Width */
+            flex-direction: row; 
+            border-bottom: 4px solid var(--primary);
+            background: rgba(255, 0, 0, 0.05);
+        }
         
-        .watermark { position: absolute; top: 10px; right: 10px; background: rgba(255,0,0,0.8); color: white; padding: 2px 6px; font-size: 10px; font-weight: bold; border-radius: 3px; z-index: 10; pointer-events: none; }
+        .card.featured .media-box { width: 60%; height: 400px; }
+        .card.featured .content { width: 40%; padding: 30px; display: flex; flex-direction: column; justify-content: center; }
+        .card.featured .title { font-size: 28px; line-height: 1.3; margin-bottom: 15px; }
+        .card.featured .desc { display: block; font-size: 16px; color: #aaa; margin-bottom: 20px; line-height: 1.6; }
 
-        .content { padding: 15px; }
-        .title { font-size: 18px; font-weight: 700; margin-bottom: 8px; line-height: 1.4; color: var(--text); }
+        /* Standard Card (Small News) */
+        .card .media-box { width: 100%; height: 220px; position: relative; background: black; }
+        .card .media-box img { width: 100%; height: 100%; object-fit: cover; }
+        .card .media-box iframe { width: 100%; height: 100%; border: none; }
+        .card .content { padding: 15px; }
+        .card .desc { display: none; } /* Hide text on small cards */
+
+        /* Responsive Mobile Fix */
+        @media (max-width: 768px) {
+            .card.featured { flex-direction: column; }
+            .card.featured .media-box { width: 100%; height: 250px; }
+            .card.featured .content { width: 100%; padding: 15px; }
+            .card.featured .title { font-size: 22px; }
+        }
+
+        .watermark { position: absolute; top: 10px; right: 10px; background: rgba(255,0,0,0.8); color: white; padding: 2px 6px; font-size: 10px; font-weight: bold; border-radius: 3px; z-index: 10; pointer-events: none; }
+        .title { font-size: 18px; font-weight: 700; margin-bottom: 8px; line-height: 1.4; color: var(--text); font-family: 'Segoe UI', sans-serif; }
         .meta { font-size: 12px; color: #888; display: flex; justify-content: space-between; border-top: 1px solid var(--border); padding-top: 10px; margin-top: 5px; }
 
         /* ADS BUTTON */
         .ad-btn {
             display: block; width: 100%; text-align: center; background: #ffcc00; color: black; 
-            font-weight: bold; padding: 10px; text-decoration: none; margin-top: 10px; border-radius: 5px;
+            font-weight: bold; padding: 10px; text-decoration: none; margin-top: 10px; border-radius: 5px; font-family: 'Segoe UI', sans-serif;
         }
 
         /* LIVE SCORE */
         .live-score-card { background: linear-gradient(135deg, #0d0d0d, #2b0000); padding: 15px; border-radius: 12px; margin-bottom: 25px; border: 1px solid #333; border-left: 6px solid red; display: none; }
         
-        /* FOOTER */
-        footer { background: var(--card-bg); padding: 40px 20px; margin-top: 50px; border-top: 1px solid var(--border); text-align: center; color: #666; font-size: 13px; }
+        footer { background: var(--card-bg); padding: 40px 20px; margin-top: 50px; border-top: 1px solid var(--border); text-align: center; color: #666; font-size: 13px; font-family: 'Segoe UI', sans-serif; }
     </style>
 </head>
 <body class="theme-dark">
@@ -91,6 +118,7 @@
             </div>
             
             <div style="display:flex; align-items:center;">
+                <div id="google_translate_element"></div>
                 <div class="theme-switch">
                     <div class="theme-btn t-dark" onclick="setTheme('dark')" title="Dark Mode"></div>
                     <div class="theme-btn t-med" onclick="setTheme('medium')" title="Reading Mode"></div>
@@ -105,8 +133,8 @@
             <button class="nav-btn" onclick="filterNews('live')">🔴 Live TV</button>
             <button class="nav-btn" onclick="filterNews('breaking')">🚨 Breaking</button>
             <button class="nav-btn" onclick="filterNews('sports')">🏏 Sports</button>
-            <button class="nav-btn" onclick="filterNews('tech')">📱 Tech</button>
-            <button class="nav-btn" onclick="filterNews('entertainment')">🎭 Entertainment</button> <button class="nav-btn" onclick="filterNews('movie')">🎬 Movies</button>
+            <button class="nav-btn" onclick="filterNews('tech')">📱 Tech / Business</button> <button class="nav-btn" onclick="filterNews('entertainment')">🎭 Entertainment</button>
+            <button class="nav-btn" onclick="filterNews('movie')">🎬 Movies</button>
             <button class="nav-btn" onclick="filterNews('viral')">⚡ Viral</button>
         </div>
     </header>
@@ -117,7 +145,7 @@
             <div id="match-info" style="color:#ccc; margin-top:5px;">Connecting...</div>
         </div>
 
-        <h2 id="feed-title" style="border-left: 5px solid var(--primary); padding-left: 10px;">TOP STORIES</h2>
+        <h2 id="feed-title" style="border-left: 5px solid var(--primary); padding-left: 10px; font-family: 'Segoe UI', sans-serif;">TOP STORIES</h2>
         
         <div class="grid" id="news-grid">
             <p style="text-align:center; color:#666; padding: 50px;">
@@ -141,8 +169,18 @@
         const SMARTLINK = "https://www.effectivegatecpm.com/uym16xq3jk?key=492c6ab2b2e619a347f8a0c6f22515e1";
     </script>
 
+    <script type="text/javascript">
+        function googleTranslateElementInit() {
+          new google.translate.TranslateElement({
+            pageLanguage: 'en', 
+            includedLanguages: 'bn,hi,en,ta,te', 
+            layout: google.translate.TranslateElement.InlineLayout.SIMPLE
+          }, 'google_translate_element');
+        }
+    </script>
+    <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
     <script>
-        // --- THEME LOGIC ---
         function setTheme(theme) {
             document.body.className = '';
             if(theme === 'medium') document.body.classList.add('theme-medium');
@@ -151,7 +189,7 @@
 
         let allData = [];
         
-        // Auto-Play Logic
+        // Auto-Play
         let observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 let iframe = entry.target.querySelector('iframe');
@@ -178,14 +216,13 @@
                     document.getElementById('footer-loc').innerText = ipData.city || "India";
                 } catch(e){}
 
-                // Refresh Current View
+                // Default Logic
                 const activeBtn = document.querySelector('.nav-btn.active');
                 if(activeBtn) {
                     let cat = 'all';
-                    if(!activeBtn.innerText.includes('Paper')) {
-                        // Extract simple category name
-                        const text = activeBtn.innerText.toLowerCase(); 
-                        if(text.includes('live')) cat = 'live';
+                    const text = activeBtn.innerText.toLowerCase();
+                    if(!text.includes('paper')) {
+                         if(text.includes('live')) cat = 'live';
                         else if(text.includes('breaking')) cat = 'breaking';
                         else if(text.includes('sports')) cat = 'sports';
                         else if(text.includes('tech')) cat = 'tech';
@@ -204,21 +241,33 @@
             
             grid.innerHTML = '';
             
-            // Show Cricket only on Home & Live
             if(cat === 'all' || cat === 'live') cricBox.style.display = 'block';
             else cricBox.style.display = 'none';
 
-            // Filter Logic
             let filtered = [];
-            if(cat === 'all') filtered = [...allData]; 
-            else filtered = allData.filter(n => n.category.toLowerCase().includes(cat));
+            
+            // LOGIC: Breaking = ONLY VIDEOS
+            if(cat === 'breaking') {
+                filtered = allData.filter(n => n.type === 'video');
+            }
+            // LOGIC: Tech / Business
+            else if(cat === 'tech') {
+                filtered = allData.filter(n => n.category === 'tech' || n.category === 'business');
+            }
+            // LOGIC: Newspaper (Mix of everything)
+            else if(cat === 'all') {
+                filtered = [...allData];
+            } 
+            else {
+                filtered = allData.filter(n => n.category.toLowerCase().includes(cat));
+            }
 
             if(filtered.length === 0) {
-                grid.innerHTML = "<p style='text-align:center;'>No news found in this category.</p>";
+                grid.innerHTML = "<p style='text-align:center;'>No news found.</p>";
                 return;
             }
 
-            filtered.forEach(n => {
+            filtered.forEach((n, index) => {
                 let mediaHTML = '';
                 if(n.type === 'video') {
                     mediaHTML = `
@@ -227,15 +276,20 @@
                         <iframe src="${n.video_url}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
                     </div>`;
                 } else {
-                    mediaHTML = `<img src="${n.thumb}" style="width:100%; height:200px; object-fit:cover;">`;
+                    mediaHTML = `<img src="${n.thumb}" style="width:100%; height:100%; object-fit:cover;">`;
                 }
 
+                // FEATURED LOGIC (Only for 'Newspaper' tab, first item)
+                const isFeatured = (cat === 'all' && index === 0);
+                const cardClass = isFeatured ? 'card featured' : 'card';
+
                 const card = document.createElement('div');
-                card.className = 'card';
+                card.className = cardClass;
                 card.innerHTML = `
-                    ${mediaHTML}
+                    <div class="media-box">${mediaHTML}</div>
                     <div class="content">
                         <div class="title">${n.title}</div>
+                        <div class="desc">${n.desc || 'Click to read full story...'}</div>
                         <div class="meta">
                             <span>${n.time}</span>
                             <span>${n.source || 'LPBS'}</span>
@@ -250,14 +304,13 @@
         }
 
         window.filterNews = function(cat) {
-            // Update Active Button
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            // Find correct button to highlight
+            // Highlight Button Logic
             const buttons = document.querySelectorAll('.nav-btn');
             buttons.forEach(btn => {
-                if(btn.innerText.toLowerCase().includes(cat === 'all' ? 'paper' : cat)) {
-                    btn.classList.add('active');
-                }
+                const txt = btn.innerText.toLowerCase();
+                if(cat === 'all' && txt.includes('paper')) btn.classList.add('active');
+                else if(txt.includes(cat)) btn.classList.add('active');
             });
             renderNews(cat);
         }
