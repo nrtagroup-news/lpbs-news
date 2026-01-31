@@ -231,9 +231,9 @@ def create_viral_thumbnail(image_url, title, lang):
         draw.text((30, 500), short_title, font=title_font, fill=(255, 255, 0), stroke_width=4, stroke_fill="black") 
         
         # 3. সাবটাইটেল (স্ট্রোক সহ)
-        if lang == 'bn': subtitle = "▶ ভিডিও দেখতে এখানে ক্লিক করুন 👇"
-        elif lang == 'hi': subtitle = "▶ वीडियो देखने के लिए यहाँ क्लिक करें 👇"
-        else: subtitle = "▶ Watch Full Video (Click Here) 👇"
+        if lang == 'bn': subtitle = "▶ সম্পূর্ণ ভিডিও দেখতে প্রথম কমেন্টের লিঙ্কে ক্লিক করুন। 👇"
+        elif lang == 'hi': subtitle = "▶ पूरा वीडियो देखने के लिए पहले कमेंट लिंक पर क्लिक करें 👇"
+        else: subtitle = "▶ Watch Full Video (FULL VIDEO CLICK FIRST COMENT URL) 👇"
         
         draw.text((30, 610), subtitle, font=sub_font, fill=(255, 255, 255), stroke_width=3, stroke_fill="black")
 
@@ -321,3 +321,4 @@ if __name__ == "__main__":
     print(f"🔥 SERVER STARTED ON PORT {PORT}")
     with socketserver.TCPServer(("0.0.0.0", PORT), MyRequestHandler) as httpd:
         httpd.serve_forever()
+
