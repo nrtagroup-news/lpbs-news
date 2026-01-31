@@ -24,7 +24,7 @@ PORT = int(os.environ.get("PORT", 8080))
 CONFIG_FILE = "config.json"
 DB_FILE = "news_db.json"
 NEWS_API_KEY = "pub_102fa773efa04ad2871534886e425eab"
-RETENTION_HOURS = 48
+RETENTION_HOURS = 3
 PROMO_IMAGE_FILE = "promo_image.jpg"
 
 # ফন্ট ম্যাপ (আপনার ফাইলের নামের সাথে মিল রেখে)
@@ -321,4 +321,5 @@ if __name__ == "__main__":
     print(f"🔥 SERVER STARTED ON PORT {PORT}")
     with socketserver.TCPServer(("0.0.0.0", PORT), MyRequestHandler) as httpd:
         httpd.serve_forever()
+
 
