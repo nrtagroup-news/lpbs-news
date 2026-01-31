@@ -3,59 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LPBS Super Admin</title>
+    <title>LPBS Super Admin - Tamal Dey</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { background: #0f0f0f; color: #e0e0e0; font-family: 'Segoe UI', sans-serif; padding: 15px; margin: 0; }
+        /* WHITE THEME DESIGN */
+        body { background: #f4f6f8; color: #333; font-family: 'Segoe UI', sans-serif; padding: 20px; margin: 0; }
         
-        /* SECURITY LAYER */
-        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-        .login-box { background: #1a1a1a; padding: 30px; border-radius: 15px; border: 1px solid #d32f2f; text-align: center; width: 85%; max-width: 320px; box-shadow: 0 0 40px rgba(211, 47, 47, 0.4); }
-        .login-input { width: 100%; padding: 15px; margin: 15px 0; background: #222; border: 1px solid #444; color: white; font-size: 20px; text-align: center; border-radius: 8px; letter-spacing: 5px; font-weight: bold; }
-        .btn-unlock { background: #d32f2f; color: white; width: 100%; padding: 12px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 8px; transition: 0.3s; }
+        /* LOGIN LAYER */
+        #login-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #fff; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        .login-box { background: #fff; padding: 40px; border-radius: 10px; border: 1px solid #ddd; text-align: center; width: 90%; max-width: 350px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); }
+        .login-input { width: 100%; padding: 15px; margin: 20px 0; background: #f9f9f9; border: 2px solid #ddd; color: #333; font-size: 24px; text-align: center; border-radius: 8px; letter-spacing: 5px; font-weight: bold; }
+        .btn-unlock { background: #d32f2f; color: white; width: 100%; padding: 15px; border: none; font-size: 16px; font-weight: bold; cursor: pointer; border-radius: 8px; transition: 0.3s; }
         
         /* MAIN LAYOUT */
-        .container { max-width: 800px; margin: 0 auto; display: none; padding-bottom: 80px; }
-        h2 { border-bottom: 2px solid #333; padding-bottom: 10px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+        .container { max-width: 900px; margin: 0 auto; display: none; padding-bottom: 100px; }
         
+        /* HEADER */
+        .header-box { background: #fff; padding: 20px; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-left: 5px solid #d32f2f; }
+        .title { font-size: 24px; font-weight: 900; color: #d32f2f; text-transform: uppercase; }
+        .admin-name { font-size: 14px; color: #555; font-weight: 600; background: #eee; padding: 5px 12px; border-radius: 20px; }
+
         /* CARDS */
-        .card { background: #1e1e1e; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #333; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .card-header { font-size: 16px; font-weight: bold; color: #aaa; margin-bottom: 15px; display: flex; align-items: center; text-transform: uppercase; letter-spacing: 1px; }
+        .card { background: #fff; border-radius: 12px; padding: 25px; margin-bottom: 20px; border: 1px solid #e0e0e0; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+        .card-header { font-size: 18px; font-weight: 800; color: #333; margin-bottom: 20px; display: flex; align-items: center; text-transform: uppercase; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
         .card-icon { margin-right: 10px; color: #d32f2f; }
 
         /* LIVE STATS */
-        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; text-align: center; }
-        .stat-box { background: #252525; padding: 15px; border-radius: 10px; border: 1px solid #333; }
-        .stat-num { font-size: 24px; font-weight: bold; color: #fff; }
-        .stat-label { font-size: 12px; color: #888; margin-top: 5px; }
-        .pulse { animation: pulse-green 2s infinite; }
-        @keyframes pulse-green { 0% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(0, 255, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(0, 255, 0, 0); } }
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; text-align: center; }
+        .stat-box { background: #f8f9fa; padding: 20px; border-radius: 10px; border: 1px solid #e9ecef; }
+        .stat-num { font-size: 32px; font-weight: 900; color: #d32f2f; }
+        .stat-label { font-size: 13px; color: #777; font-weight: bold; margin-top: 5px; text-transform: uppercase; }
 
-        /* VIRAL PROMO MAKER */
-        .promo-box { border: 1px dashed #ff6f00; background: #1a1005; }
-        .preview-area { display: none; margin-top: 15px; background: #000; padding: 10px; border-radius: 8px; border: 1px solid #444; }
-        .preview-img { width: 100%; border-radius: 8px; margin-bottom: 10px; border: 1px solid #333; }
+        /* INPUTS & FORMS */
+        input[type="text"], select, textarea { width: 100%; padding: 12px; background: #fff; border: 2px solid #eee; color: #333; border-radius: 6px; box-sizing: border-box; margin-bottom: 10px; font-size: 15px; font-family: inherit; transition: 0.3s; }
+        input:focus { border-color: #d32f2f; outline: none; }
         
-        /* FORMS */
-        select, input[type="text"], textarea { width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid #444; color: white; border-radius: 6px; box-sizing: border-box; margin-bottom: 10px; font-size: 14px; }
-        
+        /* API FIELD DESIGN */
+        .api-field { background: #fff8e1; border-color: #ffe0b2 !important; font-family: monospace; color: #d84315 !important; font-weight: bold; }
+        .api-label { font-size: 12px; color: #f57c00; font-weight: bold; display: block; margin-bottom: 5px; }
+
         /* CHANNEL LIST */
-        .channel-list { max-height: 250px; overflow-y: auto; background: #151515; border-radius: 6px; margin-bottom: 10px; }
-        .channel-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid #2a2a2a; font-size: 13px; }
+        .channel-list { max-height: 250px; overflow-y: auto; background: #f9f9f9; border-radius: 8px; margin-bottom: 15px; border: 1px solid #eee; }
+        .channel-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 15px; border-bottom: 1px solid #eee; font-size: 14px; background: #fff; }
         .channel-item:last-child { border-bottom: none; }
         
         /* BUTTONS */
-        .btn { border: none; padding: 10px; border-radius: 6px; cursor: pointer; font-weight: bold; display: inline-flex; align-items: center; justify-content: center; }
-        .btn-add { background: #1565c0; color: white; width: 100%; }
-        .btn-del { background: #c62828; color: white; padding: 5px 10px; border-radius: 4px; }
-        .btn-magic { background: linear-gradient(135deg, #d32f2f, #ff6f00); color: white; width: 100%; font-size: 16px; padding: 12px; margin-top: 5px; box-shadow: 0 4px 15px rgba(211, 47, 47, 0.3); }
-        .btn-copy { background: #333; color: white; width: 100%; margin-top: 5px; border: 1px solid #555; }
-        .btn-copy:active { background: #00e676; border-color: #00e676; }
+        .btn { border: none; padding: 10px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+        .btn-add { background: #2196f3; color: white; height: 46px; }
+        .btn-add:hover { background: #1976d2; }
+        .btn-del { background: #ffebee; color: #c62828; padding: 6px 12px; border-radius: 4px; }
+        .btn-del:hover { background: #ffcdd2; }
         
-        .btn-save { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 600px; background: #2e7d32; color: white; padding: 15px; font-size: 18px; border-radius: 50px; box-shadow: 0 5px 20px rgba(0,0,0,0.5); z-index: 100; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .btn-magic { background: linear-gradient(135deg, #ff6f00, #ff8f00); color: white; width: 100%; padding: 15px; font-size: 16px; margin-top: 10px; box-shadow: 0 5px 15px rgba(255, 111, 0, 0.3); }
+        .btn-copy { background: #333; color: white; width: 100%; margin-top: 8px; border: 1px solid #555; }
+        
+        .btn-save { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 500px; background: #2e7d32; color: white; padding: 18px; font-size: 18px; font-weight: bold; border-radius: 50px; box-shadow: 0 10px 30px rgba(46, 125, 50, 0.4); z-index: 100; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; transition: 0.3s; }
+        .btn-save:hover { transform: translateX(-50%) scale(1.05); }
 
         /* LOADING SPINNER */
-        .loader { border: 3px solid #f3f3f3; border-top: 3px solid #d32f2f; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; margin-right: 10px; }
+        .loader { border: 3px solid rgba(255,255,255,0.3); border-top: 3px solid #fff; border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; display: inline-block; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
@@ -63,42 +69,40 @@
 
     <div id="login-overlay">
         <div class="login-box">
-            <h2 style="justify-content:center; border:none; color:#d32f2f; margin:0;"><i class="fa-solid fa-user-secret"></i> ADMIN</h2>
-            <p style="color:#666; font-size:12px; margin-top:5px;">System Security Active</p>
-            <input type="password" id="pass-input" class="login-input" placeholder="CODE">
-            <button class="btn-unlock" onclick="checkPass()">ACCESS PANEL</button>
-            <p id="err-msg" style="color:#ff3333; margin-top:15px; display:none; font-weight:bold;">⛔ ACCESS DENIED</p>
+            <h2 style="color:#d32f2f; margin:0 0 10px 0;"><i class="fa-solid fa-lock"></i> SECURE ACCESS</h2>
+            <p style="color:#666; font-size:14px; margin-bottom:20px;">Tamal Dey's Control Room</p>
+            <input type="password" id="pass-input" class="login-input" placeholder="ENTER PIN">
+            <button class="btn-unlock" onclick="checkPass()">UNLOCK PANEL</button>
+            <p id="err-msg" style="color:#d32f2f; margin-top:15px; display:none; font-weight:bold;">⛔ WRONG PIN</p>
         </div>
     </div>
 
     <div class="container" id="main-panel">
-        <h2 style="color:white;">
-            <span><i class="fa-solid fa-robot" style="color:#00e676;"></i> LPBS AI CONTROL</span>
-            <span style="font-size:12px; background:#333; padding:5px 10px; border-radius:20px;">v2.5 (FB Logic)</span>
-        </h2>
+        
+        <div class="header-box">
+            <div class="title"><i class="fa-solid fa-tower-broadcast"></i> LPBS AI CONTROL</div>
+            <div class="admin-name"><i class="fa-solid fa-user-tie"></i> Admin: Tamal Dey</div>
+        </div>
 
-        <div class="card" style="border-top: 4px solid #00e676;">
-            <div class="card-header"><i class="fa-solid fa-chart-line card-icon"></i> Live Traffic</div>
+        <div class="card">
+            <div class="card-header"><i class="fa-solid fa-chart-line card-icon"></i> Real-Time Traffic</div>
             <div class="stats-grid">
                 <div class="stat-box">
-                    <div class="stat-num" style="color:#00e676;" id="count-today">0</div>
-                    <div class="stat-label">TODAY</div>
+                    <div class="stat-num" id="count-today">0</div>
+                    <div class="stat-label">Visitors Today</div>
                 </div>
-                <div class="stat-box">
-                    <div class="stat-num" style="color:#ffea00;" id="count-total">0</div>
-                    <div class="stat-label">LIFETIME</div>
+                <div class="stat-box" style="border-color:#d32f2f;">
+                    <div class="stat-num" id="count-total">0</div>
+                    <div class="stat-label">Total Views (Lifetime)</div>
                 </div>
-            </div>
-            <div style="text-align:center; margin-top:10px; font-size:12px; color:#555;">
-                <i class="fa-solid fa-circle pulse" style="color:#00e676; font-size:8px;"></i> System is Online
             </div>
         </div>
 
-        <div class="card promo-box">
-            <div class="card-header" style="color:#ff9800;"><i class="fa-solid fa-fire card-icon"></i> Viral Post Maker</div>
+        <div class="card" style="border: 1px solid #ff9800;">
+            <div class="card-header" style="color:#ef6c00;"><i class="fa-solid fa-fire card-icon" style="color:#ef6c00;"></i> Viral Post Generator</div>
             
-            <label style="font-size:12px; color:#aaa;">Select Trending News:</label>
-            <select id="promo-news-list" onchange="resetPreview()"><option>Loading News...</option></select>
+            <label style="font-size:13px; color:#666; font-weight:bold;">Select News to Viral:</label>
+            <select id="promo-news-list" onchange="resetPreview()"><option>Loading...</option></select>
             
             <div style="display:flex; gap:10px;">
                 <select id="promo-lang">
@@ -109,103 +113,110 @@
             </div>
 
             <button class="btn btn-magic" id="gen-btn" onclick="generatePromo()">
-                <i class="fa-solid fa-wand-magic-sparkles"></i> GENERATE VIRAL IMAGE
+                <i class="fa-solid fa-wand-magic-sparkles"></i> CREATE VIRAL IMAGE
             </button>
             
-            <div id="preview-box" class="preview-area">
-                <img id="prev-img" class="preview-img" src="">
+            <div id="preview-box" style="display:none; margin-top:20px; background:#fafafa; padding:15px; border-radius:10px; border:1px solid #eee;">
+                <img id="prev-img" style="width:100%; border-radius:8px; border:1px solid #ddd; margin-bottom:10px;" src="">
                 
-                <label style="color:#aaa; font-size:12px;">1. Post Caption (Copy This):</label>
-                <textarea id="prev-caption" rows="5"></textarea>
-                <button class="btn btn-copy" onclick="copyCaption()">
-                    <i class="fa-solid fa-copy"></i> Copy Caption
-                </button>
+                <label style="color:#333; font-size:13px; font-weight:bold;">1. Caption (Copy & Paste on FB):</label>
+                <textarea id="prev-caption" rows="4"></textarea>
+                <button class="btn btn-copy" onclick="copyCaption()"><i class="fa-regular fa-copy"></i> Copy Caption</button>
 
-                <label style="color:#00e676; font-size:12px; margin-top:10px; display:block;">2. Link for First Comment:</label>
-                <input type="text" id="prev-link" style="border-color:#00e676; color:#00e676; font-weight:bold;">
-                <button class="btn btn-copy" onclick="copyLink()">
-                    <i class="fa-solid fa-link"></i> Copy Link
-                </button>
+                <label style="color:#2e7d32; font-size:13px; font-weight:bold; margin-top:15px; display:block;">2. First Comment Link:</label>
+                <input type="text" id="prev-link" style="border-color:#2e7d32; color:#2e7d32; font-weight:bold;">
+                <button class="btn btn-copy" onclick="copyLink()" style="background:#2e7d32; border:none;"><i class="fa-solid fa-link"></i> Copy Link</button>
             </div>
         </div>
 
         <div class="card">
-            <div class="card-header"><i class="fa-solid fa-map-location-dot card-icon"></i> Location Override</div>
-            <input type="text" id="loc-input" placeholder="e.g. Kolkata, West Bengal">
+            <div class="card-header"><i class="fa-solid fa-location-dot card-icon"></i> Location Override</div>
+            <input type="text" id="loc-input" placeholder="e.g. Kolkata, West Bengal (Leave empty for auto)">
         </div>
 
         <div id="category-container"></div>
 
         <button class="btn-save" onclick="saveConfig()">
-            <i class="fa-solid fa-floppy-disk"></i> SAVE CHANGES
+            <i class="fa-solid fa-floppy-disk"></i> SAVE ALL CHANGES
         </button>
-        <div id="msg" style="text-align:center; color:#00e676; margin-top:10px; display:none; position:fixed; bottom:80px; left:0; width:100%; background:rgba(0,0,0,0.8); padding:5px;"></div>
     </div>
 
     <script>
-        // --- UPDATED CATEGORIES (YOUR REQUEST) ---
         const categories = [
             { id: 'live', name: '🔴 Live Channels' },
             { id: 'breaking', name: '🚨 Breaking News' },
             { id: 'sports', name: '🏏 Sports' },
             { id: 'tech', name: '🎮 Tech' },
-            { id: 'entertainment', name: '🎭 Entertainment' },  // Renamed
-            { id: 'movies', name: '🍿 Movies' },            // New Category
-            { id: 'viral', name: '⚡ Viral (FB/YouTube)' }   // Facebook Supported
+            { id: 'entertainment', name: '🎭 Entertainment' },
+            { id: 'movies', name: '🍿 Movies' },
+            { id: 'viral', name: '⚡ Viral (FB/YT)' }
         ];
 
-        let config = { channels: {} };
+        let config = { channels: {}, apis: {} }; // Added 'apis' object
         let newsData = [];
 
-        // --- AUTHENTICATION ---
+        // --- AUTH ---
         if(sessionStorage.getItem('lpbs_admin') === 'ok') {
             document.getElementById('login-overlay').style.display = 'none';
             document.getElementById('main-panel').style.display = 'block';
         }
 
         function checkPass() {
-            const pass = document.getElementById('pass-input').value;
-            if(pass === '33982625') { 
+            if(document.getElementById('pass-input').value === '33982625') { 
                 sessionStorage.setItem('lpbs_admin', 'ok');
                 document.getElementById('login-overlay').style.display = 'none';
                 document.getElementById('main-panel').style.display = 'block';
             } else {
                 document.getElementById('err-msg').style.display = 'block';
-                document.getElementById('pass-input').value = "";
             }
         }
 
-        // --- INITIALIZATION ---
+        // --- INIT ---
         function initCategories() {
             const container = document.getElementById('category-container');
             container.innerHTML = '';
             categories.forEach(cat => {
-                let placeholder = "Paste YouTube Link...";
+                let placeholder = "Paste YouTube Video/Channel Link...";
                 if(cat.id === 'viral') placeholder = "Paste Facebook or YouTube Link...";
                 
                 container.innerHTML += `
                 <div class="card">
                     <div class="card-header">${cat.name}</div>
+                    
+                    <div style="margin-bottom:15px;">
+                        <span class="api-label"><i class="fa-solid fa-robot"></i> Robot Search Query (API Keyword):</span>
+                        <input type="text" id="api-${cat.id}" class="api-field" placeholder="e.g. Latest Bollywood News, IPL Highlights">
+                    </div>
+
                     <div id="list-${cat.id}" class="channel-list"></div>
-                    <div style="display:flex; gap:5px; margin-top:10px;">
+                    <div style="display:flex; gap:10px;">
                         <input type="text" id="new-${cat.id}" placeholder="${placeholder}" style="margin-bottom:0;">
-                        <button class="btn btn-add" style="width:auto; padding:0 20px;" onclick="addLink('${cat.id}')">ADD</button>
+                        <button class="btn btn-add" onclick="addLink('${cat.id}')"><i class="fa-solid fa-plus"></i> ADD</button>
                     </div>
                 </div>`;
             });
         }
 
-        // --- CORE FUNCTIONS ---
+        // --- LOAD DATA ---
         async function loadData() {
             try {
+                // Load Config
                 const res = await fetch('config.json?v=' + Date.now());
                 if(res.ok) config = await res.json();
                 if(!config.channels) config.channels = {};
+                if(!config.apis) config.apis = {}; // Ensure API object exists
                 
                 document.getElementById('loc-input').value = config.location_override || "";
-                categories.forEach(cat => renderList(cat.id));
-            } catch(e) { console.error("Config Load Error", e); }
+                
+                // Populate Fields
+                categories.forEach(cat => {
+                    renderList(cat.id);
+                    document.getElementById(`api-${cat.id}`).value = config.apis[cat.id] || "";
+                });
 
+            } catch(e) { console.error(e); }
+
+            // Load Stats
             try {
                 const res = await fetch('/get_stats');
                 const data = await res.json();
@@ -213,12 +224,13 @@
                 document.getElementById('count-total').innerText = data.total;
             } catch(e) {}
 
+            // Load News for Promo
             try {
                 const res = await fetch('news_db.json?v=' + Date.now());
                 const data = await res.json();
                 newsData = data.news || [];
                 const select = document.getElementById('promo-news-list');
-                select.innerHTML = '<option value="">-- Select a News to Viral --</option>';
+                select.innerHTML = '<option value="">-- Select News --</option>';
                 newsData.slice(0, 20).forEach((n, idx) => {
                     const opt = document.createElement('option');
                     opt.value = idx;
@@ -234,19 +246,19 @@
             const links = config.channels[catId] || [];
             
             if(links.length === 0) {
-                listDiv.innerHTML = '<div style="padding:10px; color:#555; text-align:center;">No links added</div>';
+                listDiv.innerHTML = '<div style="padding:15px; color:#999; text-align:center; font-style:italic;">No manual links added. Robot will use API keywords.</div>';
                 return;
             }
 
             links.forEach((url, idx) => {
-                let icon = '<i class="fa-brands fa-youtube" style="color:red; margin-right:5px;"></i>';
+                let icon = '<i class="fa-brands fa-youtube" style="color:red; margin-right:8px;"></i>';
                 if(url.includes('facebook') || url.includes('fb.watch')) {
-                    icon = '<i class="fa-brands fa-facebook" style="color:#1877F2; margin-right:5px;"></i>';
+                    icon = '<i class="fa-brands fa-facebook" style="color:#1877F2; margin-right:8px;"></i>';
                 }
 
                 listDiv.innerHTML += `
                 <div class="channel-item">
-                    <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:80%;">
+                    <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:80%; color:#333;">
                         ${icon} ${url}
                     </span>
                     <button class="btn btn-del" onclick="removeLink('${catId}', ${idx})"><i class="fa-solid fa-trash"></i></button>
@@ -273,30 +285,42 @@
 
         window.saveConfig = async function() {
             const btn = document.querySelector('.btn-save');
+            const originalText = btn.innerHTML;
             btn.innerHTML = '<div class="loader"></div> SAVING...';
+            btn.disabled = true;
             
             config.location_override = document.getElementById('loc-input').value;
             
-            await fetch('/save_config', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(config)
+            // Save API Keywords
+            categories.forEach(cat => {
+                config.apis[cat.id] = document.getElementById(`api-${cat.id}`).value;
             });
-
-            setTimeout(() => {
-                btn.innerHTML = '<i class="fa-solid fa-check"></i> SAVED!';
-                btn.style.background = '#00e676';
+            
+            try {
+                await fetch('/save_config', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(config)
+                });
+                
                 setTimeout(() => {
-                    btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> SAVE CHANGES';
-                    btn.style.background = '#2e7d32';
-                }, 2000);
-            }, 1000);
+                    btn.innerHTML = '<i class="fa-solid fa-check"></i> SAVED SUCCESSFULLY!';
+                    btn.style.background = '#4caf50';
+                    setTimeout(() => {
+                        btn.innerHTML = originalText;
+                        btn.style.background = '#2e7d32';
+                        btn.disabled = false;
+                    }, 2000);
+                }, 1000);
+            } catch(e) {
+                alert("Save Failed! Check connection.");
+                btn.disabled = false;
+                btn.innerHTML = originalText;
+            }
         }
 
-        // --- VIRAL PROMO LOGIC (FIRST COMMENT SYSTEM) ---
-        function resetPreview() {
-            document.getElementById('preview-box').style.display = 'none';
-        }
+        // --- VIRAL PROMO ---
+        function resetPreview() { document.getElementById('preview-box').style.display = 'none'; }
 
         window.generatePromo = async function() {
             const idx = document.getElementById('promo-news-list').value;
@@ -314,11 +338,7 @@
                 const res = await fetch('/create_promo', {
                     method: 'POST',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        title: news.title,
-                        thumb: news.thumb,
-                        lang: lang
-                    })
+                    body: JSON.stringify({ title: news.title, thumb: news.thumb, lang: lang })
                 });
                 
                 const result = await res.json();
@@ -328,7 +348,6 @@
                     const link = `https://news.lpbs.in/article.html?id=${news.id}`;
                     const hashtags = result.hashtags;
                     
-                    // SMART CAPTION LOGIC (Text points to First Comment)
                     let caption = "";
                     if(lang === 'bn') {
                         caption = `🔥 ব্রেকিং: ${news.title}\n\nভিডিওটি দেখতে নিচের প্রথম কমেন্টে দেওয়া লিংকে ক্লিক করুন 👇👇\n(Link in First Comment)\n\n${hashtags}`;
@@ -344,32 +363,26 @@
                     
                     document.getElementById('preview-box').style.display = 'block';
                 }
-            } catch(e) {
-                alert("Server Error! Robot might be sleeping.");
-            }
+            } catch(e) { alert("Server Error! Robot might be sleeping."); }
 
-            btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> GENERATE VIRAL IMAGE';
+            btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> CREATE VIRAL IMAGE';
             btn.disabled = false;
         }
 
         window.copyCaption = function() {
             const el = document.getElementById('prev-caption');
-            el.select();
-            document.execCommand('copy');
-            alert("Caption Copied! Now Paste on Facebook.");
+            el.select(); document.execCommand('copy');
+            alert("Caption Copied!");
         }
-
         window.copyLink = function() {
             const el = document.getElementById('prev-link');
-            el.select();
-            document.execCommand('copy');
-            alert("Link Copied! Paste this in the First Comment.");
+            el.select(); document.execCommand('copy');
+            alert("Link Copied!");
         }
 
-        // Start
+        // START
         initCategories();
         loadData();
     </script>
 </body>
 </html>
-
