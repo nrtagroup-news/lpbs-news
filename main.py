@@ -27,10 +27,10 @@ NEWS_API_KEY = "pub_102fa773efa04ad2871534886e425eab"
 RETENTION_HOURS = 48
 PROMO_IMAGE_FILE = "promo_image.jpg"
 
-# ফন্ট ম্যাপ
+# ফন্ট ম্যাপ (আপনার ফাইলের নামের সাথে মিল রেখে)
 FONTS = {
     'bn': 'bn.ttf',
-    'hi': 'hn.ttf',
+    'hi': 'hn.ttf',  # আপনার আপলোড করা হিন্দি ফন্ট
     'en': 'en.ttf',
     'tm': 'tm.ttf'
 }
@@ -164,7 +164,7 @@ def robot_loop():
             time.sleep(60)
 
 # ==========================================
-# 🎨 PART 2: PROMO GENERATOR
+# 🎨 PART 2: PROMO GENERATOR (Updated with Logo & Bold Text)
 # ==========================================
 
 def get_hashtags(title, lang):
@@ -183,6 +183,7 @@ def create_viral_thumbnail(image_url, title, lang):
         base_width, base_height = 1280, 720
         canvas = Image.new("RGB", (base_width, base_height), (0,0,0))
         
+        # ইমেজ সাইজ হ্যান্ডলিং
         img_ratio = img.width / img.height
         target_ratio = base_width / base_height
         
@@ -200,11 +201,12 @@ def create_viral_thumbnail(image_url, title, lang):
         draw = ImageDraw.Draw(final_img)
         font_filename = FONTS.get(lang, 'en.ttf')
         
+        # ফন্ট লোডিং (বড় সাইজ)
         try:
             if os.path.exists(font_filename):
-                title_font = ImageFont.truetype(font_filename, 70)
-                sub_font = ImageFont.truetype(font_filename, 45)
-                logo_font = ImageFont.truetype(font_filename, 40)
+                title_font = ImageFont.truetype(font_filename, 70) # ফন্ট সাইজ বড় (৭০)
+                sub_font = ImageFont.truetype(font_filename, 45)   # সাবটাইটেল (৪৫)
+                logo_font = ImageFont.truetype(font_filename, 40)  # লোগো ফন্ট
             else:
                 title_font = ImageFont.load_default()
                 sub_font = ImageFont.load_default()
@@ -212,19 +214,23 @@ def create_viral_thumbnail(image_url, title, lang):
         except:
             title_font = ImageFont.load_default(); sub_font = ImageFont.load_default(); logo_font = ImageFont.load_default()
 
+        # কালো শেড বা ওভারলে
         overlay = Image.new('RGBA', final_img.size, (0,0,0,0))
         draw_overlay = ImageDraw.Draw(overlay)
         draw_overlay.rectangle([(0, 480), (1280, 720)], fill=(0, 0, 0, 180)) 
         final_img = Image.alpha_composite(final_img.convert('RGBA'), overlay).convert('RGB')
         draw = ImageDraw.Draw(final_img)
 
-        # লোগো এবং টেক্সট
-        draw.rectangle([(30, 30), (280, 90)], fill="#cc0000")
+        # 1. লোগো বসানো (Top Left)
+        draw.rectangle([(30, 30), (280, 90)], fill="#cc0000") # লাল বক্স
         draw.text((45, 40), "LPBS NEWS", font=logo_font, fill="white", stroke_width=2, stroke_fill="black")
 
+        # 2. টাইটেল (বড় + বোল্ড + স্ট্রোক)
         short_title = title[:60] + "..." if len(title) > 60 else title
+        # stroke_width=4 দিয়ে লেখা বোল্ড ও আউটলাইন
         draw.text((30, 500), short_title, font=title_font, fill=(255, 255, 0), stroke_width=4, stroke_fill="black") 
         
+        # 3. সাবটাইটেল (স্ট্রোক সহ)
         if lang == 'bn': subtitle = "▶ ভিডিও দেখতে এখানে ক্লিক করুন 👇"
         elif lang == 'hi': subtitle = "▶ वीडियो देखने के लिए यहाँ क्लिक करें 👇"
         else: subtitle = "▶ Watch Full Video (Click Here) 👇"
@@ -292,7 +298,7 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
         else:
             super().do_GET()
 
-    # --- এখানে Syntax Error ছিল, ঠিক করে দিলাম ---
+    # --- Syntax Error ফিক্স করা হয়েছে (আগে এক লাইনে ছিল) ---
     def update_stats(self):
         s_file = "stats.json"
         data = {"total": 0, "today": 0, "date": ""}
