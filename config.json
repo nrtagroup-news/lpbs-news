@@ -2,17 +2,22 @@
     "location_override": "Agartala, Tripura",
     "channels": {
         "live": [
+            "https://www.youtube.com/@aajtak/videos",
             "https://www.youtube.com/@DDnews/videos",
-            "https://www.youtube.com/@ZeeNews/videos"
+            "https://www.youtube.com/@abpanandatv/videos"
         ],
         "breaking": [
-            "https://www.youtube.com/@RepublicBharat/shorts"
+            "https://www.youtube.com/@RepublicBharat/shorts",
+            "https://www.youtube.com/@ZeeNews/videos",
         ],
         "sports": [
             "https://www.youtube.com/@SportsTak/videos",
             "https://www.youtube.com/@WWE/videos"
         ],
-        "tech": [],
+        "tech": [
+            "https://www.youtube.com/@ZeeBusiness/videos",
+            "https://www.youtube.com/@TechBurner/videos"
+        ],
         "entertainment": [
             "https://www.youtube.com/@tseries/videos",
             "https://www.youtube.com/@sangeetbangla/videos"
@@ -22,3 +27,4 @@
     }
 
 }
+
