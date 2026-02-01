@@ -8,6 +8,9 @@
     <meta name="author" content="NRTA Group">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#000000">
+    
     <title>LPBS NEWS - Sabse Aage, Sabse Tej</title>
     
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7398472528361759" crossorigin="anonymous"></script>
@@ -16,7 +19,12 @@
     <script>
       window.OneSignalDeferred = window.OneSignalDeferred || [];
       OneSignalDeferred.push(async function(OneSignal) {
-        await OneSignal.init({ appId: "a2089b57-b359-48e9-b4f5-9ba54f0f44c5" });
+        await OneSignal.init({ 
+            appId: "a2089b57-b359-48e9-b4f5-9ba54f0f44c5",
+            safari_web_id: "web.onesignal.auto.63b8d45f-40e8-4672-871c-43f901119565",
+            notifyButton: { enable: true },
+            allowLocalhostAsSecureOrigin: true
+        });
       });
     </script>
     
@@ -25,10 +33,9 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <style>
-        /* CSS VARIABLES (Updated with WhatsApp Color) */
+        /* CSS VARIABLES */
         :root { --primary: #ff0000; --whatsapp: #25D366; --bg: #000000; --card-bg: #111; --text: #e0e0e0; --border: #222; --hover: #1a1a1a; }
         
-        /* THEMES */
         body.theme-medium { --bg: #222; --card-bg: #333; --text: #f0f0f0; --border: #444; --hover: #444; }
         body.theme-light { --bg: #f4f4f4; --card-bg: #ffffff; --text: #111; --border: #ddd; --hover: #f9f9f9; }
         
@@ -42,25 +49,22 @@
         .brand { font-size: 28px; font-weight: 900; margin: 0; text-transform: uppercase; color: var(--text); line-height: 1; }
         .slogan { font-size: 11px; color: #ffeb3b; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-top: 3px; }
 
-        /* WHATSAPP BUTTON STYLE (NEW) */
+        /* WHATSAPP HEADER BUTTON */
         .wa-btn { background: var(--whatsapp); color: white; text-decoration: none; font-size: 12px; font-weight: bold; padding: 5px 10px; border-radius: 20px; display: flex; align-items: center; gap: 5px; animation: pulse 2s infinite; border: 1px solid #128C7E; }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(37, 211, 102, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); } }
 
-        /* UTILITY TICKER STYLE (NEW) */
+        /* UTILITY TICKER */
         .utility-bar { background: #1a1a1a; color: #ffd700; font-size: 13px; font-weight: bold; padding: 8px; white-space: nowrap; overflow: hidden; border-bottom: 1px solid #333; display: flex; align-items: center; }
         .ticker-wrap { width: 100%; overflow: hidden; }
         .ticker-move { display: inline-block; white-space: nowrap; padding-left: 100%; animation: ticker 20s linear infinite; }
         @keyframes ticker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
         .util-item { margin-right: 30px; display: inline-flex; align-items: center; gap: 5px; }
 
-        /* CONTROLS SECTION */
+        /* CONTROLS */
         .controls { display: flex; align-items: center; gap: 10px; }
-        
         .theme-dots { display: flex; gap: 5px; background: rgba(255,255,255,0.1); padding: 3px; border-radius: 10px; }
         .dot { width: 15px; height: 15px; border-radius: 50%; cursor: pointer; border: 1px solid #555; }
-        .dot.dark { background: #000; }
-        .dot.medium { background: #333; }
-        .dot.light { background: #fff; }
+        .dot.dark { background: #000; } .dot.medium { background: #333; } .dot.light { background: #fff; }
 
         .grid-btn { background: none; border: 1px solid var(--border); color: var(--text); padding: 5px 8px; border-radius: 4px; cursor: pointer; display: none; }
         @media(max-width: 768px) { .grid-btn { display: block; } }
@@ -106,7 +110,11 @@
 
         .info { padding: 15px; }
         .title { font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--text); line-height: 1.4; }
-        .meta { font-size: 12px; color: #888; display: flex; justify-content: space-between; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px; }
+        
+        /* SHARE BUTTON STYLE (NEW) */
+        .meta { font-size: 12px; color: #888; display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px; }
+        .share-btn { background: none; border: 1px solid #333; color: var(--whatsapp); padding: 3px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 5px; transition: 0.3s; }
+        .share-btn:hover { background: var(--whatsapp); color: white; border-color: var(--whatsapp); }
 
         .watermark { position: absolute; top: 10px; right: 10px; background: var(--primary); color: white; padding: 3px 6px; font-size: 10px; font-weight: bold; border-radius: 3px; z-index: 6; pointer-events: none; }
         .loc-badge { background: #ffeb3b; color: black; padding: 2px 6px; font-size: 11px; font-weight: bold; border-radius: 3px; display:inline-block; margin-bottom: 5px; }
@@ -120,7 +128,6 @@
 
         .live-score { background: linear-gradient(90deg, #111, #330000); padding: 12px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid red; display: none; color: white; }
 
-        /* APP INSTALL PROMPT (NEW) */
         #install-app { position: fixed; bottom: 10px; left: 10px; right: 10px; background: #222; border: 1px solid #444; padding: 10px; border-radius: 8px; display: none; align-items: center; justify-content: space-between; z-index: 2000; box-shadow: 0 5px 20px rgba(0,0,0,0.5); }
         .app-btn { background: var(--primary); color: white; border: none; padding: 5px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; }
 
@@ -232,9 +239,8 @@
         const SMARTLINK = "https://www.effectivegatecpm.com/uym16xq3jk?key=492c6ab2b2e619a347f8a0c6f22515e1";
         let userCity = "";
         let userRegion = "";
-        let deferredPrompt; // For PWA
+        let deferredPrompt; 
 
-        // --- GOOGLE TRANSLATOR ---
         function googleTranslateElementInit() {
             new google.translate.TranslateElement({
                 pageLanguage: 'en',
@@ -250,14 +256,12 @@
         let allData = [];
         let currentLayout = 'list';
 
-        // --- 1. THEME MANAGER ---
         function setTheme(theme) {
             document.body.className = '';
             if (theme === 'medium') document.body.classList.add('theme-medium');
             else if (theme === 'light') document.body.classList.add('theme-light');
         }
 
-        // --- 2. LAYOUT MANAGER ---
         function toggleGrid() {
             const grid = document.getElementById('news-grid');
             const btn = document.querySelector('.grid-btn i');
@@ -272,13 +276,11 @@
             }
         }
 
-        // --- 3. LITE VIDEO PLAYER ---
         function loadVideo(element, url) {
             element.innerHTML = `<iframe src="${url}&autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
             element.style.cursor = 'default';
         }
 
-        // --- 4. DATA SECURITY ---
         function sanitizeHTML(str) {
             if (!str) return "";
             return str.replace(/[&<>"']/g, function(m) {
@@ -286,21 +288,22 @@
             });
         }
 
-        // --- 5. GOLD API & UTILITY TICKER (NEW) ---
+        // --- SHARE FUNCTION (NEW) ---
+        function shareNews(title) {
+            const text = `${title}\n\nRead more at: ${SMARTLINK}`;
+            const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
+        }
+
         async function loadMarketData(city) {
             const goldOptions = { method: 'GET', headers: { 'x-access-token': 'goldapi-1k19sml45hnkq-io', 'Content-Type': 'application/json' } };
-            
             try {
-                // Fetch Gold Price (India Standard)
                 const gRes = await fetch('https://www.goldapi.io/api/XAU/INR', goldOptions);
                 const gData = await gRes.json();
-                
-                // Calculate 10g Price (24K & 22K approx)
                 const price24k = gData.price_gram_24k * 10; 
                 const price22k = price24k * 0.916; 
                 const date = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
 
-                // Update Ticker with IP Location
                 const content = `
                     <span class="util-item"><i class="fa-solid fa-coins"></i> Gold Rate Today in ${city || "Agartala"} (${date})</span>
                     <span class="util-item" style="color:#00e676;">24K (10g): ₹${Math.floor(price24k).toLocaleString()}</span>
@@ -314,25 +317,20 @@
             }
         }
 
-        // --- 6. SYSTEM LOADER ---
         async function loadSystem() {
             try {
-                // Get IP Location
                 const ipRes = await fetch('https://ipapi.co/json/');
                 const ipData = await ipRes.json();
                 userCity = ipData.city || "";
                 userRegion = ipData.region || "";
                 document.getElementById('footer-loc').innerText = `${userCity}, ${userRegion}`;
 
-                // Call Market Data
                 loadMarketData(userCity);
 
-                // Fetch News
                 const res = await fetch('news_db.json?nocache=' + new Date().getTime());
                 const data = await res.json();
                 allData = data.news;
                 
-                // Refresh Active Tab
                 const activeBtn = document.querySelector('.nav-btn.active');
                 if (activeBtn) {
                     let cat = 'all';
@@ -359,7 +357,6 @@
             cricBox.style.display = (cat === 'all' || cat === 'live') ? 'block' : 'none';
 
             let filtered = [];
-            
             if (cat === 'all') filtered = [...allData];
             else if (cat === 'breaking') filtered = allData.filter(n => n.category === 'breaking' && n.type === 'video'); 
             else filtered = allData.filter(n => n.category.toLowerCase().includes(cat));
@@ -396,6 +393,7 @@
                 const locBadge = (n.title + n.desc).toLowerCase().includes(userCity.toLowerCase()) ? 
                                 `<span class="loc-badge"><i class="fa-solid fa-location-dot"></i> ${userCity}</span>` : '';
 
+                // SHARE BUTTON ADDED INSIDE META DIV 👇
                 const div = document.createElement('div');
                 div.className = isFeatured ? 'card featured' : 'card';
                 div.innerHTML = `
@@ -406,6 +404,9 @@
                         ${isFeatured ? `<div style="color:var(--text); opacity:0.8; margin-bottom:10px; font-size:14px;">${sanitizeHTML(n.desc)}</div>` : ''}
                         <div class="meta">
                             <span>${n.time}</span>
+                            <button class="share-btn" onclick="shareNews('${safeTitle}')">
+                                <i class="fa-brands fa-whatsapp"></i> Share
+                            </button>
                             <span>${sanitizeHTML(n.source) || 'LPBS Bureau'}</span>
                         </div>
                         <a href="${SMARTLINK}" target="_blank" style="display:block; text-align:center; background:var(--primary); color:white; padding:10px; margin-top:12px; text-decoration:none; font-weight:bold; border-radius:4px; font-size:13px; text-transform:uppercase; letter-spacing:0.5px;">
@@ -417,7 +418,6 @@
             });
         }
 
-        // --- NAVIGATION HANDLER ---
         window.filterNews = function(cat) {
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
             const buttons = document.querySelectorAll('.nav-btn');
@@ -429,7 +429,6 @@
             renderNews(cat);
         }
 
-        // --- APP INSTALL LOGIC (NEW) ---
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
@@ -445,7 +444,6 @@
             }
         }
 
-        // --- MODALS ---
         function openModal(type) {
             const modal = document.getElementById('infoModal');
             const body = document.getElementById('modalBody');
@@ -467,9 +465,8 @@
         }
         function closeModal() { document.getElementById('infoModal').style.display = 'none'; }
 
-        // Start System
         loadSystem();
-        setInterval(loadSystem, 60000); // Check for updates every 1 minute
+        setInterval(loadSystem, 60000);
     </script>
 </body>
 </html>
