@@ -17,7 +17,7 @@ except ImportError:
     PILLOW_AVAILABLE = False
     print("⚠️ WARNING: Pillow library not found! requirements.txt এ Pillow যুক্ত করুন।")
 
-# --- কনফিগারেশন (Render Port Fix) ---
+# --- কনফিগারেশন ---
 # রেন্ডার অটোমেটিক যে পোর্ট দেবে সেটা নেবে, না পেলে 8080
 PORT = int(os.environ.get("PORT", 8080))
 
@@ -27,10 +27,10 @@ NEWS_API_KEY = "pub_102fa773efa04ad2871534886e425eab"
 RETENTION_HOURS = 3
 PROMO_IMAGE_FILE = "promo_image.jpg"
 
-# ফন্ট ম্যাপ (আপনার ফাইলের নামের সাথে মিল রেখে)
+# ফন্ট ম্যাপ
 FONTS = {
     'bn': 'bn.ttf',
-    'hi': 'hn.ttf',  # আপনার আপলোড করা হিন্দি ফন্ট
+    'hi': 'hn.ttf',
     'en': 'en.ttf',
     'tm': 'tm.ttf'
 }
@@ -98,11 +98,11 @@ def fetch_social_videos(channels):
     video_news = []
     today_str, yesterday_str = get_smart_date()
     
-    # --- CHANGE HERE: REMOVED extract_flat: True TO FIX LIVE VIDEO ISSUE ---
+    # --- CRITICAL FIX: extract_flat আবার ফেরত আনা হয়েছে যাতে হ্যাং না করে ---
     ydl_opts = {
         'quiet': True, 
         'ignoreerrors': True, 
-        # 'extract_flat': True,  <-- THIS LINE REMOVED
+        'extract_flat': True,  # এটা থাকতেই হবে, না হলে সার্ভার হ্যাং করবে
         'playlistend': 5, 
         'socket_timeout': 15
     }
@@ -118,19 +118,25 @@ def fetch_social_videos(channels):
                     found = False
                     for video in entries:
                         if not video: continue
-                        duration = video.get('duration', 0)
-                        is_short = (duration > 0 and duration < 60)
+                        
+                        # Live Video Fix: লাইভ ভিডিওর সময় (duration) থাকে না, তাই চেক সরানো হলো
+                        # duration = video.get('duration', 0) 
+                        # is_short = (duration > 0 and duration < 60)
+                        
+                        # নতুন লজিক: সব ভিডিও নেবে
                         video_id = video['id']
                         original_url = video.get('webpage_url', url)
                         embed_link = get_embed_code(original_url, video_id)
+                        
+                        # থাম্বনেইল ফিক্স
                         thumb = video.get('thumbnail')
                         if not thumb: thumb = f"https://i.ytimg.com/vi/{video_id}/hqdefault.jpg"
 
                         video_news.append({
                             "id": video_id,
                             "category": category,
-                            "title": video.get('title'),
-                            "desc": video.get('title'),
+                            "title": video.get('title') or "Live Video",
+                            "desc": video.get('title') or "Click to watch",
                             "thumb": thumb,
                             "video_url": embed_link,
                             "original_link": original_url,
@@ -138,7 +144,7 @@ def fetch_social_videos(channels):
                             "time": "Latest",
                             "timestamp": time.time(),
                             "type": "video",
-                            "is_short": is_short,
+                            "is_short": False, # ডিফল্ট False
                             "platform": "facebook" if "facebook" in original_url else "youtube"
                         })
                         found = True
@@ -172,7 +178,7 @@ def robot_loop():
             time.sleep(60)
 
 # ==========================================
-# 🎨 PART 2: PROMO GENERATOR (Updated with Logo & Bold Text)
+# 🎨 PART 2: PROMO GENERATOR
 # ==========================================
 
 def get_hashtags(title, lang):
@@ -191,7 +197,6 @@ def create_viral_thumbnail(image_url, title, lang):
         base_width, base_height = 1280, 720
         canvas = Image.new("RGB", (base_width, base_height), (0,0,0))
         
-        # ইমেজ সাইজ হ্যান্ডলিং
         img_ratio = img.width / img.height
         target_ratio = base_width / base_height
         
@@ -209,12 +214,11 @@ def create_viral_thumbnail(image_url, title, lang):
         draw = ImageDraw.Draw(final_img)
         font_filename = FONTS.get(lang, 'en.ttf')
         
-        # ফন্ট লোডিং (বড় সাইজ)
         try:
             if os.path.exists(font_filename):
-                title_font = ImageFont.truetype(font_filename, 70) # ফন্ট সাইজ বড় (৭০)
-                sub_font = ImageFont.truetype(font_filename, 45)   # সাবটাইটেল (৪৫)
-                logo_font = ImageFont.truetype(font_filename, 40)  # লোগো ফন্ট
+                title_font = ImageFont.truetype(font_filename, 70)
+                sub_font = ImageFont.truetype(font_filename, 45)
+                logo_font = ImageFont.truetype(font_filename, 40)
             else:
                 title_font = ImageFont.load_default()
                 sub_font = ImageFont.load_default()
@@ -222,26 +226,21 @@ def create_viral_thumbnail(image_url, title, lang):
         except:
             title_font = ImageFont.load_default(); sub_font = ImageFont.load_default(); logo_font = ImageFont.load_default()
 
-        # কালো শেড বা ওভারলে
         overlay = Image.new('RGBA', final_img.size, (0,0,0,0))
         draw_overlay = ImageDraw.Draw(overlay)
         draw_overlay.rectangle([(0, 480), (1280, 720)], fill=(0, 0, 0, 180)) 
         final_img = Image.alpha_composite(final_img.convert('RGBA'), overlay).convert('RGB')
         draw = ImageDraw.Draw(final_img)
 
-        # 1. লোগো বসানো (Top Left)
-        draw.rectangle([(30, 30), (280, 90)], fill="#cc0000") # লাল বক্স
+        draw.rectangle([(30, 30), (280, 90)], fill="#cc0000")
         draw.text((45, 40), "LPBS NEWS", font=logo_font, fill="white", stroke_width=2, stroke_fill="black")
 
-        # 2. টাইটেল (বড় + বোল্ড + স্ট্রোক)
         short_title = title[:60] + "..." if len(title) > 60 else title
-        # stroke_width=4 দিয়ে লেখা বোল্ড ও আউটলাইন
         draw.text((30, 500), short_title, font=title_font, fill=(255, 255, 0), stroke_width=4, stroke_fill="black") 
         
-        # 3. সাবটাইটেল (স্ট্রোক সহ)
-        if lang == 'bn': subtitle = "▶ সম্পূর্ণ ভিডিও দেখতে প্রথম কমেন্টের লিঙ্কে ক্লিক করুন। 👇"
-        elif lang == 'hi': subtitle = "▶ पूरा वीडियो देखने के लिए पहले कमेंट लिंक पर क्लिक करें 👇"
-        else: subtitle = "▶ Watch Full Video (FULL VIDEO CLICK FIRST COMENT URL) 👇"
+        if lang == 'bn': subtitle = "▶ ভিডিও দেখতে এখানে ক্লিক করুন 👇"
+        elif lang == 'hi': subtitle = "▶ वीडियो देखने के लिए यहाँ क्लिक करें 👇"
+        else: subtitle = "▶ Watch Full Video (Click Here) 👇"
         
         draw.text((30, 610), subtitle, font=sub_font, fill=(255, 255, 255), stroke_width=3, stroke_fill="black")
 
@@ -306,12 +305,13 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
         else:
             super().do_GET()
 
-    # --- Syntax Error ফিক্স করা হয়েছে (আগে এক লাইনে ছিল) ---
+    # --- SYNTAX ERROR FIXED HERE ---
     def update_stats(self):
         s_file = "stats.json"
         data = {"total": 0, "today": 0, "date": ""}
         if os.path.exists(s_file):
             try:
+                # নিচের লাইন দুটো আলাদা করা হয়েছে
                 with open(s_file, 'r') as f:
                     data = json.load(f)
             except:
@@ -329,3 +329,4 @@ if __name__ == "__main__":
     print(f"🔥 SERVER STARTED ON PORT {PORT}")
     with socketserver.TCPServer(("0.0.0.0", PORT), MyRequestHandler) as httpd:
         httpd.serve_forever()
+                
