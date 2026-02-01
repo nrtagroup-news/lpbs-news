@@ -19,12 +19,7 @@
     <script>
       window.OneSignalDeferred = window.OneSignalDeferred || [];
       OneSignalDeferred.push(async function(OneSignal) {
-        await OneSignal.init({ 
-            appId: "a2089b57-b359-48e9-b4f5-9ba54f0f44c5",
-            safari_web_id: "web.onesignal.auto.63b8d45f-40e8-4672-871c-43f901119565",
-            notifyButton: { enable: true },
-            allowLocalhostAsSecureOrigin: true
-        });
+        await OneSignal.init({ appId: "a2089b57-b359-48e9-b4f5-9ba54f0f44c5" });
       });
     </script>
     
@@ -49,9 +44,15 @@
         .brand { font-size: 28px; font-weight: 900; margin: 0; text-transform: uppercase; color: var(--text); line-height: 1; }
         .slogan { font-size: 11px; color: #ffeb3b; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-top: 3px; }
 
-        /* WHATSAPP HEADER BUTTON */
+        /* WHATSAPP BUTTON STYLE */
         .wa-btn { background: var(--whatsapp); color: white; text-decoration: none; font-size: 12px; font-weight: bold; padding: 5px 10px; border-radius: 20px; display: flex; align-items: center; gap: 5px; animation: pulse 2s infinite; border: 1px solid #128C7E; }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(37, 211, 102, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); } }
+
+        /* DONATE BUTTON STYLE (NEW) */
+        .donate-icon { color: #ffd700; font-size: 20px; cursor: pointer; position: relative; margin-right: 5px; animation: bounce 2s infinite; }
+        .donate-popup { display: none; position: absolute; top: 40px; right: -20px; background: white; padding: 10px; border-radius: 8px; border: 2px solid #ffd700; text-align: center; z-index: 10001; width: 120px; box-shadow: 0 0 20px rgba(255, 215, 0, 0.3); }
+        .donate-popup::after { content: ''; position: absolute; top: -10px; right: 25px; border-width: 0 10px 10px 10px; border-style: solid; border-color: transparent transparent white transparent; }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-5px);} 60% {transform: translateY(-3px);} }
 
         /* UTILITY TICKER */
         .utility-bar { background: #1a1a1a; color: #ffd700; font-size: 13px; font-weight: bold; padding: 8px; white-space: nowrap; overflow: hidden; border-bottom: 1px solid #333; display: flex; align-items: center; }
@@ -61,7 +62,7 @@
         .util-item { margin-right: 30px; display: inline-flex; align-items: center; gap: 5px; }
 
         /* CONTROLS */
-        .controls { display: flex; align-items: center; gap: 10px; }
+        .controls { display: flex; align-items: center; gap: 10px; position: relative; } /* Added relative for popup */
         .theme-dots { display: flex; gap: 5px; background: rgba(255,255,255,0.1); padding: 3px; border-radius: 10px; }
         .dot { width: 15px; height: 15px; border-radius: 50%; cursor: pointer; border: 1px solid #555; }
         .dot.dark { background: #000; } .dot.medium { background: #333; } .dot.light { background: #fff; }
@@ -111,7 +112,7 @@
         .info { padding: 15px; }
         .title { font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--text); line-height: 1.4; }
         
-        /* SHARE BUTTON STYLE (NEW) */
+        /* SHARE BUTTON STYLE */
         .meta { font-size: 12px; color: #888; display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px; }
         .share-btn { background: none; border: 1px solid #333; color: var(--whatsapp); padding: 3px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 5px; transition: 0.3s; }
         .share-btn:hover { background: var(--whatsapp); color: white; border-color: var(--whatsapp); }
@@ -154,6 +155,15 @@
             </a>
             
             <div class="controls">
+                
+                <div class="donate-icon" onclick="toggleDonate()">
+                    <i class="fa-solid fa-hand-holding-dollar"></i>
+                    <div class="donate-popup" id="donate-pop">
+                        <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=upi://pay?pa=Nrta1@icici&pn=LPBS%20News&cu=INR" style="width:100px; height:100px;">
+                        <div style="color:black; font-size:10px; font-weight:bold; margin-top:5px;">Pay Anything<br>Nrta1@icici</div>
+                    </div>
+                </div>
+
                 <div class="theme-dots" title="Change Theme">
                     <div class="dot dark" onclick="setTheme('dark')"></div>
                     <div class="dot medium" onclick="setTheme('medium')"></div>
@@ -288,7 +298,19 @@
             });
         }
 
-        // --- SHARE FUNCTION (NEW) ---
+        // --- DONATE FUNCTION (NEW) ---
+        function toggleDonate() {
+            const d = document.getElementById('donate-pop');
+            d.style.display = (d.style.display === 'block') ? 'none' : 'block';
+        }
+        // Close if clicked outside
+        window.onclick = function(event) {
+            if (!event.target.matches('.donate-icon') && !event.target.closest('.donate-icon')) {
+                const pop = document.getElementById('donate-pop');
+                if(pop) pop.style.display = "none";
+            }
+        }
+
         function shareNews(title) {
             const text = `${title}\n\nRead more at: ${SMARTLINK}`;
             const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
@@ -393,7 +415,6 @@
                 const locBadge = (n.title + n.desc).toLowerCase().includes(userCity.toLowerCase()) ? 
                                 `<span class="loc-badge"><i class="fa-solid fa-location-dot"></i> ${userCity}</span>` : '';
 
-                // SHARE BUTTON ADDED INSIDE META DIV 👇
                 const div = document.createElement('div');
                 div.className = isFeatured ? 'card featured' : 'card';
                 div.innerHTML = `
