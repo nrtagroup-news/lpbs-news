@@ -10,6 +10,8 @@
     
     <title>LPBS NEWS - Sabse Aage, Sabse Tej</title>
     
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7398472528361759" crossorigin="anonymous"></script>
+
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     <script>
       window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -23,8 +25,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <style>
-        /* CSS VARIABLES */
-        :root { --primary: #ff0000; --bg: #000000; --card-bg: #111; --text: #e0e0e0; --border: #222; --hover: #1a1a1a; }
+        /* CSS VARIABLES (Updated with WhatsApp Color) */
+        :root { --primary: #ff0000; --whatsapp: #25D366; --bg: #000000; --card-bg: #111; --text: #e0e0e0; --border: #222; --hover: #1a1a1a; }
         
         /* THEMES */
         body.theme-medium { --bg: #222; --card-bg: #333; --text: #f0f0f0; --border: #444; --hover: #444; }
@@ -40,21 +42,29 @@
         .brand { font-size: 28px; font-weight: 900; margin: 0; text-transform: uppercase; color: var(--text); line-height: 1; }
         .slogan { font-size: 11px; color: #ffeb3b; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-top: 3px; }
 
+        /* WHATSAPP BUTTON STYLE (NEW) */
+        .wa-btn { background: var(--whatsapp); color: white; text-decoration: none; font-size: 12px; font-weight: bold; padding: 5px 10px; border-radius: 20px; display: flex; align-items: center; gap: 5px; animation: pulse 2s infinite; border: 1px solid #128C7E; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(37, 211, 102, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); } }
+
+        /* UTILITY TICKER STYLE (NEW) */
+        .utility-bar { background: #1a1a1a; color: #ffd700; font-size: 13px; font-weight: bold; padding: 8px; white-space: nowrap; overflow: hidden; border-bottom: 1px solid #333; display: flex; align-items: center; }
+        .ticker-wrap { width: 100%; overflow: hidden; }
+        .ticker-move { display: inline-block; white-space: nowrap; padding-left: 100%; animation: ticker 20s linear infinite; }
+        @keyframes ticker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
+        .util-item { margin-right: 30px; display: inline-flex; align-items: center; gap: 5px; }
+
         /* CONTROLS SECTION */
         .controls { display: flex; align-items: center; gap: 10px; }
         
-        /* Theme Switcher Dots */
         .theme-dots { display: flex; gap: 5px; background: rgba(255,255,255,0.1); padding: 3px; border-radius: 10px; }
         .dot { width: 15px; height: 15px; border-radius: 50%; cursor: pointer; border: 1px solid #555; }
         .dot.dark { background: #000; }
         .dot.medium { background: #333; }
         .dot.light { background: #fff; }
 
-        /* Grid Toggle */
         .grid-btn { background: none; border: 1px solid var(--border); color: var(--text); padding: 5px 8px; border-radius: 4px; cursor: pointer; display: none; }
         @media(max-width: 768px) { .grid-btn { display: block; } }
 
-        /* Google Translator */
         #google_translate_element { overflow: hidden; height: 26px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); }
         .goog-te-combo { margin: 0 !important; height: 26px !important; font-size: 12px; background: var(--bg); color: var(--text); border: none; }
         .goog-logo-link, .goog-te-banner-frame { display: none !important; } 
@@ -69,8 +79,6 @@
         /* MAIN GRID */
         .container { padding: 10px; max-width: 1400px; margin: 0 auto; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; padding-top: 15px; }
-        
-        /* Mobile Layout Classes */
         .grid.mobile-list { grid-template-columns: 1fr; } 
         .grid.mobile-grid { grid-template-columns: 1fr 1fr; } 
 
@@ -78,18 +86,15 @@
         .card { background: var(--card-bg); border-radius: 8px; overflow: hidden; border: 1px solid var(--border); display: flex; flex-direction: column; transition: transform 0.2s; }
         .card:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
 
-        /* Featured Card (Layout) */
         .card.featured { grid-column: 1 / -1; flex-direction: row; border-bottom: 4px solid var(--primary); background: rgba(255, 0, 0, 0.05); }
         .card.featured .media { width: 60%; height: 350px; }
         .card.featured .info { width: 40%; padding: 25px; justify-content: center; display: flex; flex-direction: column; }
         .card.featured .title { font-size: 26px; line-height: 1.3; }
 
-        /* Media Container (Lite Load Optimization) */
         .media { width: 100%; height: 200px; position: relative; background: #000; cursor: pointer; overflow: hidden; }
         .media img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; transition: 0.3s; }
         .media:hover img { opacity: 0.7; transform: scale(1.05); }
         
-        /* Play Button Overlay */
         .play-btn { 
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             width: 50px; height: 50px; background: rgba(255,0,0,0.8); border-radius: 50%;
@@ -106,7 +111,6 @@
         .watermark { position: absolute; top: 10px; right: 10px; background: var(--primary); color: white; padding: 3px 6px; font-size: 10px; font-weight: bold; border-radius: 3px; z-index: 6; pointer-events: none; }
         .loc-badge { background: #ffeb3b; color: black; padding: 2px 6px; font-size: 11px; font-weight: bold; border-radius: 3px; display:inline-block; margin-bottom: 5px; }
 
-        /* Mobile Adjustments */
         @media(max-width: 768px) {
             .card.featured { flex-direction: column; }
             .card.featured .media { width: 100%; height: 220px; }
@@ -114,15 +118,16 @@
             .card.featured .title { font-size: 20px; }
         }
 
-        /* LIVE SCORE */
         .live-score { background: linear-gradient(90deg, #111, #330000); padding: 12px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid red; display: none; color: white; }
 
-        /* FOOTER */
+        /* APP INSTALL PROMPT (NEW) */
+        #install-app { position: fixed; bottom: 10px; left: 10px; right: 10px; background: #222; border: 1px solid #444; padding: 10px; border-radius: 8px; display: none; align-items: center; justify-content: space-between; z-index: 2000; box-shadow: 0 5px 20px rgba(0,0,0,0.5); }
+        .app-btn { background: var(--primary); color: white; border: none; padding: 5px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; }
+
         footer { background: var(--card-bg); padding: 40px 10px; margin-top: 50px; text-align: center; border-top: 1px solid var(--border); }
         .footer-links a { color: #888; margin: 0 15px; text-decoration: none; cursor: pointer; transition: 0.3s; }
         .footer-links a:hover { color: var(--primary); }
 
-        /* MODAL */
         .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
         .modal-content { background: var(--card-bg); padding: 25px; border-radius: 12px; max-width: 500px; width: 90%; border: 1px solid var(--border); text-align: left; position: relative; color: var(--text); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .close-btn { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: var(--primary); }
@@ -136,6 +141,10 @@
                 <h1 class="brand">LPBS <span style="color:var(--primary)">NEWS</span></h1>
                 <span class="slogan">SABSE AAGE, SABSE TEJ</span>
             </div>
+            
+            <a href="https://whatsapp.com/channel/0029Vb77DOeISTkIcDn27S0E" target="_blank" class="wa-btn">
+                <i class="fa-brands fa-whatsapp"></i> JOIN
+            </a>
             
             <div class="controls">
                 <div class="theme-dots" title="Change Theme">
@@ -166,6 +175,14 @@
         </div>
     </header>
 
+    <div class="utility-bar">
+        <div class="ticker-wrap">
+            <div class="ticker-move" id="ticker-content">
+                Loading Market Data...
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <div id="cricket-box" class="live-score">
             <h4 style="margin:0;"><i class="fa-solid fa-satellite-dish"></i> LIVE CRICKET UPDATE</h4>
@@ -179,6 +196,16 @@
                 <i class="fa-solid fa-circle-notch fa-spin fa-2x"></i><br><br>Loading Latest News...
             </p>
         </div>
+    </div>
+
+    <div id="install-app">
+        <div style="display:flex; align-items:center; gap:10px;">
+            <i class="fa-brands fa-android" style="color:#00e676; font-size:24px;"></i>
+            <div style="color:white; font-size:13px;">
+                <strong>Install LPBS App</strong><br>Get Faster Updates
+            </div>
+        </div>
+        <button class="app-btn" onclick="installPWA()">INSTALL</button>
     </div>
 
     <footer>
@@ -205,6 +232,7 @@
         const SMARTLINK = "https://www.effectivegatecpm.com/uym16xq3jk?key=492c6ab2b2e619a347f8a0c6f22515e1";
         let userCity = "";
         let userRegion = "";
+        let deferredPrompt; // For PWA
 
         // --- GOOGLE TRANSLATOR ---
         function googleTranslateElementInit() {
@@ -227,7 +255,6 @@
             document.body.className = '';
             if (theme === 'medium') document.body.classList.add('theme-medium');
             else if (theme === 'light') document.body.classList.add('theme-light');
-            // 'dark' is default
         }
 
         // --- 2. LAYOUT MANAGER ---
@@ -245,14 +272,13 @@
             }
         }
 
-        // --- 3. LITE VIDEO PLAYER (SPEED BOOSTER) ---
+        // --- 3. LITE VIDEO PLAYER ---
         function loadVideo(element, url) {
-            // Replace Image with Iframe on Click
             element.innerHTML = `<iframe src="${url}&autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
             element.style.cursor = 'default';
         }
 
-        // --- 4. DATA SECURITY (XSS Prevention) ---
+        // --- 4. DATA SECURITY ---
         function sanitizeHTML(str) {
             if (!str) return "";
             return str.replace(/[&<>"']/g, function(m) {
@@ -260,7 +286,35 @@
             });
         }
 
-        // --- 5. SYSTEM LOADER ---
+        // --- 5. GOLD API & UTILITY TICKER (NEW) ---
+        async function loadMarketData(city) {
+            const goldOptions = { method: 'GET', headers: { 'x-access-token': 'goldapi-1k19sml45hnkq-io', 'Content-Type': 'application/json' } };
+            
+            try {
+                // Fetch Gold Price (India Standard)
+                const gRes = await fetch('https://www.goldapi.io/api/XAU/INR', goldOptions);
+                const gData = await gRes.json();
+                
+                // Calculate 10g Price (24K & 22K approx)
+                const price24k = gData.price_gram_24k * 10; 
+                const price22k = price24k * 0.916; 
+                const date = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short' });
+
+                // Update Ticker with IP Location
+                const content = `
+                    <span class="util-item"><i class="fa-solid fa-coins"></i> Gold Rate Today in ${city || "Agartala"} (${date})</span>
+                    <span class="util-item" style="color:#00e676;">24K (10g): ₹${Math.floor(price24k).toLocaleString()}</span>
+                    <span class="util-item" style="color:#ffeb3b;">22K (10g): ₹${Math.floor(price22k).toLocaleString()}</span>
+                    <span class="util-item"><i class="fa-solid fa-arrow-trend-up"></i> Silver (1kg): ₹${Math.floor(gData.price_gram_24k * 85).toLocaleString()}</span>
+                    <span class="util-item">|  Join WhatsApp for Daily Updates!</span>
+                `;
+                document.getElementById('ticker-content').innerHTML = content + content; 
+            } catch(e) {
+                document.getElementById('ticker-content').innerHTML = "Gold Rate: Updating... | Market Closed";
+            }
+        }
+
+        // --- 6. SYSTEM LOADER ---
         async function loadSystem() {
             try {
                 // Get IP Location
@@ -270,7 +324,10 @@
                 userRegion = ipData.region || "";
                 document.getElementById('footer-loc').innerText = `${userCity}, ${userRegion}`;
 
-                // Fetch News (With Cache Buster for Instant Update)
+                // Call Market Data
+                loadMarketData(userCity);
+
+                // Fetch News
                 const res = await fetch('news_db.json?nocache=' + new Date().getTime());
                 const data = await res.json();
                 allData = data.news;
@@ -303,12 +360,10 @@
 
             let filtered = [];
             
-            // Logic: Breaking = Video Only
             if (cat === 'all') filtered = [...allData];
             else if (cat === 'breaking') filtered = allData.filter(n => n.category === 'breaking' && n.type === 'video'); 
             else filtered = allData.filter(n => n.category.toLowerCase().includes(cat));
 
-            // Sorting: Location First
             filtered.sort((a, b) => {
                 const textA = (a.title + a.desc).toLowerCase();
                 const textB = (b.title + b.desc).toLowerCase();
@@ -326,7 +381,6 @@
                 let mediaHTML = '';
                 const safeTitle = sanitizeHTML(n.title);
                 
-                // Optimized Video Rendering
                 if (n.type === 'video') {
                     mediaHTML = `
                     <div class="media" onclick="loadVideo(this, '${n.video_url}')">
@@ -338,7 +392,6 @@
                     mediaHTML = `<div class="media" style="cursor:default"><img src="${n.thumb}" loading="lazy"></div>`;
                 }
 
-                // Featured Card Logic
                 const isFeatured = (cat === 'all' && index === 0);
                 const locBadge = (n.title + n.desc).toLowerCase().includes(userCity.toLowerCase()) ? 
                                 `<span class="loc-badge"><i class="fa-solid fa-location-dot"></i> ${userCity}</span>` : '';
@@ -364,10 +417,9 @@
             });
         }
 
-        // --- 6. NAVIGATION HANDLER ---
+        // --- NAVIGATION HANDLER ---
         window.filterNews = function(cat) {
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            // Smart Active State
             const buttons = document.querySelectorAll('.nav-btn');
             buttons.forEach(btn => {
                 let txt = btn.innerText.toLowerCase();
@@ -377,7 +429,23 @@
             renderNews(cat);
         }
 
-        // --- 7. MODALS ---
+        // --- APP INSTALL LOGIC (NEW) ---
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            document.getElementById('install-app').style.display = 'flex';
+        });
+
+        async function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') document.getElementById('install-app').style.display = 'none';
+                deferredPrompt = null;
+            }
+        }
+
+        // --- MODALS ---
         function openModal(type) {
             const modal = document.getElementById('infoModal');
             const body = document.getElementById('modalBody');
@@ -387,16 +455,13 @@
                 body.innerHTML = `
                     <h2 style="color:var(--primary); border-bottom:1px solid #333; padding-bottom:10px;">ABOUT LPBS NEWS</h2>
                     <p><strong>Mission:</strong> Sabse Aage, Sabse Tej.</p>
-                    <p>LPBS News is an advanced AI-powered news aggregator designed to bring you real-time updates from trusted sources globally.</p>
-                    <p>We combine Technology with Journalism to provide a seamless reading experience.</p>
+                    <p>LPBS News is an advanced AI-powered news aggregator.</p>
                     <div style="margin-top:15px; font-size:12px; color:#888;">Powered by NRTA Group AI Tech.</div>
                 `;
             } else {
                 body.innerHTML = `
                     <h2 style="color:var(--primary); border-bottom:1px solid #333; padding-bottom:10px;">CONTACT US</h2>
-                    <p>For copyright issues, removal requests, or business inquiries:</p>
-                    <p style="font-size:18px; color:var(--text);"><i class="fa-solid fa-envelope"></i> <strong>nrtagroup@gmail.com</strong></p>
-                    <p style="font-size:12px; color:#888;">We strictly adhere to copyright policies. Any reported content will be reviewed within 24 hours.</p>
+                    <p>For copyright issues: <strong style="color:white;">nrtagroup@gmail.com</strong></p>
                 `;
             }
         }
@@ -408,5 +473,3 @@
     </script>
 </body>
 </html>
-
-
