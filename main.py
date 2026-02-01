@@ -97,7 +97,15 @@ def fetch_text_news():
 def fetch_social_videos(channels):
     video_news = []
     today_str, yesterday_str = get_smart_date()
-    ydl_opts = {'quiet': True, 'ignoreerrors': True, 'extract_flat': True, 'playlistend': 5, 'socket_timeout': 15}
+    
+    # --- CHANGE HERE: REMOVED extract_flat: True TO FIX LIVE VIDEO ISSUE ---
+    ydl_opts = {
+        'quiet': True, 
+        'ignoreerrors': True, 
+        # 'extract_flat': True,  <-- THIS LINE REMOVED
+        'playlistend': 5, 
+        'socket_timeout': 15
+    }
 
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         for category, urls in channels.items():
@@ -321,5 +329,3 @@ if __name__ == "__main__":
     print(f"🔥 SERVER STARTED ON PORT {PORT}")
     with socketserver.TCPServer(("0.0.0.0", PORT), MyRequestHandler) as httpd:
         httpd.serve_forever()
-
-
