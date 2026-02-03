@@ -36,14 +36,45 @@
             --bg: #050505; 
             --card-bg: #121212; 
             --text: #e0e0e0; 
-            --border: #1a331a; /* Dark Greenish Border */
+            --border: #1a331a; 
             --hover: #0f240f; 
         }
         
         body.theme-medium { --bg: #1a1a1a; --card-bg: #2d2d2d; --text: #f0f0f0; --border: #333; }
         body.theme-light { --bg: #f0f5f0; --card-bg: #ffffff; --text: #004d00; --border: #cce0cc; --hover: #e6f2e6; }
         
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; padding-bottom: 20px; transition: background 0.3s, color 0.3s; user-select: none; -webkit-tap-highlight-color: transparent; }
+        /* Body Padding increased for Bottom Ad */
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; padding-bottom: 80px; transition: background 0.3s, color 0.3s; user-select: none; -webkit-tap-highlight-color: transparent; }
+
+        /* AD SPACES CSS */
+        .ad-header-box {
+            text-align: center;
+            padding: 5px 0;
+            background: #000;
+            border-bottom: 1px solid #222;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 60px; /* Space reserved */
+        }
+
+        .ad-footer-sticky {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #0a1f0a; /* Matches App Theme */
+            z-index: 9999;
+            text-align: center;
+            padding: 5px 0;
+            border-top: 2px solid var(--primary);
+            box-shadow: 0 -5px 15px rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 50px;
+        }
 
         /* HEADER STRUCTURE */
         header { background: var(--card-bg); padding: 10px 15px; position: sticky; top:0; z-index:999; border-bottom: 3px solid var(--primary); box-shadow: 0 4px 15px rgba(0,100,0,0.3); }
@@ -53,30 +84,24 @@
         .brand { font-size: 26px; font-weight: 900; margin: 0; text-transform: uppercase; color: var(--text); line-height: 1; display: inline-block; padding-bottom: 2px; letter-spacing: -0.5px; }
         .slogan { font-size: 10px; color: #4caf50; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
         
-        /* LIVE BADGE */
         .header-live-badge { 
             position: absolute; top: -5px; right: -40px; 
-            background: #cc0000; /* Keep RED for Live alert visibility */
-            color: white; font-size: 9px; font-weight: bold; 
+            background: #cc0000; color: white; font-size: 9px; font-weight: bold; 
             padding: 2px 5px; border-radius: 3px; animation: blink 1s infinite; 
         }
 
-        /* REAL TIME INFO BAR */
         .stats-row {
             display: flex; align-items: center; gap: 10px; font-size: 11px; color: #bbb; margin-top: 5px; font-weight: 600;
         }
         .live-count { color: var(--primary-light); animation: pulseGreen 2s infinite; display: flex; align-items: center; gap: 4px; }
 
-        /* WHATSAPP BUTTON STYLE */
         .wa-btn { background: var(--whatsapp); color: white; text-decoration: none; font-size: 11px; font-weight: bold; padding: 6px 12px; border-radius: 20px; display: flex; align-items: center; gap: 5px; animation: pulse 2s infinite; border: 1px solid #128C7E; box-shadow: 0 0 10px rgba(37, 211, 102, 0.2); }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.4); } 70% { box-shadow: 0 0 0 8px rgba(37, 211, 102, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); } }
         @keyframes pulseGreen { 0% { opacity: 0.7; } 50% { opacity: 1; text-shadow: 0 0 5px var(--primary); } 100% { opacity: 0.7; } }
 
-        /* SUPPORT BUTTON STYLE */
         .donate-btn-text { background: linear-gradient(45deg, var(--primary), #008000); color: white; font-weight: 800; font-size: 11px; padding: 6px 12px; border-radius: 4px; cursor: pointer; text-transform: uppercase; display: flex; align-items: center; gap: 5px; border: 1px solid #004d00; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
         .donate-popup { display: none; position: absolute; top: 45px; right: 0; background: var(--card-bg); padding: 15px; border-radius: 8px; border: 2px solid var(--primary); text-align: center; z-index: 10001; width: 140px; box-shadow: 0 0 20px rgba(0, 100, 0, 0.5); }
         
-        /* UTILITY TICKER */
         .utility-bar { background: #081a08; border-bottom: 1px solid var(--primary); display: flex; align-items: center; position: relative; height: 35px; }
         .ticker-wrap { width: 100%; overflow: hidden; display: flex; align-items: center; }
         .ticker-move { display: inline-flex; white-space: nowrap; animation: ticker 40s linear infinite; align-items: center; }
@@ -85,7 +110,6 @@
         
         .market-share-btn { position: absolute; right: 0; top: 0; height: 100%; background: var(--whatsapp); color: white; border: none; padding: 0 15px; cursor: pointer; font-weight: bold; font-size: 11px; z-index: 10; display: flex; align-items: center; gap: 5px; }
 
-        /* CONTROLS */
         .controls { display: flex; align-items: center; gap: 8px; position: relative; }
         .theme-dots { display: flex; gap: 5px; background: rgba(0,100,0,0.2); padding: 3px; border-radius: 10px; border: 1px solid var(--border); }
         .dot { width: 12px; height: 12px; border-radius: 50%; cursor: pointer; border: 1px solid #555; }
@@ -99,19 +123,16 @@
         .goog-logo-link, .goog-te-banner-frame { display: none !important; } 
         body { top: 0px !important; }
 
-        /* NAV SCROLLER */
         .nav-scroller { display: flex; gap: 10px; overflow-x: auto; padding: 8px 0; scrollbar-width: none; border-top: 1px solid var(--border); }
         .nav-btn { background: transparent; color: #888; border: none; padding: 6px 10px; cursor: pointer; white-space: nowrap; font-size: 13px; font-weight: 600; transition: 0.2s; border-radius: 20px; }
         .nav-btn:hover { color: var(--primary-light); background: rgba(0,100,0,0.1); }
         .nav-btn.active { background: var(--primary); color: white; font-weight: 700; box-shadow: 0 2px 6px rgba(0,100,0,0.4); }
 
-        /* MAIN GRID */
         .container { padding: 10px; max-width: 1400px; margin: 0 auto; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 15px; padding-top: 10px; }
         .grid.mobile-list { grid-template-columns: 1fr; } 
         .grid.mobile-grid { grid-template-columns: 1fr 1fr; } 
 
-        /* CARD DESIGN - MOBILE OPTIMIZED */
         .card { background: var(--card-bg); border-radius: 10px; overflow: hidden; border: 1px solid var(--border); display: flex; flex-direction: column; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .card:active { transform: scale(0.98); }
 
@@ -135,7 +156,6 @@
         .info { padding: 12px; }
         .title { font-size: 15px; font-weight: 700; margin-bottom: 8px; color: var(--text); line-height: 1.4; }
         
-        /* SHARE BUTTON STYLE */
         .meta { font-size: 11px; color: #888; display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 8px; }
         .share-btn { background: none; border: 1px solid #333; color: var(--whatsapp); padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; display: flex; align-items: center; gap: 5px; transition: 0.3s; }
         .share-btn:hover { background: var(--whatsapp); color: white; border-color: var(--whatsapp); }
@@ -150,13 +170,12 @@
             .card.featured .title { font-size: 18px; }
         }
 
-        /* SCORECARD DESIGN - DEEP GREEN & VISIBLE */
         .live-score-container { 
             display: flex; gap: 10px; overflow-x: auto; margin-bottom: 15px; 
             padding-bottom: 5px; scrollbar-width: none; 
         }
         .score-card { 
-            background: linear-gradient(135deg, #0a1f0a, #000); /* Dark Green Tint */
+            background: linear-gradient(135deg, #0a1f0a, #000); 
             border: 1px solid #1a331a; border-left: 4px solid var(--primary-light); 
             border-radius: 8px; padding: 10px; color: white;
             min-width: 260px; flex: 1; 
@@ -171,7 +190,8 @@
         .match-score { font-size: 18px; font-weight: 800; color: #4caf50; font-family: 'Courier New', monospace; margin-bottom: 2px; text-shadow: 0 0 5px rgba(0,128,0,0.5); }
         .match-status { font-size: 10px; color: #aaa; }
 
-        #install-app { position: fixed; bottom: 10px; left: 10px; right: 10px; background: #0a1f0a; border: 1px solid var(--primary); padding: 10px; border-radius: 8px; display: none; align-items: center; justify-content: space-between; z-index: 2000; box-shadow: 0 5px 20px rgba(0,0,0,0.7); }
+        /* INSTALL APP BUTTON */
+        #install-app { position: fixed; bottom: 60px; left: 10px; right: 10px; background: #0a1f0a; border: 1px solid var(--primary); padding: 10px; border-radius: 8px; display: none; align-items: center; justify-content: space-between; z-index: 2000; box-shadow: 0 5px 20px rgba(0,0,0,0.7); }
         .app-btn { background: var(--primary); color: white; border: none; padding: 6px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; }
 
         footer { background: var(--card-bg); padding: 30px 10px; margin-top: 30px; text-align: center; border-top: 3px solid var(--primary); }
@@ -182,7 +202,6 @@
         .modal-content { background: var(--card-bg); padding: 25px; border-radius: 12px; max-width: 500px; width: 90%; border: 1px solid var(--primary); text-align: left; position: relative; color: var(--text); box-shadow: 0 10px 30px rgba(0,100,0,0.3); }
         .close-btn { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: var(--primary); }
     </style>
-    <script src="https://quge5.com/88/tag.min.js" data-zone="208195" async data-cfasync="false"></script>
 </head>
 <body class="theme-dark">
 
@@ -205,7 +224,6 @@
             </a>
             
             <div class="controls">
-                
                 <div class="donate-btn-text" onclick="toggleDonate()">
                     <i class="fa-solid fa-hand-holding-heart"></i> SUPPORT
                 </div>
@@ -242,6 +260,10 @@
             <button class="nav-btn" onclick="filterNews('viral')">⚡ Viral</button>
         </div>
     </header>
+
+    <div class="ad-header-box">
+        <p style="color:#444; font-size:10px;">ADVERTISEMENT</p>
+    </div>
 
     <div class="utility-bar">
         <div class="ticker-wrap">
@@ -290,6 +312,11 @@
         </p>
     </footer>
 
+    <div class="ad-footer-sticky">
+        <p style="color:#fff; font-size:10px;">AD SPACE (Sticky)</p>
+        <span onclick="this.parentElement.style.display='none'" style="position:absolute; right:5px; top:-15px; background:red; color:white; padding:2px 8px; font-size:9px; border-radius:3px; cursor:pointer;">X</span>
+    </div>
+
     <div id="infoModal" class="modal">
         <div class="modal-content">
             <span class="close-btn" onclick="closeModal()">&times;</span>
@@ -319,7 +346,6 @@
     <script>
         let allData = [];
         
-        // --- REAL TIME CLOCK & VISITOR ---
         function updateDateTime() {
             const now = new Date();
             const options = { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
@@ -329,7 +355,6 @@
         updateDateTime();
 
         function updateVisitors() {
-            // Fake realistic visitor fluctuation
             const base = 1200;
             const variance = Math.floor(Math.random() * 300);
             document.getElementById('visitor-count').innerText = (base + variance).toLocaleString();
@@ -392,9 +417,7 @@
             window.open(url, '_blank');
         }
 
-        // --- UPDATED: ROBUST SCORE LOGIC ---
         async function loadMarketData(city) {
-            // Simulated Data for Demo Speed
             const goldPrice = "24K ₹63,500 | 22K ₹58,200";
             const goldString = `Gold (${city}): ${goldPrice}`;
             
@@ -417,23 +440,17 @@
             document.getElementById('ticker-content').innerHTML = goldHTML + stockString + goldHTML + stockString;
         }
 
-        // --- FORCED CRICKET SCORE DISPLAY ---
         async function loadLiveScores() {
             const container = document.getElementById('live-scores-area');
-            
-            // Check if user is on a relevant tab
             const activeBtn = document.querySelector('.nav-btn.active');
             const txt = activeBtn ? activeBtn.innerText.toLowerCase() : 'paper';
             
-            // Only hide if strictly on tech/entertainment/viral
             if(txt.includes('tech') || txt.includes('viral') || txt.includes('ent') || txt.includes('movie')) {
                 container.style.display = 'none';
                 return;
             }
             container.style.display = 'flex';
 
-            // MOCK DATA TO ENSURE DISPLAY (Since API is unreliable without backend)
-            // In a real scenario, fetch your API here.
             const html = `
                 <div class="score-card">
                     <div class="score-header">
@@ -461,13 +478,11 @@
                     <div class="match-score">2 - 2</div>
                     <div class="match-status">88' Minute - Full Time Soon</div>
                 </div>`;
-            
             container.innerHTML = html;
         }
 
         async function loadSystem() {
             try {
-                // Geo Data
                 try {
                     const ipRes = await fetch('https://ipapi.co/json/');
                     const ipData = await ipRes.json();
@@ -480,22 +495,17 @@
                     loadMarketData("India");
                 }
 
-                // Load News
-                // Simulating fetch for demo purposes or use real file
                 try {
                     const res = await fetch('news_db.json?nocache=' + new Date().getTime());
                     const data = await res.json();
                     allData = data.news;
                 } catch (e) {
-                    console.log("Using fallback data");
-                    // Fallback if JSON missing
                     allData = [
                         {title: "Big Market Surge Today", category: "business", type: "img", thumb: "https://via.placeholder.com/400x200", desc: "Markets hit all time high.", time: "10m ago", source: "LPBS Biz"},
                         {title: "Viral Video: Cat saves dog", category: "viral", type: "video", video_url: "", thumb: "https://via.placeholder.com/400x200", desc: "Amazing footage.", time: "1h ago", source: "Social"}
                     ];
                 }
                 
-                // Initial Render
                 const activeBtn = document.querySelector('.nav-btn.active');
                 if (activeBtn) {
                     let cat = 'all';
@@ -517,8 +527,6 @@
         function renderNews(cat) {
             const grid = document.getElementById('news-grid');
             grid.innerHTML = '';
-            
-            // Re-trigger scores
             loadLiveScores();
 
             let filtered = [];
@@ -526,16 +534,10 @@
             else if (cat === 'breaking') filtered = allData.filter(n => n.category === 'breaking' && n.type === 'video'); 
             else filtered = allData.filter(n => n.category.toLowerCase().includes(cat));
 
-            // Basic Sort
-            filtered.sort((a, b) => {
-               // Prioritize local news logic would go here
-               return 0; 
-            });
+            filtered.sort((a, b) => 0);
 
-            if (filtered.length === 0 && allData.length > 0) {
-                 // If filter empty, show some defaults
-                 filtered = allData.slice(0, 5);
-            } else if (filtered.length === 0) {
+            if (filtered.length === 0 && allData.length > 0) filtered = allData.slice(0, 5);
+            else if (filtered.length === 0) {
                 grid.innerHTML = "<p style='text-align:center; width:100%; color:#888; padding:20px;'>Updating News Feed...</p>";
                 return;
             }
@@ -631,9 +633,8 @@
         function closeModal() { document.getElementById('infoModal').style.display = 'none'; }
 
         loadSystem();
-        setInterval(loadLiveScores, 10000); // Update scores often
-        setInterval(loadSystem, 60000); // Check news every min
+        setInterval(loadLiveScores, 10000); 
+        setInterval(loadSystem, 60000); 
     </script>
 </body>
 </html>
-
