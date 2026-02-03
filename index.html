@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="LPBS NEWS - Sabse Aage, Sabse Tej. The best AI-powered digital newspaper providing latest news, breaking updates, live TV, sports, and tech news based on your location.">
     <meta name="keywords" content="LPBS News, AI News, Live TV, Breaking News, Bengali News, Hindi News, Sports Update, Tech News, Viral Video">
     <meta name="author" content="NRTA Group">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#006400">
+    <meta name="theme-color" content="#000000">
     
     <title>LPBS NEWS - Sabse Aage, Sabse Tej</title>
     
@@ -28,8 +28,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <style>
-        /* CSS VARIABLES - Primary Color Changed to Dark Green (#006400) */
-        :root { --primary: #006400; --whatsapp: #25D366; --bg: #000000; --card-bg: #111; --text: #e0e0e0; --border: #222; --hover: #1a1a1a; }
+        /* CSS VARIABLES */
+        :root { --primary: #ff0000; --whatsapp: #25D366; --bg: #000000; --card-bg: #111; --text: #e0e0e0; --border: #222; --hover: #1a1a1a; }
         
         body.theme-medium { --bg: #222; --card-bg: #333; --text: #f0f0f0; --border: #444; --hover: #444; }
         body.theme-light { --bg: #f4f4f4; --card-bg: #ffffff; --text: #111; --border: #ddd; --hover: #f9f9f9; }
@@ -37,22 +37,8 @@
         body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; padding-bottom: 20px; transition: background 0.3s, color 0.3s; }
 
         /* HEADER STRUCTURE */
-        header { background: var(--card-bg); padding: 0; position: sticky; top:0; z-index:999; border-bottom: 3px solid var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
-        
-        /* NEW: TOP INFO BAR STYLE (Clock & Visitor) */
-        .top-info-bar {
-            background: #004d00; /* Darker Green shade */
-            color: #fff;
-            padding: 5px 15px;
-            font-size: 11px;
-            font-weight: bold;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid #333;
-        }
-
-        .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 10px 15px 0 15px; }
+        header { background: var(--card-bg); padding: 10px 15px; position: sticky; top:0; z-index:999; border-bottom: 3px solid var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
+        .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
         
         .brand-box { display: flex; flex-direction: column; position: relative; }
         .brand { font-size: 28px; font-weight: 900; margin: 0; text-transform: uppercase; color: var(--text); line-height: 1; border-bottom: 3px solid var(--primary); display: inline-block; padding-bottom: 5px; }
@@ -92,9 +78,8 @@
         .grid-btn { background: none; border: 1px solid var(--border); color: var(--text); padding: 5px 8px; border-radius: 4px; cursor: pointer; display: none; }
         @media(max-width: 768px) { .grid-btn { display: block; } }
 
-        /* Google Translate Fix for Mobile */
-        #google_translate_element { overflow: hidden; height: 26px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); max-width: 120px; }
-        .goog-te-combo { margin: 0 !important; height: 26px !important; font-size: 12px; background: var(--bg); color: var(--text); border: none; width: 100%; }
+        #google_translate_element { overflow: hidden; height: 26px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); }
+        .goog-te-combo { margin: 0 !important; height: 26px !important; font-size: 12px; background: var(--bg); color: var(--text); border: none; }
         .goog-logo-link, .goog-te-banner-frame { display: none !important; } 
         body { top: 0px !important; }
 
@@ -148,9 +133,6 @@
             .card.featured .media { width: 100%; height: 220px; }
             .card.featured .info { width: 100%; padding: 15px; }
             .card.featured .title { font-size: 20px; }
-            /* Mobile Adjustments for Controls */
-            .controls { gap: 5px; }
-            .brand { font-size: 22px; }
         }
 
         /* UPDATED COMPACT SIDE-BY-SIDE SCORECARD DESIGN */
@@ -188,11 +170,6 @@
 <body class="theme-dark">
 
     <header>
-        <div class="top-info-bar">
-            <div id="live-time"><i class="fa-regular fa-clock"></i> Loading...</div>
-            <div id="visitor-box"><i class="fa-solid fa-users"></i> Live: <span id="visitor-count">...</span></div>
-        </div>
-
         <div class="top-row">
             <div class="brand-box">
                 <div style="position:relative; display:inline-block;">
@@ -209,7 +186,7 @@
             <div class="controls">
                 
                 <div class="donate-btn-text" onclick="toggleDonate()">
-                    <i class="fa-solid fa-heart"></i> <span style="display:none;">DONATE</span>
+                    <i class="fa-solid fa-heart"></i> DONATE NOW
                 </div>
                 <div class="donate-popup" id="donate-pop">
                     <div style="font-weight:bold; font-size:12px; margin-bottom:5px; color:#000;">SCAN & SUPPORT</div>
@@ -620,41 +597,6 @@
         }
         function closeModal() { document.getElementById('infoModal').style.display = 'none'; }
 
-        // --- NEW ADDITIONS FOR CLOCK AND VISITOR ---
-        function updateClock() {
-            const now = new Date();
-            const options = { 
-                timeZone: 'Asia/Kolkata', 
-                weekday: 'short', 
-                year: 'numeric', 
-                month: 'short', 
-                day: 'numeric', 
-                hour: '2-digit', 
-                minute: '2-digit', 
-                second: '2-digit' 
-            };
-            document.getElementById('live-time').innerHTML = '<i class="fa-regular fa-clock"></i> ' + now.toLocaleString('en-IN', options);
-        }
-        setInterval(updateClock, 1000);
-
-        function updateVisitorCount() {
-            let count = localStorage.getItem('lpbs_visitors');
-            if(!count) count = 15420; // Default Starting Number
-            else count = parseInt(count);
-
-            document.getElementById('visitor-count').innerText = count.toLocaleString();
-            
-            setInterval(() => {
-                if(Math.random() > 0.6) {
-                    count += Math.floor(Math.random() * 3) + 1;
-                    localStorage.setItem('lpbs_visitors', count);
-                    document.getElementById('visitor-count').innerText = count.toLocaleString();
-                }
-            }, 4000);
-        }
-        updateVisitorCount();
-
-        // Standard Loaders
         loadSystem();
         setInterval(loadLiveScores, 5000);
         setInterval(loadSystem, 60000);
