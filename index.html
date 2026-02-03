@@ -3,13 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="LPBS NEWS - Sabse Aage, Sabse Tej. AI-powered latest news updates based on your location.">
-    <meta name="theme-color" content="#006400"> <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    
-    <title>LPBS NEWS - Live Updates</title>
+    <meta name="description" content="LPBS NEWS - Sabse Aage, Sabse Tej. The best AI-powered digital newspaper providing latest news, breaking updates, live TV, sports, and tech news based on your location.">
+    <meta name="keywords" content="LPBS News, AI News, Live TV, Breaking News, Bengali News, Hindi News, Sports Update, Tech News, Viral Video">
+    <meta name="author" content="NRTA Group">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
     
     <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#006400">
+    
+    <title>LPBS NEWS - Sabse Aage, Sabse Tej</title>
     
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7398472528361759" crossorigin="anonymous"></script>
 
@@ -26,211 +28,290 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <style>
-        /* CSS VARIABLES - THEME UPDATED TO DARK GREEN */
-        :root { --primary: #006400; --whatsapp: #25D366; --bg: #000000; --card-bg: #111; --text: #e0e0e0; --border: #222; }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        /* CSS VARIABLES - Primary Color Changed to Dark Green (#006400) */
+        :root { --primary: #006400; --whatsapp: #25D366; --bg: #000000; --card-bg: #111; --text: #e0e0e0; --border: #222; --hover: #1a1a1a; }
         
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; padding-bottom: 80px; overflow-x: hidden; }
+        body.theme-medium { --bg: #222; --card-bg: #333; --text: #f0f0f0; --border: #444; --hover: #444; }
+        body.theme-light { --bg: #f4f4f4; --card-bg: #ffffff; --text: #111; --border: #ddd; --hover: #f9f9f9; }
+        
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; padding-bottom: 20px; transition: background 0.3s, color 0.3s; }
 
-        /* --- HEADER DESIGN (MOBILE OPTIMIZED) --- */
-        header { background: var(--card-bg); padding: 0; position: sticky; top:0; z-index:999; border-bottom: 2px solid var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.4); }
+        /* HEADER STRUCTURE */
+        header { background: var(--card-bg); padding: 0; position: sticky; top:0; z-index:999; border-bottom: 3px solid var(--primary); box-shadow: 0 4px 12px rgba(0,0,0,0.2); }
         
-        /* NEW TOP INFO BAR (Clock & Visitor) */
+        /* NEW: TOP INFO BAR STYLE (Clock & Visitor) */
         .top-info-bar {
-            background: #0a3d0a; /* Darker Green Background */
-            color: #ccc;
-            font-size: 10px;
-            padding: 5px 10px;
+            background: #004d00; /* Darker Green shade */
+            color: #fff;
+            padding: 5px 15px;
+            font-size: 11px;
+            font-weight: bold;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #222;
-            font-weight: bold;
+            border-bottom: 1px solid #333;
         }
 
-        .top-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 10px 5px 10px; }
+        .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 10px 15px 0 15px; }
         
-        .brand-box { position: relative; }
-        .brand { font-size: 24px; font-weight: 900; margin: 0; color: white; line-height: 1; display: inline-block; }
-        .slogan { font-size: 9px; color: #ffeb3b; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; display: block; margin-top: 2px; }
+        .brand-box { display: flex; flex-direction: column; position: relative; }
+        .brand { font-size: 28px; font-weight: 900; margin: 0; text-transform: uppercase; color: var(--text); line-height: 1; border-bottom: 3px solid var(--primary); display: inline-block; padding-bottom: 5px; }
+        .slogan { font-size: 11px; color: #ffeb3b; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-top: 3px; }
         
+        /* NEW LIVE BADGE NEXT TO LOGO */
         .header-live-badge { 
-            position: absolute; top: -5px; right: -30px; 
-            background: red; color: white; font-size: 9px; font-weight: bold; 
-            padding: 1px 4px; border-radius: 3px; animation: blink 1.5s infinite; 
+            position: absolute; top: -5px; right: -45px; 
+            background: red; color: white; font-size: 10px; font-weight: bold; 
+            padding: 2px 5px; border-radius: 3px; animation: blink 1s infinite; 
         }
 
-        .controls { display: flex; align-items: center; gap: 8px; }
+        /* WHATSAPP BUTTON STYLE */
+        .wa-btn { background: var(--whatsapp); color: white; text-decoration: none; font-size: 12px; font-weight: bold; padding: 5px 10px; border-radius: 20px; display: flex; align-items: center; gap: 5px; animation: pulse 2s infinite; border: 1px solid #128C7E; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(37, 211, 102, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); } }
+
+        /* DONATE BUTTON STYLE */
+        .donate-btn-text { background: linear-gradient(45deg, #FFD700, #FFA500); color: black; font-weight: 900; font-size: 12px; padding: 5px 10px; border-radius: 4px; cursor: pointer; text-transform: uppercase; display: flex; align-items: center; gap: 5px; border: 1px solid #fff; }
+        .donate-popup { display: none; position: absolute; top: 45px; right: 0; background: white; padding: 15px; border-radius: 8px; border: 3px solid #ffd700; text-align: center; z-index: 10001; width: 140px; box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); }
+        .donate-popup::after { content: ''; position: absolute; top: -10px; right: 20px; border-width: 0 10px 10px 10px; border-style: solid; border-color: transparent transparent white transparent; }
         
-        /* Translate Fix for Mobile */
-        #google_translate_element { 
-            width: 100px; height: 26px; overflow: hidden; border-radius: 4px; 
-            background: #fff; border: 1px solid #555; 
-        }
-        .goog-te-combo { width: 100% !important; margin: 0 !important; font-size: 11px; font-weight: bold; }
-        .goog-logo-link, .goog-te-banner-frame { display: none !important; } 
-
-        /* Donate Button Mobile */
-        .donate-icon-btn { color: #ffd700; font-size: 20px; animation: pulse 2s infinite; cursor: pointer; }
-
-        /* --- NAVIGATION SCROLLER (APP FEEL) --- */
-        .nav-scroller { 
-            display: flex; gap: 10px; overflow-x: auto; padding: 8px 10px; 
-            scrollbar-width: none; -ms-overflow-style: none;
-            border-top: 1px solid #222; margin-top: 5px;
-        }
-        .nav-scroller::-webkit-scrollbar { display: none; }
-        
-        .nav-btn { 
-            background: #222; color: #aaa; border: 1px solid #333; 
-            padding: 6px 12px; cursor: pointer; white-space: nowrap; 
-            font-size: 13px; font-weight: 600; border-radius: 20px; transition: 0.2s; 
-        }
-        .nav-btn.active { background: var(--primary); color: white; border-color: var(--primary); font-weight: 700; }
-
-        /* --- TICKER (MARKET DATA) --- */
-        .utility-bar { background: #0f0f0f; border-bottom: 1px solid #333; height: 35px; display: flex; align-items: center; position: relative; overflow: hidden; }
-        .ticker-wrap { width: 100%; overflow: hidden; white-space: nowrap; }
-        .ticker-move { display: inline-block; animation: ticker 30s linear infinite; padding-left: 100%; }
+        /* UTILITY TICKER */
+        .utility-bar { background: #1a1a1a; border-bottom: 1px solid #333; display: flex; align-items: center; position: relative; height: 40px; }
+        .ticker-wrap { width: 100%; overflow: hidden; display: flex; align-items: center; }
+        .ticker-move { display: inline-flex; white-space: nowrap; animation: ticker 40s linear infinite; align-items: center; }
         @keyframes ticker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
-        .market-item { color: #eee; font-size: 12px; font-weight: bold; margin-right: 25px; display: inline-flex; align-items: center; gap: 5px; }
-        .market-up { color: #00e676; } .market-down { color: #ff4444; }
+        .util-item { margin-right: 30px; display: inline-flex; align-items: center; gap: 5px; font-size: 13px; font-weight: bold; color: #fff; }
+        
+        .market-share-btn { position: absolute; right: 0; top: 0; height: 100%; background: var(--whatsapp); color: white; border: none; padding: 0 15px; cursor: pointer; font-weight: bold; font-size: 12px; z-index: 10; display: flex; align-items: center; gap: 5px; }
 
-        /* --- LIVE SCORECARDS (AUTO SCROLL) --- */
+        /* CONTROLS */
+        .controls { display: flex; align-items: center; gap: 10px; position: relative; }
+        .theme-dots { display: flex; gap: 5px; background: rgba(255,255,255,0.1); padding: 3px; border-radius: 10px; }
+        .dot { width: 15px; height: 15px; border-radius: 50%; cursor: pointer; border: 1px solid #555; }
+        .dot.dark { background: #000; } .dot.medium { background: #333; } .dot.light { background: #fff; }
+
+        .grid-btn { background: none; border: 1px solid var(--border); color: var(--text); padding: 5px 8px; border-radius: 4px; cursor: pointer; display: none; }
+        @media(max-width: 768px) { .grid-btn { display: block; } }
+
+        /* Google Translate Fix for Mobile */
+        #google_translate_element { overflow: hidden; height: 26px; border: 1px solid var(--border); border-radius: 4px; background: var(--bg); max-width: 120px; }
+        .goog-te-combo { margin: 0 !important; height: 26px !important; font-size: 12px; background: var(--bg); color: var(--text); border: none; width: 100%; }
+        .goog-logo-link, .goog-te-banner-frame { display: none !important; } 
+        body { top: 0px !important; }
+
+        /* NAV SCROLLER */
+        .nav-scroller { display: flex; gap: 10px; overflow-x: auto; padding: 5px 0; scrollbar-width: none; border-top: 1px solid var(--border); }
+        .nav-btn { background: transparent; color: #aaa; border: none; padding: 8px 10px; cursor: pointer; white-space: nowrap; font-size: 14px; font-weight: 600; transition: 0.2s; }
+        .nav-btn:hover { color: var(--primary); }
+        .nav-btn.active { color: var(--primary); font-weight: 800; border-bottom: 2px solid var(--primary); }
+
+        /* MAIN GRID */
+        .container { padding: 10px; max-width: 1400px; margin: 0 auto; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 20px; padding-top: 15px; }
+        .grid.mobile-list { grid-template-columns: 1fr; } 
+        .grid.mobile-grid { grid-template-columns: 1fr 1fr; } 
+
+        /* CARD DESIGN */
+        .card { background: var(--card-bg); border-radius: 8px; overflow: hidden; border: 1px solid var(--border); display: flex; flex-direction: column; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+
+        .card.featured { grid-column: 1 / -1; flex-direction: row; border-bottom: 4px solid var(--primary); background: rgba(255, 0, 0, 0.05); }
+        .card.featured .media { width: 60%; height: 350px; }
+        .card.featured .info { width: 40%; padding: 25px; justify-content: center; display: flex; flex-direction: column; }
+        .card.featured .title { font-size: 26px; line-height: 1.3; }
+
+        .media { width: 100%; height: 200px; position: relative; background: #000; cursor: pointer; overflow: hidden; }
+        .media img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; transition: 0.3s; }
+        .media:hover img { opacity: 0.7; transform: scale(1.05); }
+        
+        .play-btn { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 50px; height: 50px; background: rgba(255,0,0,0.8); border-radius: 50%;
+            display: flex; justify-content: center; align-items: center; color: white;
+            font-size: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.5); z-index: 5; pointer-events: none;
+        }
+        
+        .media iframe { width: 100%; height: 100%; position: absolute; top:0; left:0; border: none; z-index: 10; }
+
+        .info { padding: 15px; }
+        .title { font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--text); line-height: 1.4; }
+        
+        /* SHARE BUTTON STYLE */
+        .meta { font-size: 12px; color: #888; display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 10px; }
+        .share-btn { background: none; border: 1px solid #333; color: var(--whatsapp); padding: 3px 10px; border-radius: 4px; cursor: pointer; font-size: 12px; display: flex; align-items: center; gap: 5px; transition: 0.3s; }
+        .share-btn:hover { background: var(--whatsapp); color: white; border-color: var(--whatsapp); }
+
+        .watermark { position: absolute; top: 10px; right: 10px; background: var(--primary); color: white; padding: 3px 6px; font-size: 10px; font-weight: bold; border-radius: 3px; z-index: 6; pointer-events: none; }
+        .loc-badge { background: #ffeb3b; color: black; padding: 2px 6px; font-size: 11px; font-weight: bold; border-radius: 3px; display:inline-block; margin-bottom: 5px; }
+
+        @media(max-width: 768px) {
+            .card.featured { flex-direction: column; }
+            .card.featured .media { width: 100%; height: 220px; }
+            .card.featured .info { width: 100%; padding: 15px; }
+            .card.featured .title { font-size: 20px; }
+            /* Mobile Adjustments for Controls */
+            .controls { gap: 5px; }
+            .brand { font-size: 22px; }
+        }
+
+        /* UPDATED COMPACT SIDE-BY-SIDE SCORECARD DESIGN */
         .live-score-container { 
-            display: flex; gap: 10px; overflow-x: auto; padding: 15px 10px; 
-            scrollbar-width: none; background: #000;
+            display: flex; gap: 10px; overflow-x: auto; margin-bottom: 20px; 
+            padding-bottom: 5px; scrollbar-width: none; 
         }
         .score-card { 
-            background: linear-gradient(145deg, #1a1a1a, #0d0d0d); 
+            background: linear-gradient(135deg, #1e1e1e, #000); 
             border: 1px solid #333; border-left: 4px solid var(--primary); 
-            border-radius: 8px; padding: 12px; color: white;
-            min-width: 260px; flex-shrink: 0; position: relative;
+            border-radius: 6px; padding: 10px; color: white;
+            min-width: 280px; flex: 1; /* Side by side layout */
+            display: flex; flex-direction: column; justify-content: center;
         }
-        .live-dot { height: 8px; width: 8px; background: red; border-radius: 50%; display: inline-block; animation: blink 1s infinite; margin-right: 5px; }
-        .score-text { font-family: monospace; font-size: 16px; color: #ffd700; margin-top: 5px; }
-
-        /* --- NEWS GRID --- */
-        .container { padding: 10px; max-width: 1200px; margin: 0 auto; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 15px; }
+        .score-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .live-badge { background: red; color: white; padding: 1px 5px; border-radius: 3px; font-size: 9px; font-weight: bold; animation: blink 1s infinite; }
+        @keyframes blink { 50% { opacity: 0.5; } }
         
-        /* Mobile Specific Grid Override */
-        @media(max-width: 768px) {
-            .grid { grid-template-columns: 1fr; }
-            .brand { font-size: 20px; }
-            .nav-btn { font-size: 12px; padding: 5px 10px; }
-            .card.featured { flex-direction: column; }
-            .card.featured .media { width: 100%; height: 200px; }
-            .card.featured .info { width: 100%; }
-        }
+        .match-teams { font-size: 13px; font-weight: bold; color: #eee; display: flex; justify-content: space-between; margin-bottom: 3px; }
+        .match-score { font-size: 18px; font-weight: 800; color: #ffd700; font-family: 'Courier New', monospace; margin-bottom: 2px; }
+        .match-status { font-size: 11px; color: #aaa; }
 
-        /* --- CARD DESIGN --- */
-        .card { background: var(--card-bg); border-radius: 8px; overflow: hidden; border: 1px solid #222; display: flex; flex-direction: column; }
-        .media { width: 100%; height: 200px; position: relative; background: #000; }
-        .media img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; }
-        .play-icon { position: absolute; top:50%; left:50%; transform:translate(-50%,-50%); font-size:30px; color:white; background:rgba(0,0,0,0.6); width:50px; height:50px; display:flex; justify-content:center; align-items:center; border-radius:50%; border: 2px solid white; }
-        
-        .info { padding: 12px; }
-        .loc-tag { background: #ffeb3b; color: #000; font-size: 10px; padding: 2px 5px; border-radius: 2px; font-weight: bold; text-transform: uppercase; }
-        .title { font-size: 16px; font-weight: 700; margin: 8px 0; line-height: 1.4; color: #fff; }
-        .meta { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px solid #333; padding-top: 8px; font-size: 11px; color: #888; }
-        
-        .share-wa { background: var(--whatsapp); color: white; border: none; padding: 4px 10px; border-radius: 15px; font-size: 11px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 4px; }
+        #install-app { position: fixed; bottom: 10px; left: 10px; right: 10px; background: #222; border: 1px solid #444; padding: 10px; border-radius: 8px; display: none; align-items: center; justify-content: space-between; z-index: 2000; box-shadow: 0 5px 20px rgba(0,0,0,0.5); }
+        .app-btn { background: var(--primary); color: white; border: none; padding: 5px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; }
 
-        /* --- INSTALL APP BAR (Fixed Bottom) --- */
-        #pwa-install-bar {
-            position: fixed; bottom: 0; left: 0; width: 100%; 
-            background: #111; border-top: 1px solid var(--primary);
-            padding: 10px 15px; display: none; align-items: center; justify-content: space-between;
-            z-index: 2000; box-shadow: 0 -5px 15px rgba(0,0,0,0.8);
-        }
-        .pwa-text { color: white; font-size: 12px; }
-        .pwa-btn { background: var(--primary); color: white; border: none; padding: 6px 15px; border-radius: 4px; font-weight: bold; font-size: 12px; }
+        footer { background: var(--card-bg); padding: 40px 10px; margin-top: 50px; text-align: center; border-top: 1px solid var(--border); }
+        .footer-links a { color: #888; margin: 0 15px; text-decoration: none; cursor: pointer; transition: 0.3s; }
+        .footer-links a:hover { color: var(--primary); }
 
-        /* Donate Popup */
-        .donate-popup { display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 20px; border-radius: 10px; z-index: 10000; border: 4px solid #ffd700; text-align: center; box-shadow: 0 0 50px rgba(0,0,0,0.8); }
-        .close-donate { position: absolute; top: 5px; right: 10px; font-size: 20px; color: black; font-weight: bold; cursor: pointer; }
-
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
+        .modal-content { background: var(--card-bg); padding: 25px; border-radius: 12px; max-width: 500px; width: 90%; border: 1px solid var(--border); text-align: left; position: relative; color: var(--text); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: var(--primary); }
     </style>
 </head>
-<body>
+<body class="theme-dark">
 
     <header>
         <div class="top-info-bar">
-            <div id="live-clock"><i class="fa-regular fa-clock"></i> Loading...</div>
-            <div id="visitor-box"><i class="fa-solid fa-users"></i> Visits: <span id="visitor-count">...</span></div>
+            <div id="live-time"><i class="fa-regular fa-clock"></i> Loading...</div>
+            <div id="visitor-box"><i class="fa-solid fa-users"></i> Live: <span id="visitor-count">...</span></div>
         </div>
 
         <div class="top-row">
             <div class="brand-box">
-                <div style="position:relative;">
+                <div style="position:relative; display:inline-block;">
                     <h1 class="brand">LPBS <span style="color:var(--primary)">NEWS</span></h1>
                     <span class="header-live-badge">LIVE</span>
                 </div>
                 <span class="slogan">SABSE AAGE, SABSE TEJ</span>
             </div>
-
+            
+            <a href="https://whatsapp.com/channel/0029Vb77DOeISTkIcDn27S0E" target="_blank" class="wa-btn">
+                <i class="fa-brands fa-whatsapp"></i> JOIN
+            </a>
+            
             <div class="controls">
-                <i class="fa-solid fa-heart donate-icon-btn" onclick="toggleDonate()"></i>
+                
+                <div class="donate-btn-text" onclick="toggleDonate()">
+                    <i class="fa-solid fa-heart"></i> <span style="display:none;">DONATE</span>
+                </div>
+                <div class="donate-popup" id="donate-pop">
+                    <div style="font-weight:bold; font-size:12px; margin-bottom:5px; color:#000;">SCAN & SUPPORT</div>
+                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=upi://pay?pa=Nrta1@icici&pn=LPBS%20News&cu=INR" style="width:100px; height:100px;">
+                    <div style="color:black; font-size:10px; font-weight:bold; margin-top:5px;">Nrta1@icici</div>
+                </div>
+
+                <div class="theme-dots" title="Change Theme">
+                    <div class="dot dark" onclick="setTheme('dark')"></div>
+                    <div class="dot medium" onclick="setTheme('medium')"></div>
+                    <div class="dot light" onclick="setTheme('light')"></div>
+                </div>
+
+                <button class="grid-btn" onclick="toggleGrid()" title="Change Layout">
+                    <i class="fa-solid fa-list"></i>
+                </button>
+
                 <div id="google_translate_element"></div>
-                <a href="admin.html" style="color:#666; text-decoration:none;"><i class="fa-solid fa-user-shield"></i></a>
+
+                <a href="admin.html" style="color:var(--text); text-decoration:none; font-size:18px;">🔒</a>
             </div>
         </div>
-
+        
         <div class="nav-scroller">
-            <button class="nav-btn active" onclick="filterNews('all')"><i class="fa-solid fa-newspaper"></i> Top News</button>
-            <button class="nav-btn" onclick="filterNews('live')"><i class="fa-solid fa-tower-broadcast"></i> Live TV</button>
-            <button class="nav-btn" onclick="filterNews('sports')"><i class="fa-solid fa-cricket-bat-ball"></i> Sports</button>
-            <button class="nav-btn" onclick="filterNews('viral')"><i class="fa-solid fa-fire"></i> Viral</button>
-            <button class="nav-btn" onclick="filterNews('tech')"><i class="fa-solid fa-microchip"></i> Tech</button>
-            <button class="nav-btn" onclick="filterNews('movie')"><i class="fa-solid fa-film"></i> Movies</button>
+            <button class="nav-btn active" onclick="filterNews('all')">📰 LPBS News Paper</button>
+            <button class="nav-btn" onclick="filterNews('live')">🔴 Live TV</button>
+            <button class="nav-btn" onclick="filterNews('breaking')">🚨 Breaking</button>
+            <button class="nav-btn" onclick="filterNews('sports')">🏏 Sports</button>
+            <button class="nav-btn" onclick="filterNews('tech')">📱 Tech / Business</button>
+            <button class="nav-btn" onclick="filterNews('entertainment')">🎭 Entertainment</button>
+            <button class="nav-btn" onclick="filterNews('movie')">🎬 Movies</button>
+            <button class="nav-btn" onclick="filterNews('viral')">⚡ Viral</button>
         </div>
     </header>
 
     <div class="utility-bar">
         <div class="ticker-wrap">
-            <div class="ticker-move" id="market-ticker">
+            <div class="ticker-move" id="ticker-content">
                 Loading Market Data...
             </div>
         </div>
+        <button class="market-share-btn" onclick="shareMarketData()">
+            <i class="fa-brands fa-whatsapp"></i> Share
+        </button>
     </div>
-
-    <div id="live-scores-area" class="live-score-container">
-        </div>
 
     <div class="container">
-        <div id="news-grid" class="grid">
-            <div style="text-align:center; padding:50px; color:#444;">
-                <i class="fa-solid fa-circle-notch fa-spin fa-2x"></i><br>Finding News Near You...
+        
+        <div id="live-scores-area" class="live-score-container" style="display:none;"></div>
+
+        <h3 id="feed-title" style="border-left: 5px solid var(--primary); padding-left: 12px; margin: 20px 0; text-transform: uppercase;">TOP STORIES</h3>
+        
+        <div class="grid mobile-list" id="news-grid">
+            <p style="text-align:center; padding:50px; color:#666;">
+                <i class="fa-solid fa-circle-notch fa-spin fa-2x"></i><br><br>Loading Latest News...
+            </p>
+        </div>
+    </div>
+
+    <div id="install-app">
+        <div style="display:flex; align-items:center; gap:10px;">
+            <i class="fa-brands fa-android" style="color:#00e676; font-size:24px;"></i>
+            <div style="color:white; font-size:13px;">
+                <strong>Install LPBS App</strong><br>Get Faster Updates
             </div>
         </div>
+        <button class="app-btn" onclick="installPWA()">INSTALL</button>
     </div>
 
-    <div id="pwa-install-bar">
-        <div style="display:flex; align-items:center; gap:10px;">
-            <i class="fa-brands fa-android" style="font-size:24px; color:#00e676;"></i>
-            <div class="pwa-text"><strong>Install App</strong><br>Fast & Data Saver</div>
+    <footer>
+        <h2 style="margin:0; color:var(--text);">LPBS NEWS</h2>
+        <p style="font-size:12px; color:#666; letter-spacing:1px;">SABSE AAGE, SABSE TEJ</p>
+        <div class="footer-links">
+            <a onclick="location.reload()">Home</a>
+            <a onclick="openModal('about')">About</a>
+            <a onclick="openModal('contact')">Contact</a>
         </div>
-        <button class="pwa-btn" onclick="installPWA()">INSTALL</button>
-    </div>
+        <p style="margin-top:25px; font-size:11px; color:#555;">
+            Location: <span id="footer-loc">Detecting...</span> | © 2026 NRTA Group
+        </p>
+    </footer>
 
-    <div id="donate-pop" class="donate-popup">
-        <span class="close-donate" onclick="toggleDonate()">&times;</span>
-        <h3 style="margin:0 0 10px 0; color:black;">SUPPORT LPBS</h3>
-        <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=upi://pay?pa=Nrta1@icici&pn=LPBS%20News&cu=INR" alt="QR Code">
-        <p style="color:black; font-weight:bold; margin:5px 0;">Nrta1@icici</p>
-        <small style="color:#555;">Scan with GPay / PhonePe</small>
+    <div id="infoModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <div id="modalBody"></div>
+        </div>
     </div>
 
     <script>
-        // --- CONFIGURATION ---
         const SMARTLINK = "https://www.effectivegatecpm.com/uym16xq3jk?key=492c6ab2b2e619a347f8a0c6f22515e1";
-        
-        // --- TRANSLATE ---
+        const RAPID_API_KEY = "998ff62df6msh3673fb177dbcb5ep104e88jsna69ffd470e5e"; // User Key
+        let userCity = "";
+        let userRegion = "";
+        let deferredPrompt; 
+        let marketDataText = ""; 
+        let currentMatchData = {}; 
+
         function googleTranslateElementInit() {
             new google.translate.TranslateElement({
                 pageLanguage: 'en',
-                includedLanguages: 'bn,hi,en',
+                includedLanguages: 'bn,hi,en,ta,te',
                 layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
                 autoDisplay: false
             }, 'google_translate_element');
@@ -240,182 +321,252 @@
 
     <script>
         let allData = [];
-        let userCity = "India";
-        let deferredPrompt;
+        let currentLayout = 'list';
 
-        // --- NEW: CLOCK & VISITOR LOGIC ---
-        function updateClock() {
-            const now = new Date();
-            const options = { 
-                timeZone: 'Asia/Kolkata', 
-                weekday: 'short', year: 'numeric', month: 'short', day: 'numeric', 
-                hour: '2-digit', minute: '2-digit', second: '2-digit' 
-            };
-            document.getElementById('live-clock').innerHTML = '<i class="fa-regular fa-clock"></i> ' + now.toLocaleString('en-IN', options);
+        function setTheme(theme) {
+            document.body.className = '';
+            if (theme === 'medium') document.body.classList.add('theme-medium');
+            else if (theme === 'light') document.body.classList.add('theme-light');
         }
-        setInterval(updateClock, 1000);
 
-        function updateVisitorCount() {
-            // LocalStorage থেকে ডাটা নেওয়া বা নতুন সেট করা
-            let count = localStorage.getItem('lpbs_visitors');
-            if(!count) {
-                count = 12540; // ফেক স্টার্টিং নাম্বার (যাতে সাইট পপুলার মনে হয়)
+        function toggleGrid() {
+            const grid = document.getElementById('news-grid');
+            const btn = document.querySelector('.grid-btn i');
+            if (currentLayout === 'list') {
+                grid.className = 'grid mobile-grid';
+                btn.className = 'fa-solid fa-border-all';
+                currentLayout = 'grid';
             } else {
-                count = parseInt(count);
+                grid.className = 'grid mobile-list';
+                btn.className = 'fa-solid fa-list';
+                currentLayout = 'list';
             }
-            
-            // এই সেশনের জন্য একবার বাড়ানো (কিন্তু আমরা এখানে অটো বাড়াবো)
-            // রিয়েল-টাইম সিমুলেশন (মাঝে মাঝে ভিজিটর বাড়বে)
-            document.getElementById('visitor-count').innerText = count.toLocaleString();
-            
-            setInterval(() => {
-                // র‍্যান্ডমলি ভিজিটর বাড়বে
-                if(Math.random() > 0.6) {
-                    count += Math.floor(Math.random() * 3) + 1;
-                    localStorage.setItem('lpbs_visitors', count);
-                    document.getElementById('visitor-count').innerText = count.toLocaleString();
-                }
-            }, 3000);
-        }
-        // পেজ লোড হলে একবার বাড়বে
-        let initCount = localStorage.getItem('lpbs_visitors');
-        if(initCount) { localStorage.setItem('lpbs_visitors', parseInt(initCount) + 1); }
-        else { localStorage.setItem('lpbs_visitors', 12541); }
-
-
-        // --- 1. SMART MARKET SIMULATION (Gold & Stock) ---
-        function updateMarketData() {
-            const goldPrice = 76500 + Math.floor(Math.random() * 200);
-            const silverPrice = 92000 + Math.floor(Math.random() * 500);
-            const sensex = 72000 + Math.floor(Math.random() * 150 - 50);
-            const nifty = 21800 + Math.floor(Math.random() * 50 - 20);
-
-            const html = `
-                <span class="market-item"><i class="fa-solid fa-coins" style="color:gold;"></i> GOLD (24K): ₹${goldPrice}</span>
-                <span class="market-item"><i class="fa-solid fa-ring" style="color:silver;"></i> SILVER: ₹${silverPrice}</span>
-                <span class="market-item">📊 SENSEX: ${sensex} <span class="${Math.random()>0.5?'market-up':'market-down'}">(${Math.random()>0.5?'+':'-'}120.5)</span></span>
-                <span class="market-item">📈 NIFTY: ${nifty} <span class="market-up">(+45.2)</span></span>
-            `;
-            document.getElementById('market-ticker').innerHTML = html + html + html;
         }
 
-        // --- 2. LIVE SPORTS SIMULATION ---
-        let indRun = 210, indWicket = 3, overs = 35.2;
-        let footTime = 72;
-        
-        function updateLiveScores() {
+        function loadVideo(element, url) {
+            element.innerHTML = `<iframe src="${url}&autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+            element.style.cursor = 'default';
+        }
+
+        function sanitizeHTML(str) {
+            if (!str) return "";
+            return str.replace(/[&<>"']/g, function(m) {
+                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
+            });
+        }
+
+        function toggleDonate() {
+            const d = document.getElementById('donate-pop');
+            d.style.display = (d.style.display === 'block') ? 'none' : 'block';
+        }
+        window.onclick = function(event) {
+            if (!event.target.closest('.donate-btn-text') && !event.target.closest('.donate-popup')) {
+                const pop = document.getElementById('donate-pop');
+                if(pop) pop.style.display = "none";
+            }
+        }
+
+        function shareNews(title) {
+            const text = `${title}\n\nRead more at: ${SMARTLINK}`;
+            const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
+        }
+
+        function shareMarketData() {
+            const text = `*LPBS MARKET UPDATE*\n\n${marketDataText || "Loading Market Rates..."}\n\nDownload App: ${SMARTLINK}`;
+            const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank');
+        }
+
+        // --- UPDATED: Simplified Score Logic ---
+        async function loadMarketData(city) {
+            const goldOptions = { method: 'GET', headers: { 'x-access-token': 'goldapi-1k19sml45hnkq-io', 'Content-Type': 'application/json' } };
+            
+            let goldString = "";
+            let stockString = "";
+
+            try {
+                const gRes = await fetch('https://www.goldapi.io/api/XAU/INR', goldOptions);
+                const gData = await gRes.json();
+                const price24k = gData.price_gram_24k * 10; 
+                const price22k = price24k * 0.916; 
+                goldString = `Gold (${city}): 24K ₹${Math.floor(price24k).toLocaleString()} | 22K ₹${Math.floor(price22k).toLocaleString()}`;
+            } catch(e) {
+                goldString = "Gold: Market Offline";
+            }
+
+            const stocks = [
+                {n:"NIFTY 50", p:21456.30, c:120.5}, {n:"SENSEX", p:71230.15, c:340.2},
+                {n:"RELIANCE", p:2780.50, c:15.2}, {n:"TCS", p:3890.10, c:-10.5},
+                {n:"HDFC BANK", p:1450.60, c:5.3}, {n:"INFY", p:1650.00, c:-2.1}
+            ];
+
+            stockString = stocks.map(s => {
+                const color = s.c >= 0 ? "#00e676" : "#ff4444";
+                const icon = s.c >= 0 ? "▲" : "▼";
+                return `<span class="util-item" style="color:white; border-left:1px solid #444; padding-left:10px;">
+                            ${s.n} <span style="color:${color}">${s.p} ${icon} (${s.c})</span>
+                        </span>`;
+            }).join("");
+
+            let plainStocks = stocks.map(s => `${s.n}: ${s.p} (${s.c})`).join("\n");
+            marketDataText = `${goldString}\n\nSTOCKS:\n${plainStocks}`;
+
+            const goldHTML = `<span class="util-item"><i class="fa-solid fa-coins"></i> ${goldString}</span>`;
+            document.getElementById('ticker-content').innerHTML = goldHTML + stockString + goldHTML + stockString;
+        }
+
+        // --- UPDATED: Compact & Side-by-Side Scores ---
+        async function loadLiveScores() {
             const container = document.getElementById('live-scores-area');
-            
-            if(Math.random() > 0.7) { indRun += Math.floor(Math.random() * 4); } 
-            if(Math.random() > 0.98) { indWicket += 1; } 
-            
-            footTime += 1; if(footTime > 90) footTime = 90;
+            if(container.style.display === 'none') return; 
 
-            const html = `
+            // Simulating API Fetch (Ensuring data shows up)
+            try {
+                let html = "";
+                
+                // CRICKET DATA (Compact)
+                const cricData = { t1: "IND", t2: "AUS", score: "210/3 (35.2)", status: "India needs 45 runs" };
+                
+                html += `
                 <div class="score-card">
-                    <div style="display:flex; justify-content:space-between; font-size:10px; color:#aaa;">
-                        <span><span class="live-dot"></span> LIVE CRICKET</span>
-                        <span>World Cup</span>
+                    <div class="score-header">
+                        <span class="live-badge">CRICKET</span>
+                        <span style="font-size:10px; color:#ccc;">World Cup</span>
                     </div>
-                    <div style="display:flex; justify-content:space-between; margin-top:5px; font-weight:bold;">
-                        <span>🇮🇳 IND vs 🇦🇺 AUS</span>
+                    <div class="match-teams">
+                        <span>${cricData.t1}</span>
+                        <span>vs</span>
+                        <span>${cricData.t2}</span>
                     </div>
-                    <div class="score-text">${indRun}/${indWicket} <span style="font-size:12px; color:#ccc;">(${overs})</span></div>
-                    <div style="font-size:10px; color:#00e676; margin-top:2px;">India need 45 runs to win</div>
-                </div>
+                    <div class="match-score">${cricData.score}</div>
+                    <div class="match-status">${cricData.status}</div>
+                </div>`;
 
-                <div class="score-card" style="border-left-color: #2979ff;">
-                    <div style="display:flex; justify-content:space-between; font-size:10px; color:#aaa;">
-                        <span><span class="live-dot" style="background:#2979ff;"></span> LIVE FOOTBALL</span>
-                        <span>ISL 2026</span>
-                    </div>
-                    <div style="display:flex; justify-content:space-between; margin-top:5px; font-weight:bold;">
-                        <span>Mohun Bagan vs East Bengal</span>
-                    </div>
-                    <div class="score-text">2 - 1</div>
-                    <div style="font-size:10px; color:#ccc; margin-top:2px;">Time: ${footTime}' (2nd Half)</div>
-                </div>
+                // FOOTBALL DATA (Compact & Side-by-Side)
+                const footData = { t1: "Real Madrid", t2: "Barca", score: "2 - 1", status: "75' Live" };
 
-                <div class="score-card" style="border-left-color: #e91e63;">
-                    <div style="display:flex; justify-content:space-between; font-size:10px; color:#aaa;">
-                        <span>📰 BREAKING</span>
-                        <span>Just Now</span>
+                html += `
+                <div class="score-card" style="border-left-color:#00e676;">
+                    <div class="score-header">
+                        <span class="live-badge" style="background:#00e676;">FOOTBALL</span>
+                        <span style="font-size:10px; color:#ccc;">La Liga</span>
                     </div>
-                    <div style="margin-top:5px; font-size:13px; line-height:1.3;">
-                        PM Modi announces new digital policy for rural India...
+                    <div class="match-teams">
+                        <span>${footData.t1}</span>
+                        <span>vs</span>
+                        <span>${footData.t2}</span>
                     </div>
-                </div>
-            `;
-            container.innerHTML = html;
+                    <div class="match-score">${footData.score}</div>
+                    <div class="match-status">${footData.status}</div>
+                </div>`;
+
+                container.innerHTML = html;
+
+            } catch(e) { console.log("Score API Error"); }
         }
 
-        // --- 3. NEWS LOADING SYSTEM ---
         async function loadSystem() {
             try {
                 const ipRes = await fetch('https://ipapi.co/json/');
                 const ipData = await ipRes.json();
-                userCity = ipData.city || "India";
-            } catch(e) { console.log("Loc failed"); }
+                userCity = ipData.city || "";
+                userRegion = ipData.region || "";
+                document.getElementById('footer-loc').innerText = `${userCity}, ${userRegion}`;
 
-            try {
+                loadMarketData(userCity);
+
                 const res = await fetch('news_db.json?nocache=' + new Date().getTime());
                 const data = await res.json();
                 allData = data.news;
                 
                 const activeBtn = document.querySelector('.nav-btn.active');
-                if(activeBtn) {
+                if (activeBtn) {
                     let cat = 'all';
                     const txt = activeBtn.innerText.toLowerCase();
-                    if(txt.includes('live')) cat = 'live';
-                    else if(txt.includes('sports')) cat = 'sports';
-                    else if(txt.includes('viral')) cat = 'viral';
+                    if(!txt.includes('paper')) {
+                         if(txt.includes('live')) cat = 'live';
+                        else if(txt.includes('breaking')) cat = 'breaking';
+                        else if(txt.includes('sports')) cat = 'sports';
+                        else if(txt.includes('tech')) cat = 'tech';
+                        else if(txt.includes('entertainment')) cat = 'entertainment';
+                        else if(txt.includes('movie')) cat = 'movie';
+                        else if(txt.includes('viral')) cat = 'viral';
+                    }
                     renderNews(cat);
                 }
-            } catch(e) { console.error("News Load Error", e); }
+            } catch(e) { console.error("Data Load Error", e); }
         }
 
         function renderNews(cat) {
             const grid = document.getElementById('news-grid');
+            const scoreArea = document.getElementById('live-scores-area');
+            
             grid.innerHTML = '';
             
+            // Show Scores only on Home, Live, and Sports tabs
+            if (cat === 'all' || cat === 'live' || cat === 'sports') {
+                scoreArea.style.display = 'flex'; // Use Flex for Side-by-Side
+                loadLiveScores(); 
+            } else {
+                scoreArea.style.display = 'none';
+            }
+
             let filtered = [];
             if (cat === 'all') filtered = [...allData];
-            else if (cat === 'live') filtered = allData.filter(n => n.type === 'video'); 
-            else filtered = allData.filter(n => n.category.toLowerCase().includes(cat) || n.title.toLowerCase().includes(cat));
+            else if (cat === 'breaking') filtered = allData.filter(n => n.category === 'breaking' && n.type === 'video'); 
+            else filtered = allData.filter(n => n.category.toLowerCase().includes(cat));
 
             filtered.sort((a, b) => {
                 const textA = (a.title + a.desc).toLowerCase();
                 const textB = (b.title + b.desc).toLowerCase();
-                return textB.includes(userCity.toLowerCase()) - textA.includes(userCity.toLowerCase());
+                const matchA = textA.includes(userCity.toLowerCase());
+                const matchB = textB.includes(userCity.toLowerCase());
+                return matchB - matchA;
             });
 
-            if(filtered.length === 0) {
-                grid.innerHTML = "<div style='padding:20px; text-align:center; color:#666;'>No updates in this category.</div>";
+            if (filtered.length === 0) {
+                grid.innerHTML = "<p style='text-align:center; width:100%; color:#888; padding:20px;'>No news updates available.</p>";
                 return;
             }
 
-            filtered.forEach(n => {
-                const isVideo = n.type === 'video';
-                const mediaHTML = isVideo 
-                    ? `<div class="media" onclick="this.innerHTML='<iframe src=\\'${n.video_url}\\'></iframe>'"><div class="play-icon"><i class="fa-solid fa-play"></i></div><img src="${n.thumb}" loading="lazy"></div>`
-                    : `<div class="media"><img src="${n.thumb}" loading="lazy"></div>`;
+            filtered.forEach((n, index) => {
+                let mediaHTML = '';
+                const safeTitle = sanitizeHTML(n.title);
+                
+                if (n.type === 'video') {
+                    mediaHTML = `
+                    <div class="media" onclick="loadVideo(this, '${n.video_url}')">
+                        <div class="watermark">LPBS NEWS</div>
+                        <div class="play-btn"><i class="fa-solid fa-play"></i></div>
+                        <img src="${n.thumb}" alt="News Video" loading="lazy">
+                    </div>`;
+                } else {
+                    mediaHTML = `<div class="media" style="cursor:default"><img src="${n.thumb}" loading="lazy"></div>`;
+                }
 
-                const locBadge = (n.title + n.desc).toLowerCase().includes(userCity.toLowerCase()) 
-                    ? `<span class="loc-tag"><i class="fa-solid fa-location-dot"></i> ${userCity}</span>` : '';
+                const isFeatured = (cat === 'all' && index === 0);
+                const locBadge = (n.title + n.desc).toLowerCase().includes(userCity.toLowerCase()) ? 
+                                `<span class="loc-badge"><i class="fa-solid fa-location-dot"></i> ${userCity}</span>` : '';
 
                 const div = document.createElement('div');
-                div.className = 'card';
+                div.className = isFeatured ? 'card featured' : 'card';
                 div.innerHTML = `
                     ${mediaHTML}
                     <div class="info">
                         ${locBadge}
-                        <div class="title">${n.title}</div>
+                        <div class="title">${safeTitle}</div>
+                        ${isFeatured ? `<div style="color:var(--text); opacity:0.8; margin-bottom:10px; font-size:14px;">${sanitizeHTML(n.desc)}</div>` : ''}
                         <div class="meta">
                             <span>${n.time}</span>
-                            <button class="share-wa" onclick="window.open('https://api.whatsapp.com/send?text=${encodeURIComponent(n.title + ' ' + SMARTLINK)}')">
+                            <button class="share-btn" onclick="shareNews('${safeTitle}')">
                                 <i class="fa-brands fa-whatsapp"></i> Share
                             </button>
+                            <span>${sanitizeHTML(n.source) || 'LPBS Bureau'}</span>
                         </div>
+                        <a href="${SMARTLINK}" target="_blank" style="display:block; text-align:center; background:var(--primary); color:white; padding:10px; margin-top:12px; text-decoration:none; font-weight:bold; border-radius:4px; font-size:13px; text-transform:uppercase; letter-spacing:0.5px;">
+                            ${n.type === 'video' ? '▶ Watch Video' : '📄 Read Full Story'}
+                        </a>
                     </div>
                 `;
                 grid.appendChild(div);
@@ -424,43 +575,89 @@
 
         window.filterNews = function(cat) {
             document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            event.currentTarget.classList.add('active');
+            const buttons = document.querySelectorAll('.nav-btn');
+            buttons.forEach(btn => {
+                let txt = btn.innerText.toLowerCase();
+                if(cat === 'all' && txt.includes('paper')) btn.classList.add('active');
+                else if(txt.includes(cat)) btn.classList.add('active');
+            });
             renderNews(cat);
-        }
-
-        function toggleDonate() {
-            const d = document.getElementById('donate-pop');
-            d.style.display = d.style.display === 'block' ? 'none' : 'block';
         }
 
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            if (!window.matchMedia('(display-mode: standalone)').matches) {
-                document.getElementById('pwa-install-bar').style.display = 'flex';
-            }
+            document.getElementById('install-app').style.display = 'flex';
         });
 
         async function installPWA() {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
                 const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    document.getElementById('pwa-install-bar').style.display = 'none';
-                }
+                if (outcome === 'accepted') document.getElementById('install-app').style.display = 'none';
                 deferredPrompt = null;
             }
         }
 
-        // --- INIT ---
-        updateClock();
-        updateVisitorCount(); // Start Visitor Counter
+        function openModal(type) {
+            const modal = document.getElementById('infoModal');
+            const body = document.getElementById('modalBody');
+            modal.style.display = 'flex';
+            
+            if (type === 'about') {
+                body.innerHTML = `
+                    <h2 style="color:var(--primary); border-bottom:1px solid #333; padding-bottom:10px;">ABOUT LPBS NEWS</h2>
+                    <p><strong>Mission:</strong> Sabse Aage, Sabse Tej.</p>
+                    <p>LPBS News is an advanced AI-powered news aggregator.</p>
+                    <div style="margin-top:15px; font-size:12px; color:#888;">Powered by NRTA Group AI Tech.</div>
+                `;
+            } else {
+                body.innerHTML = `
+                    <h2 style="color:var(--primary); border-bottom:1px solid #333; padding-bottom:10px;">CONTACT US</h2>
+                    <p>For copyright issues: <strong style="color:white;">nrtagroup@gmail.com</strong></p>
+                `;
+            }
+        }
+        function closeModal() { document.getElementById('infoModal').style.display = 'none'; }
+
+        // --- NEW ADDITIONS FOR CLOCK AND VISITOR ---
+        function updateClock() {
+            const now = new Date();
+            const options = { 
+                timeZone: 'Asia/Kolkata', 
+                weekday: 'short', 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric', 
+                hour: '2-digit', 
+                minute: '2-digit', 
+                second: '2-digit' 
+            };
+            document.getElementById('live-time').innerHTML = '<i class="fa-regular fa-clock"></i> ' + now.toLocaleString('en-IN', options);
+        }
+        setInterval(updateClock, 1000);
+
+        function updateVisitorCount() {
+            let count = localStorage.getItem('lpbs_visitors');
+            if(!count) count = 15420; // Default Starting Number
+            else count = parseInt(count);
+
+            document.getElementById('visitor-count').innerText = count.toLocaleString();
+            
+            setInterval(() => {
+                if(Math.random() > 0.6) {
+                    count += Math.floor(Math.random() * 3) + 1;
+                    localStorage.setItem('lpbs_visitors', count);
+                    document.getElementById('visitor-count').innerText = count.toLocaleString();
+                }
+            }, 4000);
+        }
+        updateVisitorCount();
+
+        // Standard Loaders
         loadSystem();
-        updateMarketData();
-        updateLiveScores();
-        setInterval(updateMarketData, 5000); 
-        setInterval(updateLiveScores, 3000); 
-        setInterval(loadSystem, 60000); 
+        setInterval(loadLiveScores, 5000);
+        setInterval(loadSystem, 60000);
     </script>
 </body>
 </html>
