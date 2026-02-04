@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="description" content="LPBS NEWS - Sabse Aage, Sabse Tej. The best AI-powered digital newspaper providing latest news.">
-    <meta name="keywords" content="LPBS News, Bengali News, Hindi News, Sports Update">
+    <meta name="description" content="LPBS NEWS - Sabse Aage, Sabse Tej.">
     <meta name="author" content="NRTA Group">
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     
@@ -14,7 +13,6 @@
     <title>LPBS NEWS - Sabse Aage, Sabse Tej</title>
     
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-7398472528361759" crossorigin="anonymous"></script>
-
     <script src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js" defer></script>
     <script>
       window.OneSignalDeferred = window.OneSignalDeferred || [];
@@ -22,320 +20,259 @@
         await OneSignal.init({ appId: "a2089b57-b359-48e9-b4f5-9ba54f0f44c5" });
       });
     </script>
-    
     <script src="https://pl28611418.effectivegatecpm.com/35/31/b2/3531b2e932ccfe8beb37c64390437ab8.js"></script>
-
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     
     <style>
-        /* CSS VARIABLES - DEEP GREEN THEME */
+        /* --- CSS VARIABLES & RESET --- */
         :root { 
-            --primary: #006400; /* Deep Green */
-            --primary-light: #008000; /* Lighter Green for Hover */
+            --primary: #006400; 
+            --primary-light: #008000; 
             --whatsapp: #25D366; 
             --bg: #050505; 
             --card-bg: #121212; 
             --text: #e0e0e0; 
             --border: #1a331a; 
-            --hover: #0f240f; 
         }
         
-        body.theme-medium { --bg: #1a1a1a; --card-bg: #2d2d2d; --text: #f0f0f0; --border: #333; }
-        body.theme-light { --bg: #f0f5f0; --card-bg: #ffffff; --text: #004d00; --border: #cce0cc; --hover: #e6f2e6; }
-        
-        /* Body Padding increased for Bottom Ad */
-        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; padding-bottom: 80px; transition: background 0.3s, color 0.3s; user-select: none; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: 'Segoe UI', sans-serif; padding-bottom: 80px; transition: background 0.3s; user-select: none; -webkit-tap-highlight-color: transparent; overflow-x: hidden; }
 
-        /* AD SPACES CSS */
-        .ad-header-box {
-            text-align: center;
-            padding: 5px 0;
-            background: #000;
-            border-bottom: 1px solid #222;
-            width: 100%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 60px; /* Space reserved */
+        /* --- SIDEBAR NAVIGATION (NEW) --- */
+        .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 2000; display: none; backdrop-filter: blur(3px); }
+        .sidebar { 
+            position: fixed; top: 0; left: -280px; width: 260px; height: 100%; 
+            background: #0f240f; border-right: 2px solid var(--primary); 
+            z-index: 2001; transition: 0.3s; padding-top: 20px; 
+            display: flex; flex-direction: column; overflow-y: auto;
+        }
+        .sidebar.active { left: 0; }
+        
+        .sidebar-header { padding: 0 20px 20px 20px; border-bottom: 1px solid #333; margin-bottom: 10px; }
+        .sidebar-title { font-size: 24px; font-weight: 900; color: white; }
+        
+        .nav-item { 
+            padding: 15px 20px; color: #ccc; font-size: 16px; font-weight: 600; 
+            border-bottom: 1px solid #1a331a; cursor: pointer; display: flex; align-items: center; gap: 10px;
+        }
+        .nav-item:hover, .nav-item.active { background: var(--primary); color: white; padding-left: 25px; transition: 0.2s; }
+        .nav-item i { width: 25px; text-align: center; }
+
+        /* --- HEADER --- */
+        header { background: var(--card-bg); padding: 10px 15px; position: sticky; top:0; z-index:999; border-bottom: 3px solid var(--primary); box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        
+        .header-main { display: flex; justify-content: space-between; align-items: center; }
+        .menu-btn { font-size: 24px; color: white; cursor: pointer; padding: 5px; margin-right: 10px; }
+        
+        .brand-container { flex-grow: 1; }
+        .brand { font-size: 22px; font-weight: 900; margin: 0; color: white; line-height: 1.1; }
+        .sub-brand { font-size: 10px; color: #00e676; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; display: block; margin-top: 2px; }
+
+        .controls { display: flex; align-items: center; gap: 10px; }
+        .support-btn { background: linear-gradient(45deg, var(--primary), #004d00); border: 1px solid #00e676; padding: 5px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; color: white; cursor: pointer; }
+
+        /* --- GOOGLE TRANSLATE CUSTOMIZATION --- */
+        #google_translate_element { margin-left: 5px; }
+        .goog-logo-link, .goog-te-banner-frame { display: none !important; }
+        .goog-te-gadget { color: transparent !important; }
+        .goog-te-gadget .goog-te-combo { 
+            color: #000; background: #fff; border: 2px solid var(--primary); 
+            padding: 4px; border-radius: 5px; font-weight: bold; font-size: 14px; 
+            width: 100px;
         }
 
-        .ad-footer-sticky {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: #0a1f0a; /* Matches App Theme */
-            z-index: 9999;
-            text-align: center;
-            padding: 5px 0;
-            border-top: 2px solid var(--primary);
-            box-shadow: 0 -5px 15px rgba(0,0,0,0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 50px;
+        /* --- MARKET DATA SECTIONS --- */
+        .gold-rate-box {
+            background: #1a0000; color: #ffd700; text-align: center; 
+            padding: 8px; font-weight: bold; font-size: 13px;
+            border-bottom: 1px solid #333; animation: blinkGold 2s infinite;
         }
+        @keyframes blinkGold { 50% { opacity: 0.6; color: #fff; } }
 
-        /* HEADER STRUCTURE */
-        header { background: var(--card-bg); padding: 10px 15px; position: sticky; top:0; z-index:999; border-bottom: 3px solid var(--primary); box-shadow: 0 4px 15px rgba(0,100,0,0.3); }
-        .top-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        
-        .brand-box { display: flex; flex-direction: column; position: relative; }
-        .brand { font-size: 26px; font-weight: 900; margin: 0; text-transform: uppercase; color: var(--text); line-height: 1; display: inline-block; padding-bottom: 2px; letter-spacing: -0.5px; }
-        .slogan { font-size: 10px; color: #4caf50; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
-        
-        .header-live-badge { 
-            position: absolute; top: -5px; right: -40px; 
-            background: #cc0000; color: white; font-size: 9px; font-weight: bold; 
-            padding: 2px 5px; border-radius: 3px; animation: blink 1s infinite; 
-        }
-
-        .stats-row {
-            display: flex; align-items: center; gap: 10px; font-size: 11px; color: #bbb; margin-top: 5px; font-weight: 600;
-        }
-        .live-count { color: var(--primary-light); animation: pulseGreen 2s infinite; display: flex; align-items: center; gap: 4px; }
-
-        .wa-btn { background: var(--whatsapp); color: white; text-decoration: none; font-size: 11px; font-weight: bold; padding: 6px 12px; border-radius: 20px; display: flex; align-items: center; gap: 5px; animation: pulse 2s infinite; border: 1px solid #128C7E; box-shadow: 0 0 10px rgba(37, 211, 102, 0.2); }
-        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.4); } 70% { box-shadow: 0 0 0 8px rgba(37, 211, 102, 0); } 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0); } }
-        @keyframes pulseGreen { 0% { opacity: 0.7; } 50% { opacity: 1; text-shadow: 0 0 5px var(--primary); } 100% { opacity: 0.7; } }
-
-        .donate-btn-text { background: linear-gradient(45deg, var(--primary), #008000); color: white; font-weight: 800; font-size: 11px; padding: 6px 12px; border-radius: 4px; cursor: pointer; text-transform: uppercase; display: flex; align-items: center; gap: 5px; border: 1px solid #004d00; box-shadow: 0 2px 5px rgba(0,0,0,0.5); }
-        .donate-popup { display: none; position: absolute; top: 45px; right: 0; background: var(--card-bg); padding: 15px; border-radius: 8px; border: 2px solid var(--primary); text-align: center; z-index: 10001; width: 140px; box-shadow: 0 0 20px rgba(0, 100, 0, 0.5); }
-        
-        .utility-bar { background: #081a08; border-bottom: 1px solid var(--primary); display: flex; align-items: center; position: relative; height: 35px; }
-        .ticker-wrap { width: 100%; overflow: hidden; display: flex; align-items: center; }
-        .ticker-move { display: inline-flex; white-space: nowrap; animation: ticker 40s linear infinite; align-items: center; }
+        .ticker-bar { background: #000; height: 30px; overflow: hidden; display: flex; align-items: center; border-bottom: 1px solid var(--border); }
+        .ticker-move { display: inline-flex; animation: ticker 30s linear infinite; white-space: nowrap; }
         @keyframes ticker { 0% { transform: translate3d(0, 0, 0); } 100% { transform: translate3d(-100%, 0, 0); } }
-        .util-item { margin-right: 30px; display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: bold; color: #ddd; }
-        
-        .market-share-btn { position: absolute; right: 0; top: 0; height: 100%; background: var(--whatsapp); color: white; border: none; padding: 0 15px; cursor: pointer; font-weight: bold; font-size: 11px; z-index: 10; display: flex; align-items: center; gap: 5px; }
+        .stock-item { margin-right: 25px; font-size: 12px; font-weight: bold; color: #ccc; }
 
-        .controls { display: flex; align-items: center; gap: 8px; position: relative; }
-        .theme-dots { display: flex; gap: 5px; background: rgba(0,100,0,0.2); padding: 3px; border-radius: 10px; border: 1px solid var(--border); }
-        .dot { width: 12px; height: 12px; border-radius: 50%; cursor: pointer; border: 1px solid #555; }
-        .dot.dark { background: #000; } .dot.medium { background: #333; } .dot.light { background: #fff; }
-
-        .grid-btn { background: none; border: 1px solid var(--border); color: var(--text); padding: 5px 8px; border-radius: 4px; cursor: pointer; display: none; }
-        @media(max-width: 768px) { .grid-btn { display: block; } }
-
-        #google_translate_element { overflow: hidden; height: 26px; border: 1px solid var(--border); border-radius: 4px; background: var(--card-bg); }
-        .goog-te-combo { margin: 0 !important; height: 26px !important; font-size: 11px; background: var(--card-bg); color: var(--text); border: none; }
-        .goog-logo-link, .goog-te-banner-frame { display: none !important; } 
-        body { top: 0px !important; }
-
-        .nav-scroller { display: flex; gap: 10px; overflow-x: auto; padding: 8px 0; scrollbar-width: none; border-top: 1px solid var(--border); }
-        .nav-btn { background: transparent; color: #888; border: none; padding: 6px 10px; cursor: pointer; white-space: nowrap; font-size: 13px; font-weight: 600; transition: 0.2s; border-radius: 20px; }
-        .nav-btn:hover { color: var(--primary-light); background: rgba(0,100,0,0.1); }
-        .nav-btn.active { background: var(--primary); color: white; font-weight: 700; box-shadow: 0 2px 6px rgba(0,100,0,0.4); }
-
-        .container { padding: 10px; max-width: 1400px; margin: 0 auto; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 15px; padding-top: 10px; }
-        .grid.mobile-list { grid-template-columns: 1fr; } 
-        .grid.mobile-grid { grid-template-columns: 1fr 1fr; } 
-
-        .card { background: var(--card-bg); border-radius: 10px; overflow: hidden; border: 1px solid var(--border); display: flex; flex-direction: column; transition: transform 0.2s; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .card:active { transform: scale(0.98); }
-
-        .card.featured { grid-column: 1 / -1; flex-direction: row; border-bottom: 4px solid var(--primary); background: linear-gradient(to bottom, var(--card-bg), #081a08); }
-        .card.featured .media { width: 60%; height: 300px; }
-        .card.featured .info { width: 40%; padding: 20px; justify-content: center; display: flex; flex-direction: column; }
-        .card.featured .title { font-size: 22px; line-height: 1.3; }
-
-        .media { width: 100%; height: 200px; position: relative; background: #000; cursor: pointer; overflow: hidden; }
-        .media img { width: 100%; height: 100%; object-fit: cover; opacity: 0.9; transition: 0.3s; }
-        
-        .play-btn { 
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 45px; height: 45px; background: rgba(0,100,0,0.85); border-radius: 50%;
-            display: flex; justify-content: center; align-items: center; color: white;
-            font-size: 18px; box-shadow: 0 0 15px rgba(0,0,0,0.5); z-index: 5; pointer-events: none; border: 2px solid white;
+        /* --- AD SPACES --- */
+        .ad-space { 
+            background: #000; min-height: 60px; margin: 10px 0; 
+            display: flex; justify-content: center; align-items: center; 
+            border: 1px dashed #333; 
         }
-        
-        .media iframe { width: 100%; height: 100%; position: absolute; top:0; left:0; border: none; z-index: 10; }
-
-        .info { padding: 12px; }
-        .title { font-size: 15px; font-weight: 700; margin-bottom: 8px; color: var(--text); line-height: 1.4; }
-        
-        .meta { font-size: 11px; color: #888; display: flex; justify-content: space-between; align-items: center; margin-top: 10px; border-top: 1px solid var(--border); padding-top: 8px; }
-        .share-btn { background: none; border: 1px solid #333; color: var(--whatsapp); padding: 4px 10px; border-radius: 4px; cursor: pointer; font-size: 11px; display: flex; align-items: center; gap: 5px; transition: 0.3s; }
-        .share-btn:hover { background: var(--whatsapp); color: white; border-color: var(--whatsapp); }
-
-        .watermark { position: absolute; top: 8px; right: 8px; background: var(--primary); color: white; padding: 2px 5px; font-size: 9px; font-weight: bold; border-radius: 3px; z-index: 6; pointer-events: none; opacity: 0.9; }
-        .loc-badge { background: var(--primary); color: white; padding: 2px 6px; font-size: 10px; font-weight: bold; border-radius: 3px; display:inline-block; margin-bottom: 5px; }
-
-        @media(max-width: 768px) {
-            .card.featured { flex-direction: column; }
-            .card.featured .media { width: 100%; height: 200px; }
-            .card.featured .info { width: 100%; padding: 15px; }
-            .card.featured .title { font-size: 18px; }
+        .ad-footer-sticky {
+            position: fixed; bottom: 0; left: 0; width: 100%; 
+            background: #0a1f0a; z-index: 9990; text-align: center; 
+            padding: 5px 0; border-top: 2px solid var(--primary);
         }
 
+        /* --- NEWS CARD DESIGN (SMALL IMG, BIG TEXT) --- */
+        .container { padding: 10px; }
+        .news-list { display: flex; flex-direction: column; gap: 15px; }
+        
+        .news-card { 
+            display: flex; background: var(--card-bg); border-radius: 8px; 
+            overflow: hidden; border: 1px solid #222; height: 110px; /* Fixed small height */
+            position: relative;
+        }
+        .news-thumb { 
+            width: 130px; height: 100%; background: #000; position: relative; 
+            flex-shrink: 0; cursor: pointer;
+        }
+        .news-thumb img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
+        .play-icon { 
+            position: absolute; top:50%; left:50%; transform:translate(-50%,-50%); 
+            color: white; font-size: 20px; background: rgba(0,0,0,0.6); 
+            width: 30px; height: 30px; border-radius: 50%; display: flex; 
+            align-items: center; justify-content: center; border: 1px solid white;
+        }
+        
+        .news-content { padding: 10px; display: flex; flex-direction: column; justify-content: center; width: 100%; }
+        .news-title { 
+            font-size: 16px; font-weight: 700; color: #fff; line-height: 1.3; 
+            margin-bottom: 5px;
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .news-meta { font-size: 11px; color: #888; display: flex; justify-content: space-between; }
+        
+        /* Trending Badge */
+        .trending-badge {
+            position: absolute; top: 0; right: 0; background: #ff0000; color: white;
+            font-size: 9px; padding: 2px 6px; font-weight: bold;
+            animation: blinkRed 1s infinite; border-bottom-left-radius: 5px; z-index: 10;
+        }
+        @keyframes blinkRed { 50% { opacity: 0.5; } }
+
+        /* --- VIDEO MODAL PLAYER --- */
+        .video-modal {
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: black; z-index: 10000; align-items: center; justify-content: center;
+        }
+        .video-container { width: 100%; height: 60%; position: relative; }
+        .video-container iframe { width: 100%; height: 100%; border: none; }
+        
+        .modal-close {
+            position: absolute; top: 20px; right: 20px; color: white; font-size: 30px;
+            cursor: pointer; z-index: 10001; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 5px;
+        }
+        .player-watermark {
+            position: absolute; top: 10px; left: 10px; color: rgba(255,255,255,0.5);
+            font-weight: bold; font-size: 12px; pointer-events: none;
+        }
+        .player-ad {
+            position: absolute; bottom: 0; left: 0; width: 100%; height: 50px;
+            background: rgba(0,0,0,0.8); display: flex; justify-content: center; align-items: center;
+            border-top: 1px solid #444; color: #fff; font-size: 10px;
+        }
+
+        /* --- SCORECARD --- */
         .live-score-container { 
-            display: flex; gap: 10px; overflow-x: auto; margin-bottom: 15px; 
+            display: flex; gap: 10px; overflow-x: auto; margin: 10px 0; 
             padding-bottom: 5px; scrollbar-width: none; 
         }
         .score-card { 
             background: linear-gradient(135deg, #0a1f0a, #000); 
             border: 1px solid #1a331a; border-left: 4px solid var(--primary-light); 
-            border-radius: 8px; padding: 10px; color: white;
-            min-width: 260px; flex: 1; 
-            display: flex; flex-direction: column; justify-content: center;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            border-radius: 6px; padding: 10px; color: white;
+            min-width: 250px; flex: 1; 
         }
-        .score-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
-        .live-badge { background: #cc0000; color: white; padding: 2px 6px; border-radius: 3px; font-size: 9px; font-weight: bold; animation: blink 1s infinite; letter-spacing: 0.5px; }
-        @keyframes blink { 50% { opacity: 0.5; } }
-        
-        .match-teams { font-size: 13px; font-weight: bold; color: #eee; display: flex; justify-content: space-between; margin-bottom: 4px; }
-        .match-score { font-size: 18px; font-weight: 800; color: #4caf50; font-family: 'Courier New', monospace; margin-bottom: 2px; text-shadow: 0 0 5px rgba(0,128,0,0.5); }
-        .match-status { font-size: 10px; color: #aaa; }
+        .live-dot { height: 8px; width: 8px; background: red; border-radius: 50%; display: inline-block; animation: blinkRed 1s infinite; margin-right: 5px; }
 
-        /* INSTALL APP BUTTON */
-        #install-app { position: fixed; bottom: 60px; left: 10px; right: 10px; background: #0a1f0a; border: 1px solid var(--primary); padding: 10px; border-radius: 8px; display: none; align-items: center; justify-content: space-between; z-index: 2000; box-shadow: 0 5px 20px rgba(0,0,0,0.7); }
-        .app-btn { background: var(--primary); color: white; border: none; padding: 6px 15px; border-radius: 4px; font-weight: bold; cursor: pointer; font-size: 12px; }
-
-        footer { background: var(--card-bg); padding: 30px 10px; margin-top: 30px; text-align: center; border-top: 3px solid var(--primary); }
-        .footer-links a { color: #888; margin: 0 10px; text-decoration: none; cursor: pointer; transition: 0.3s; font-size: 12px; }
-        .footer-links a:hover { color: var(--primary-light); }
-
-        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; justify-content: center; align-items: center; backdrop-filter: blur(5px); }
-        .modal-content { background: var(--card-bg); padding: 25px; border-radius: 12px; max-width: 500px; width: 90%; border: 1px solid var(--primary); text-align: left; position: relative; color: var(--text); box-shadow: 0 10px 30px rgba(0,100,0,0.3); }
-        .close-btn { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: var(--primary); }
+        /* Misc */
+        #install-app { position: fixed; bottom: 70px; left: 10px; right: 10px; background: #111; padding: 10px; border-radius: 8px; display: none; align-items: center; justify-content: space-between; z-index: 5000; border: 1px solid var(--primary); }
     </style>
 </head>
-<body class="theme-dark">
+<body>
+
+    <div class="sidebar-overlay" onclick="toggleMenu()"></div>
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-title">LPBS <span style="color:var(--primary-light)">NEWS</span></div>
+            <div style="font-size:10px; color:#aaa;">Sabse Aage, Sabse Tej</div>
+        </div>
+        <div class="nav-item active" onclick="filterNews('all'); toggleMenu()"><i class="fa-solid fa-newspaper"></i> LPBS Paper</div>
+        <div class="nav-item" onclick="filterNews('live'); toggleMenu()"><i class="fa-solid fa-tower-broadcast"></i> Live TV</div>
+        <div class="nav-item" onclick="filterNews('breaking'); toggleMenu()"><i class="fa-solid fa-bolt"></i> Breaking News</div>
+        <div class="nav-item" onclick="filterNews('sports'); toggleMenu()"><i class="fa-solid fa-cricket-bat-ball"></i> Sports</div>
+        <div class="nav-item" onclick="filterNews('tech'); toggleMenu()"><i class="fa-solid fa-microchip"></i> Tech & Business</div>
+        <div class="nav-item" onclick="filterNews('entertainment'); toggleMenu()"><i class="fa-solid fa-masks-theater"></i> Entertainment</div>
+        <div class="nav-item" onclick="filterNews('movie'); toggleMenu()"><i class="fa-solid fa-film"></i> Movies</div>
+        <div class="nav-item" onclick="filterNews('viral'); toggleMenu()"><i class="fa-solid fa-fire"></i> Viral Videos</div>
+    </div>
 
     <header>
-        <div class="top-row">
-            <div class="brand-box">
-                <div style="position:relative; display:inline-block;">
-                    <h1 class="brand">LPBS <span style="color:var(--primary)">NEWS</span></h1>
-                    <span class="header-live-badge">LIVE</span>
-                </div>
-                <div class="stats-row">
-                    <span id="datetime-display">Loading...</span>
-                    <span style="margin:0 5px; color:#444;">|</span>
-                    <span class="live-count"><i class="fa-solid fa-eye"></i> <span id="visitor-count">1,240</span></span>
+        <div class="header-main">
+            <div style="display:flex; align-items:center;">
+                <div class="menu-btn" onclick="toggleMenu()"><i class="fa-solid fa-bars"></i></div>
+                <div class="brand-container">
+                    <h1 class="brand">LPBS NEWS</h1>
+                    <span class="sub-brand">SABSE AAGE, SABSE TEJ</span>
                 </div>
             </div>
-            
-            <a href="https://whatsapp.com/channel/0029Vb77DOeISTkIcDn27S0E" target="_blank" class="wa-btn">
-                <i class="fa-brands fa-whatsapp"></i> JOIN
-            </a>
-            
             <div class="controls">
-                <div class="donate-btn-text" onclick="toggleDonate()">
-                    <i class="fa-solid fa-hand-holding-heart"></i> SUPPORT
-                </div>
-                <div class="donate-popup" id="donate-pop">
-                    <div style="font-weight:bold; font-size:12px; margin-bottom:5px; color:var(--text);">SCAN & SUPPORT</div>
-                    <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=upi://pay?pa=Nrta1@icici&pn=LPBS%20News&cu=INR" style="width:100px; height:100px; border: 2px solid white;">
-                    <div style="color:var(--text); font-size:10px; font-weight:bold; margin-top:5px;">Nrta1@icici</div>
-                </div>
-
-                <div class="theme-dots" title="Change Theme">
-                    <div class="dot dark" onclick="setTheme('dark')"></div>
-                    <div class="dot medium" onclick="setTheme('medium')"></div>
-                    <div class="dot light" onclick="setTheme('light')"></div>
-                </div>
-
-                <button class="grid-btn" onclick="toggleGrid()" title="Change Layout">
-                    <i class="fa-solid fa-list"></i>
-                </button>
-
+                <div class="support-btn" onclick="toggleDonate()">SUPPORT</div>
                 <div id="google_translate_element"></div>
-
-                <a href="admin.html" style="color:var(--text); text-decoration:none; font-size:16px;">🔒</a>
             </div>
-        </div>
-        
-        <div class="nav-scroller">
-            <button class="nav-btn active" onclick="filterNews('all')">📰 LPBS Paper</button>
-            <button class="nav-btn" onclick="filterNews('live')">🔴 Live TV</button>
-            <button class="nav-btn" onclick="filterNews('breaking')">🚨 Breaking</button>
-            <button class="nav-btn" onclick="filterNews('sports')">🏏 Sports</button>
-            <button class="nav-btn" onclick="filterNews('tech')">📱 Tech</button>
-            <button class="nav-btn" onclick="filterNews('entertainment')">🎭 Ent</button>
-            <button class="nav-btn" onclick="filterNews('movie')">🎬 Movies</button>
-            <button class="nav-btn" onclick="filterNews('viral')">⚡ Viral</button>
         </div>
     </header>
 
-    <div class="ad-header-box">
-        <p style="color:#444; font-size:10px;">ADVERTISEMENT</p>
+    <div class="gold-rate-box" id="gold-rate-display">
+        GOLD: Loading... | SILVER: Loading...
     </div>
 
-    <div class="utility-bar">
-        <div class="ticker-wrap">
-            <div class="ticker-move" id="ticker-content">
-                Loading Market Data...
-            </div>
+    <div class="ticker-bar">
+        <div class="ticker-move" id="stock-ticker">
+            Loading Stocks...
         </div>
-        <button class="market-share-btn" onclick="shareMarketData()">
-            <i class="fa-brands fa-whatsapp"></i> Share
-        </button>
+    </div>
+
+    <div class="ad-space">
+        <script src="https://quge5.com/88/tag.min.js" data-zone="208195" async data-cfasync="false"></script>
+        <span style="color:#444; font-size:10px;">ADVERTISEMENT AREA</span>
     </div>
 
     <div class="container">
         
         <div id="live-scores-area" class="live-score-container"></div>
 
-        <h3 id="feed-title" style="border-left: 5px solid var(--primary); padding-left: 12px; margin: 15px 0; text-transform: uppercase; font-size:16px; color:var(--primary-light);">TOP STORIES</h3>
+        <h3 style="border-left: 4px solid var(--primary); padding-left: 10px; margin: 15px 0; color:white;">TOP STORIES</h3>
         
-        <div class="grid mobile-list" id="news-grid">
-            <p style="text-align:center; padding:50px; color:#666;">
-                <i class="fa-solid fa-circle-notch fa-spin fa-2x" style="color:var(--primary);"></i><br><br>AI Robot Fetching News...
-            </p>
+        <div class="news-list" id="news-grid">
+            <p style="text-align:center; padding:30px; color:#666;">Loading News...</p>
         </div>
+    </div>
+
+    <div class="video-modal" id="videoModal">
+        <div class="modal-close" onclick="closeVideo()">&times;</div>
+        <div class="video-container">
+            <div class="player-watermark">LPBS NEWS PLAYER</div>
+            <iframe id="videoFrame" src="" allowfullscreen allow="autoplay"></iframe>
+            <div class="player-ad">
+                <span>ADVERTISEMENT (Banner)</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="ad-footer-sticky">
+        <span style="color:#aaa; font-size:10px;">AD SPACE</span>
+        <span onclick="this.parentElement.style.display='none'" style="position:absolute; right:5px; top:-20px; background:red; color:white; padding:2px 8px; font-size:10px; border-radius:3px;">Close</span>
+    </div>
+
+    <div id="donate-pop" style="display:none; position:fixed; top:60px; right:10px; background:white; padding:10px; z-index:3000; border:2px solid var(--primary); border-radius:5px; text-align:center;">
+        <div style="font-weight:bold; color:black; font-size:12px;">SCAN TO SUPPORT</div>
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=upi://pay?pa=Nrta1@icici&pn=LPBS%20News" style="width:100px;">
     </div>
 
     <div id="install-app">
-        <div style="display:flex; align-items:center; gap:10px;">
-            <i class="fa-brands fa-android" style="color:#00e676; font-size:24px;"></i>
-            <div style="color:white; font-size:13px;">
-                <strong>Install LPBS App</strong><br>Get Faster Updates
-            </div>
-        </div>
-        <button class="app-btn" onclick="installPWA()">INSTALL</button>
-    </div>
-
-    <footer>
-        <h2 style="margin:0; color:var(--primary);">LPBS NEWS</h2>
-        <p style="font-size:11px; color:#888; letter-spacing:1px; margin-top:5px;">SABSE AAGE, SABSE TEJ</p>
-        <div class="footer-links" style="margin-top:15px;">
-            <a onclick="location.reload()">Home</a>
-            <a onclick="openModal('about')">About</a>
-            <a onclick="openModal('contact')">Contact</a>
-        </div>
-        <p style="margin-top:20px; font-size:10px; color:#555;">
-            Location: <span id="footer-loc">Detecting...</span> | © 2026 NRTA Group
-        </p>
-    </footer>
-
-    <div class="ad-footer-sticky">
-        <p style="color:#fff; font-size:10px;">AD SPACE (Sticky)</p>
-        <span onclick="this.parentElement.style.display='none'" style="position:absolute; right:5px; top:-15px; background:red; color:white; padding:2px 8px; font-size:9px; border-radius:3px; cursor:pointer;">X</span>
-    </div>
-
-    <div id="infoModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeModal()">&times;</span>
-            <div id="modalBody"></div>
-        </div>
+        <div style="color:white; font-size:12px;"><strong>Install LPBS App</strong></div>
+        <button style="background:var(--primary); color:white; border:none; padding:5px 10px; border-radius:4px;" onclick="installPWA()">INSTALL</button>
     </div>
 
     <script>
-        const SMARTLINK = "https://www.effectivegatecpm.com/uym16xq3jk?key=492c6ab2b2e619a347f8a0c6f22515e1";
-        let userCity = "";
-        let userRegion = "";
-        let deferredPrompt; 
-        let marketDataText = ""; 
-        let currentLayout = 'list';
-
+        // --- TRANSLATE SETUP ---
         function googleTranslateElementInit() {
             new google.translate.TranslateElement({
                 pageLanguage: 'en',
-                includedLanguages: 'bn,hi,en,ta,te',
+                includedLanguages: 'bn,hi,en',
                 layout: google.translate.TranslateElement.InlineLayout.SIMPLE,
                 autoDisplay: false
             }, 'google_translate_element');
@@ -344,264 +281,135 @@
     <script src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
 
     <script>
-        let allData = [];
-        
-        function updateDateTime() {
-            const now = new Date();
-            const options = { weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
-            document.getElementById('datetime-display').innerText = now.toLocaleDateString('en-US', options);
-        }
-        setInterval(updateDateTime, 1000);
-        updateDateTime();
-
-        function updateVisitors() {
-            const base = 1200;
-            const variance = Math.floor(Math.random() * 300);
-            document.getElementById('visitor-count').innerText = (base + variance).toLocaleString();
-        }
-        setInterval(updateVisitors, 5000);
-
-        function setTheme(theme) {
-            document.body.className = '';
-            if (theme === 'medium') document.body.classList.add('theme-medium');
-            else if (theme === 'light') document.body.classList.add('theme-light');
-            else document.body.classList.add('theme-dark');
-        }
-
-        function toggleGrid() {
-            const grid = document.getElementById('news-grid');
-            const btn = document.querySelector('.grid-btn i');
-            if (currentLayout === 'list') {
-                grid.className = 'grid mobile-grid';
-                btn.className = 'fa-solid fa-border-all';
-                currentLayout = 'grid';
+        // --- MENU LOGIC ---
+        function toggleMenu() {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            if(sidebar.classList.contains('active')) {
+                sidebar.classList.remove('active');
+                overlay.style.display = 'none';
             } else {
-                grid.className = 'grid mobile-list';
-                btn.className = 'fa-solid fa-list';
-                currentLayout = 'list';
+                sidebar.classList.add('active');
+                overlay.style.display = 'block';
             }
         }
-
-        function loadVideo(element, url) {
-            element.innerHTML = `<iframe src="${url}&autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-            element.style.cursor = 'default';
-        }
-
-        function sanitizeHTML(str) {
-            if (!str) return "";
-            return str.replace(/[&<>"']/g, function(m) {
-                return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
-            });
-        }
-
         function toggleDonate() {
             const d = document.getElementById('donate-pop');
             d.style.display = (d.style.display === 'block') ? 'none' : 'block';
         }
-        window.onclick = function(event) {
-            if (!event.target.closest('.donate-btn-text') && !event.target.closest('.donate-popup')) {
-                const pop = document.getElementById('donate-pop');
-                if(pop) pop.style.display = "none";
-            }
-        }
 
-        function shareNews(title) {
-            const text = `${title}\n\nRead more at: ${SMARTLINK}`;
-            const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-            window.open(url, '_blank');
-        }
+        // --- MARKET DATA (SPLIT) ---
+        function loadMarketData() {
+            // 1. Blinking Gold
+            document.getElementById('gold-rate-display').innerHTML = 
+                `GOLD (24K): ₹64,200 <span style="color:#00e676">▲</span> | SILVER: ₹78,500`;
 
-        function shareMarketData() {
-            const text = `*LPBS MARKET UPDATE*\n\n${marketDataText || "Loading Market Rates..."}\n\nDownload App: ${SMARTLINK}`;
-            const url = `https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`;
-            window.open(url, '_blank');
-        }
-
-        async function loadMarketData(city) {
-            const goldPrice = "24K ₹63,500 | 22K ₹58,200";
-            const goldString = `Gold (${city}): ${goldPrice}`;
-            
+            // 2. Scrolling Stocks
             const stocks = [
-                {n:"NIFTY", p:"21,850", c:"+120", up:true}, 
-                {n:"SENSEX", p:"72,100", c:"+340", up:true},
-                {n:"BANKNIFTY", p:"46,500", c:"-90", up:false}
+                "NIFTY: 22,050 (+120)", "SENSEX: 72,500 (+350)", "RELIANCE: 2,980 (+15)",
+                "TATA MOTORS: 940 (-2)", "HDFC: 1,450 (+5)", "SBIN: 760 (+8)"
             ];
-
-            const stockString = stocks.map(s => {
-                const color = s.up ? "#00e676" : "#ff4444";
-                const icon = s.up ? "▲" : "▼";
-                return `<span class="util-item" style="color:white; border-left:1px solid #333; padding-left:10px;">
-                            ${s.n} <span style="color:${color}">${s.p} ${icon}</span>
-                        </span>`;
-            }).join("");
-
-            marketDataText = `Gold: ${goldPrice}\nStocks: Nifty 21850, Sensex 72100`;
-            const goldHTML = `<span class="util-item" style="color:#ffd700"><i class="fa-solid fa-coins"></i> ${goldString}</span>`;
-            document.getElementById('ticker-content').innerHTML = goldHTML + stockString + goldHTML + stockString;
+            document.getElementById('stock-ticker').innerHTML = stocks.map(s => 
+                `<span class="stock-item">${s}</span>`).join("");
         }
+        loadMarketData();
 
-        async function loadLiveScores() {
-            const container = document.getElementById('live-scores-area');
-            const activeBtn = document.querySelector('.nav-btn.active');
-            const txt = activeBtn ? activeBtn.innerText.toLowerCase() : 'paper';
-            
-            if(txt.includes('tech') || txt.includes('viral') || txt.includes('ent') || txt.includes('movie')) {
-                container.style.display = 'none';
-                return;
-            }
-            container.style.display = 'flex';
-
-            const html = `
-                <div class="score-card">
-                    <div class="score-header">
-                        <span class="live-badge">LIVE CRICKET</span>
-                        <span style="font-size:9px; color:#ccc;">T20 League</span>
-                    </div>
-                    <div class="match-teams">
-                        <span>CSK</span>
-                        <span>vs</span>
-                        <span>MI</span>
-                    </div>
-                    <div class="match-score">182/4 (18.2)</div>
-                    <div class="match-status">CSK needs 12 runs in 10 balls</div>
-                </div>
-                <div class="score-card" style="border-left-color:#25D366;">
-                    <div class="score-header">
-                        <span class="live-badge" style="background:#006400;">FOOTBALL</span>
-                        <span style="font-size:9px; color:#ccc;">ISL</span>
-                    </div>
-                    <div class="match-teams">
-                        <span>Mohun Bagan</span>
-                        <span>vs</span>
-                        <span>East Bengal</span>
-                    </div>
-                    <div class="match-score">2 - 2</div>
-                    <div class="match-status">88' Minute - Full Time Soon</div>
-                </div>`;
-            container.innerHTML = html;
-        }
-
-        async function loadSystem() {
-            try {
-                try {
-                    const ipRes = await fetch('https://ipapi.co/json/');
-                    const ipData = await ipRes.json();
-                    userCity = ipData.city || "India";
-                    userRegion = ipData.region || "";
-                    document.getElementById('footer-loc').innerText = `${userCity}, ${userRegion}`;
-                    loadMarketData(userCity);
-                } catch(e) { 
-                    userCity = "India"; 
-                    loadMarketData("India");
-                }
-
-                try {
-                    const res = await fetch('news_db.json?nocache=' + new Date().getTime());
-                    const data = await res.json();
-                    allData = data.news;
-                } catch (e) {
-                    allData = [
-                        {title: "Big Market Surge Today", category: "business", type: "img", thumb: "https://via.placeholder.com/400x200", desc: "Markets hit all time high.", time: "10m ago", source: "LPBS Biz"},
-                        {title: "Viral Video: Cat saves dog", category: "viral", type: "video", video_url: "", thumb: "https://via.placeholder.com/400x200", desc: "Amazing footage.", time: "1h ago", source: "Social"}
-                    ];
-                }
-                
-                const activeBtn = document.querySelector('.nav-btn.active');
-                if (activeBtn) {
-                    let cat = 'all';
-                    const txt = activeBtn.innerText.toLowerCase();
-                    if(!txt.includes('paper')) {
-                         if(txt.includes('live')) cat = 'live';
-                        else if(txt.includes('breaking')) cat = 'breaking';
-                        else if(txt.includes('sports')) cat = 'sports';
-                        else if(txt.includes('tech')) cat = 'tech';
-                        else if(txt.includes('entertainment')) cat = 'entertainment';
-                        else if(txt.includes('movie')) cat = 'movie';
-                        else if(txt.includes('viral')) cat = 'viral';
-                    }
-                    renderNews(cat);
-                }
-            } catch(e) { console.error("Data Load Error", e); }
-        }
+        // --- NEWS LOGIC ---
+        const allData = [
+            {title: "India Wins Cricket World Cup Match Against Australia in Thriller", category: "sports", type: "video", video_url: "https://www.youtube.com/embed/dQw4w9WgXcQ", thumb: "https://img1.hscicdn.com/image/upload/f_auto,t_ds_w_1200,q_50/lsci/db/PICTURES/CMS/370500/370557.jpg", time: "10m ago", trending: true},
+            {title: "Gold Prices Hit All Time High Today in Market", category: "business", type: "img", thumb: "https://bsmedia.business-standard.com/_media/bs/img/article/2023-05/04/full/1683177397-6246.jpg", time: "1h ago", trending: true},
+            {title: "New AI Technology Launches by NRTA Group", category: "tech", type: "video", video_url: "https://www.youtube.com/embed/LXb3EKWsInQ", thumb: "https://media.istockphoto.com/id/1452604857/photo/businessman-touching-the-brain-working-of-artificial-intelligence-automation-predictive.jpg?s=612x612&w=0&k=20&c=GqoPAbqa5FkC2JE1ZJS7Q7jXBMbc13wDXFAe7cojPhY=", time: "2h ago", trending: false},
+            {title: "Viral Video: Elephant Saves Baby in Forest", category: "viral", type: "video", video_url: "https://www.youtube.com/embed/ScMzIvxBSi4", thumb: "https://i.ytimg.com/vi/ScMzIvxBSi4/hqdefault.jpg", time: "3h ago", trending: true}
+        ];
 
         function renderNews(cat) {
             const grid = document.getElementById('news-grid');
             grid.innerHTML = '';
-            loadLiveScores();
 
-            let filtered = [];
-            if (cat === 'all') filtered = [...allData];
-            else if (cat === 'breaking') filtered = allData.filter(n => n.category === 'breaking' && n.type === 'video'); 
-            else filtered = allData.filter(n => n.category.toLowerCase().includes(cat));
+            let filtered = (cat === 'all') ? allData : allData.filter(n => n.category === cat);
 
-            filtered.sort((a, b) => 0);
-
-            if (filtered.length === 0 && allData.length > 0) filtered = allData.slice(0, 5);
-            else if (filtered.length === 0) {
-                grid.innerHTML = "<p style='text-align:center; width:100%; color:#888; padding:20px;'>Updating News Feed...</p>";
-                return;
-            }
-
-            filtered.forEach((n, index) => {
-                let mediaHTML = '';
-                const safeTitle = sanitizeHTML(n.title);
+            filtered.forEach(n => {
+                // Trending Badge Logic
+                const trendHTML = n.trending ? `<div class="trending-badge">TRENDING</div>` : '';
                 
-                if (n.type === 'video') {
-                    mediaHTML = `
-                    <div class="media" onclick="loadVideo(this, '${n.video_url}')">
-                        <div class="watermark">LPBS NEWS</div>
-                        <div class="play-btn"><i class="fa-solid fa-play"></i></div>
-                        <img src="${n.thumb}" alt="News Video" loading="lazy">
-                    </div>`;
-                } else {
-                    mediaHTML = `<div class="media" style="cursor:default"><img src="${n.thumb}" loading="lazy"></div>`;
-                }
-
-                const isFeatured = (cat === 'all' && index === 0);
-                const locBadge = (n.title + n.desc).toLowerCase().includes(userCity.toLowerCase()) && userCity ? 
-                                `<span class="loc-badge"><i class="fa-solid fa-location-dot"></i> ${userCity}</span>` : '';
+                // Thumbnail Click Action
+                const clickAction = n.type === 'video' ? `onclick="openVideo('${n.video_url}')"` : '';
+                const playIcon = n.type === 'video' ? `<div class="play-icon"><i class="fa-solid fa-play"></i></div>` : '';
 
                 const div = document.createElement('div');
-                div.className = isFeatured ? 'card featured' : 'card';
+                div.className = 'news-card';
                 div.innerHTML = `
-                    ${mediaHTML}
-                    <div class="info">
-                        ${locBadge}
-                        <div class="title">${safeTitle}</div>
-                        ${isFeatured ? `<div style="color:var(--text); opacity:0.8; margin-bottom:10px; font-size:13px;">${sanitizeHTML(n.desc)}</div>` : ''}
-                        <div class="meta">
+                    <div class="news-thumb" ${clickAction}>
+                        ${trendHTML}
+                        <img src="${n.thumb}" loading="lazy">
+                        ${playIcon}
+                    </div>
+                    <div class="news-content" ${clickAction}>
+                        <div class="news-title">${n.title}</div>
+                        <div class="news-meta">
                             <span>${n.time}</span>
-                            <button class="share-btn" onclick="shareNews('${safeTitle}')">
-                                <i class="fa-brands fa-whatsapp"></i> Share
-                            </button>
-                            <span>${sanitizeHTML(n.source) || 'LPBS'}</span>
+                            <span style="color:var(--primary); font-weight:bold;">LPBS</span>
                         </div>
-                        <a href="${SMARTLINK}" target="_blank" style="display:block; text-align:center; background:var(--primary); color:white; padding:8px; margin-top:12px; text-decoration:none; font-weight:bold; border-radius:4px; font-size:12px; text-transform:uppercase;">
-                            ${n.type === 'video' ? '▶ Watch Video' : '📄 Read Story'}
-                        </a>
                     </div>
                 `;
                 grid.appendChild(div);
             });
         }
+        renderNews('all');
 
-        window.filterNews = function(cat) {
-            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-            const buttons = document.querySelectorAll('.nav-btn');
-            buttons.forEach(btn => {
-                let txt = btn.innerText.toLowerCase();
-                if(cat === 'all' && txt.includes('paper')) btn.classList.add('active');
-                else if(txt.includes(cat)) btn.classList.add('active');
-            });
-            renderNews(cat);
+        // --- VIDEO MODAL LOGIC ---
+        function openVideo(url) {
+            const modal = document.getElementById('videoModal');
+            const frame = document.getElementById('videoFrame');
+            // Adding autoplay
+            frame.src = url + "?autoplay=1&rel=0"; 
+            modal.style.display = 'flex';
+        }
+        function closeVideo() {
+            document.getElementById('videoModal').style.display = 'none';
+            document.getElementById('videoFrame').src = '';
         }
 
+        // --- DYNAMIC LIVE SCORES (SIMULATED) ---
+        function updateScores() {
+            const container = document.getElementById('live-scores-area');
+            // Randomly change runs to simulate live feeling
+            const runs = 180 + Math.floor(Math.random() * 10);
+            
+            container.innerHTML = `
+                <div class="score-card">
+                    <div style="font-size:10px; color:#ccc; display:flex; justify-content:space-between;">
+                        <span><span class="live-dot"></span>CRICKET</span>
+                        <span>T20 WC</span>
+                    </div>
+                    <div style="margin-top:5px; font-weight:bold;">IND vs AUS</div>
+                    <div style="font-size:18px; color:#00e676; font-weight:900;">${runs}/3 (18.4)</div>
+                    <div style="font-size:10px; color:#aaa;">India batting</div>
+                </div>
+                <div class="score-card" style="border-left-color:#25D366;">
+                    <div style="font-size:10px; color:#ccc; display:flex; justify-content:space-between;">
+                        <span><span class="live-dot"></span>FOOTBALL</span>
+                        <span>ISL</span>
+                    </div>
+                    <div style="margin-top:5px; font-weight:bold;">MB vs EB</div>
+                    <div style="font-size:18px; color:#00e676; font-weight:900;">2 - 1</div>
+                    <div style="font-size:10px; color:#aaa;">88' Live</div>
+                </div>
+            `;
+        }
+        setInterval(updateScores, 3000); // Update every 3 seconds
+        updateScores(); // Initial call
+
+        // Filter Function Bridge
+        window.filterNews = function(cat) { renderNews(cat); }
+
+        // PWA Install Logic (Kept same)
+        let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
             document.getElementById('install-app').style.display = 'flex';
         });
-
         async function installPWA() {
             if (deferredPrompt) {
                 deferredPrompt.prompt();
@@ -610,31 +418,6 @@
                 deferredPrompt = null;
             }
         }
-
-        function openModal(type) {
-            const modal = document.getElementById('infoModal');
-            const body = document.getElementById('modalBody');
-            modal.style.display = 'flex';
-            
-            if (type === 'about') {
-                body.innerHTML = `
-                    <h2 style="color:var(--primary); border-bottom:1px solid #333; padding-bottom:10px;">ABOUT LPBS NEWS</h2>
-                    <p><strong>Mission:</strong> Sabse Aage, Sabse Tej.</p>
-                    <p>LPBS News is an advanced AI-powered news aggregator.</p>
-                    <div style="margin-top:15px; font-size:12px; color:#888;">Powered by NRTA Group AI Tech.</div>
-                `;
-            } else {
-                body.innerHTML = `
-                    <h2 style="color:var(--primary); border-bottom:1px solid #333; padding-bottom:10px;">CONTACT US</h2>
-                    <p>For copyright issues: <strong style="color:white;">nrtagroup@gmail.com</strong></p>
-                `;
-            }
-        }
-        function closeModal() { document.getElementById('infoModal').style.display = 'none'; }
-
-        loadSystem();
-        setInterval(loadLiveScores, 10000); 
-        setInterval(loadSystem, 60000); 
     </script>
 </body>
 </html>
