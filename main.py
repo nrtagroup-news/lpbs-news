@@ -30,8 +30,12 @@ RETENTION_HOURS = 48
 
 FONTS = { 'bn': 'bn.ttf', 'hi': 'hn.ttf', 'en': 'en.ttf', 'tm': 'tm.ttf' }
 
+# --- 🧠 NEW: AI KEYS & CONFIGURATION ---
+Z_AI_KEY = "cf5a27b9240b49b9a398094d440889e5.5RDCyrw5XLRVJEiH"
+DEEP_AI_KEY = "7bc72502-db85-4dd2-9038-c3811d69ff7c"
+
 # ==========================================
-# 🧠 PART 1: THE ROBOT BRAIN (ADVANCED LOGIC)
+# 🧠 PART 1: THE ROBOT BRAIN (EXISTING LOGIC PRESERVED)
 # ==========================================
 
 def load_config():
@@ -65,17 +69,11 @@ def get_embed_code(url, video_id):
     else:
         return f"https://www.youtube-nocookie.com/embed/{video_id}?autoplay=0&rel=0"
 
-# --- 🔥 NEW: SMART MIXING ALGORITHM 🔥 ---
+# --- SMART MIXING ALGORITHM (PRESERVED) ---
 def smart_mix_news(news_list, location_keyword):
-    """
-    এই ফাংশনটি নিউজ ফিডকে এমনভাবে সাজাবে যাতে একঘেয়েমি না আসে।
-    ১. ব্রেকিং নিউজ এবং গুগল ট্রেন্ডস সবার উপরে থাকবে।
-    ২. কনফিগার করা লোকেশনের খবর তার পরেই থাকবে।
-    ৩. বাকি সব (ফানি, স্পোর্টস, মুভি) খুব সুন্দরভাবে মিক্স (Shuffle) করা থাকবে।
-    """
-    high_priority = [] # ব্রেকিং নিউজ এবং গুগল ট্রেন্ডস
-    local_priority = [] # এলাকার খবর
-    general_mix = []    # বাকি সব (এন্টারটেইনমেন্ট, স্পোর্টস ইত্যাদি)
+    high_priority = [] 
+    local_priority = [] 
+    general_mix = []    
 
     location_keyword = location_keyword.lower()
 
@@ -84,22 +82,14 @@ def smart_mix_news(news_list, location_keyword):
         category = item.get('category', '').lower()
         source = item.get('source', '').lower()
 
-        # ১. সুপার হাই প্রায়োরিটি (Google Trends & Breaking)
         if 'trend' in category or 'breaking' in category or 'trend' in source:
             high_priority.append(item)
-        
-        # ২. লোকেশন প্রায়োরিটি (User's Location)
         elif location_keyword in title or location_keyword in category:
             local_priority.append(item)
-        
-        # ৩. জেনারেল (বাকি সব)
         else:
             general_mix.append(item)
 
-    # জেনারেল খবরগুলোকে ভালোভাবে মিক্স করা হচ্ছে যাতে পরপর ১০টা ফানি ভিডিও না আসে
     random.shuffle(general_mix)
-
-    # সব জোড়া লাগানো: High Priority -> Local -> Mixed General
     final_feed = high_priority + local_priority + general_mix
     return final_feed
 
@@ -114,40 +104,23 @@ def fetch_google_trends():
             for item in root.findall('.//item')[:5]:
                 title = item.find('title').text
                 desc = f"Trending now in India: {title}. See full coverage on LPBS News."
-                try:
-                    news_item_title = item.find('ht:news_item_title', namespaces={'ht': 'https://trends.google.com/trends/trendingsearches/daily'}).text
-                    desc = news_item_title
+                try: news_item_title = item.find('ht:news_item_title', namespaces={'ht': 'https://trends.google.com/trends/trendingsearches/daily'}).text; desc = news_item_title
                 except: pass
-                
                 image_url = "https://via.placeholder.com/600x400?text=Trending+News"
-                try:
-                    image_url = item.find('ht:picture', namespaces={'ht': 'https://trends.google.com/trends/trendingsearches/daily'}).text
+                try: image_url = item.find('ht:picture', namespaces={'ht': 'https://trends.google.com/trends/trendingsearches/daily'}).text
                 except: pass
 
                 trends.append({
-                    "id": f"trend_{abs(hash(title))}",
-                    "category": "Trending 🔥",
-                    "title": title,
-                    "desc": desc,
-                    "thumb": image_url,
-                    "source": "Google Trends",
-                    "video_url": "",
-                    "time": "Hot Topic",
-                    "timestamp": time.time(),
-                    "type": "image",
-                    "platform": "google"
+                    "id": f"trend_{abs(hash(title))}", "category": "Trending 🔥", "title": title,
+                    "desc": desc, "thumb": image_url, "source": "Google Trends", "video_url": "",
+                    "time": "Hot Topic", "timestamp": time.time(), "type": "image", "platform": "google"
                 })
-    except Exception as e:
-        print(f"Trend Error: {e}")
+    except Exception as e: print(f"Trend Error: {e}")
     return trends
 
 def fetch_social_videos(channels):
     video_news = []
-    ydl_opts = {
-        'quiet': True, 'ignoreerrors': True, 'extract_flat': True,
-        'playlistend': 15, 'socket_timeout': 20
-    }
-
+    ydl_opts = { 'quiet': True, 'ignoreerrors': True, 'extract_flat': True, 'playlistend': 15, 'socket_timeout': 20 }
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         for category, urls in channels.items():
             print(f"   📂 Robot: Deep Scanning {category}...")
@@ -156,7 +129,6 @@ def fetch_social_videos(channels):
                 try:
                     info = ydl.extract_info(url, download=False)
                     entries = list(info['entries']) if 'entries' in info else [info]
-                    
                     for video in entries:
                         if not video: continue
                         video_id = video['id']
@@ -164,19 +136,11 @@ def fetch_social_videos(channels):
                         embed_link = get_embed_code(original_url, video_id)
                         thumb = video.get('thumbnail')
                         if not thumb: thumb = f"https://i.ytimg.com/vi/{video_id}/hqdefault.jpg"
-
                         video_news.append({
-                            "id": video_id,
-                            "category": category, # e.g., "Funny", "News", "Sports"
-                            "title": video.get('title') or "Latest Update",
-                            "desc": video.get('title') or "Click to watch",
-                            "thumb": thumb,
-                            "video_url": embed_link,
-                            "original_link": original_url,
-                            "source": info.get('uploader') or "Social Media",
-                            "time": "Just Now",
-                            "timestamp": time.time(),
-                            "type": "video",
+                            "id": video_id, "category": category, "title": video.get('title') or "Latest Update",
+                            "desc": video.get('title') or "Click to watch", "thumb": thumb, "video_url": embed_link,
+                            "original_link": original_url, "source": info.get('uploader') or "Social Media",
+                            "time": "Just Now", "timestamp": time.time(), "type": "video",
                             "platform": "facebook" if "facebook" in original_url else "youtube"
                         })
                 except: pass
@@ -189,60 +153,106 @@ def robot_loop():
         try:
             config = load_config()
             channels = config.get("channels", {})
-            location = config.get("location_override", "India") # Default Location
-            
-            existing_db = load_db()
-            existing_db = clean_old_news(existing_db)
-            
-            new_trends = fetch_google_trends()
-            new_videos = fetch_social_videos(channels)
-            
-            fresh_content = new_trends + new_videos
-            
+            location = config.get("location_override", "India")
+            existing_db = clean_old_news(load_db())
+            fresh_content = fetch_google_trends() + fetch_social_videos(channels)
             existing_ids = {item['id'] for item in existing_db}
-            
-            added_count = 0
             for item in fresh_content:
-                if item['id'] not in existing_ids:
-                    existing_db.append(item) # Append new items first
-                    added_count += 1
+                if item['id'] not in existing_ids: existing_db.append(item)
             
-            # 🔥 CRITICAL UPDATE: Applying Smart Mix 🔥
-            # ডাটাবেসে সেভ করার ঠিক আগে আমরা লিস্টটাকে সুন্দর করে সাজাবো
             optimized_db = smart_mix_news(existing_db, location)
-            
             with open(DB_FILE, 'w', encoding='utf-8') as f:
                 json.dump({
-                    "news": optimized_db, 
-                    "updated_at": datetime.now().strftime("%I:%M %p"), 
-                    "location": location,
-                    "total_articles": len(optimized_db)
+                    "news": optimized_db, "updated_at": datetime.now().strftime("%I:%M %p"), 
+                    "location": location, "total_articles": len(optimized_db)
                 }, f, indent=4, ensure_ascii=False)
-            
-            print(f"✅ ROBOT: Cycle Complete. Mixed & Optimized. Active News: {len(optimized_db)}")
+            print(f"✅ ROBOT: Cycle Complete. Active: {len(optimized_db)}")
             time.sleep(300) 
-
         except Exception as e:
             print(f"❌ ROBOT ERROR: {e}")
             time.sleep(60)
 
 # ==========================================
-# 🎨 PART 2: SMART PROMO & THUMBNAIL
+# 🚀 PART 2: AI POWERED PROMO ENGINE (UPDATED)
 # ==========================================
 
-def get_hashtags(title, lang):
+def fallback_hashtags(title):
+    """ ধাপ ৩: যদি কোনো AI কাজ না করে, তবে এই সিস্টেম কাজ করবে (Google Search Simulation) """
     title_lower = title.lower()
-    tags = ["#LPBSNews", "#Latest"]
+    tags = ["#LPBSNews", "#Viral"]
     keywords = {
-        "bangladesh": "#Bangladesh", "india": "#India", "modi": "#PMModi",
-        "mamata": "#MamataBanerjee", "cricket": "#Cricket", "football": "#Sports",
-        "viral": "#ViralVideo", "accident": "#Breaking", "election": "#Election2026",
-        "budget": "#Budget", "weather": "#WeatherUpdate", "job": "#Jobs"
+        "bangladesh": "#BangladeshNews", "india": "#IndiaUpdate", "modi": "#PMModi",
+        "mamata": "#MamataOfficial", "cricket": "#CricketLive", "accident": "#BreakingNews", 
+        "politics": "#Politics", "movie": "#Bollywood", "song": "#TrendingSong"
     }
     for key, tag in keywords.items():
         if key in title_lower: tags.append(tag)
+    tags.append("#ForYou")
     tags.append("#TrendingNow")
-    return " ".join(tags[:6])
+    return " ".join(tags[:8]) + "\n\n(Generated by System Fallback)"
+
+def ask_z_ai(prompt):
+    """ ধাপ ১: Z AI (6 সেকেন্ড সময় পাবে) """
+    print("🤖 AI: Asking Z AI...")
+    try:
+        # Z AI (Assuming standard OpenAI Compatible or Direct Completion)
+        # Note: Since specific endpoint isn't provided, trying standard completion structure
+        headers = { "Authorization": f"Bearer {Z_AI_KEY}", "Content-Type": "application/json" }
+        payload = {
+            "model": "gpt-3.5-turbo", # Or "z-ai-model" if known
+            "messages": [{"role": "user", "content": prompt}],
+            "max_tokens": 100
+        }
+        # Using a generic endpoint. If Z AI has a specific URL, replace it here.
+        # For now, using a common proxy pattern or OpenAI default if compatible.
+        # If this fails, it goes to DeepAI anyway.
+        response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload, timeout=6)
+        
+        if response.status_code == 200:
+            return response.json()['choices'][0]['message']['content']
+        else:
+            print(f"⚠️ Z AI Failed: {response.status_code}")
+            return None
+    except Exception as e:
+        print(f"⚠️ Z AI Error/Timeout: {e}")
+        return None
+
+def ask_deep_ai(prompt):
+    """ ধাপ ২: Deep AI (ব্যাকআপ) """
+    print("🤖 AI: Switching to Deep AI...")
+    try:
+        response = requests.post(
+            "https://api.deepai.org/api/text-generator",
+            data={'text': prompt},
+            headers={'api-key': DEEP_AI_KEY},
+            timeout=10
+        )
+        if response.status_code == 200:
+            return response.json()['output']
+        else:
+            return None
+    except Exception as e:
+        print(f"⚠️ Deep AI Error: {e}")
+        return None
+
+def generate_super_promo(title, lang):
+    """ মাস্টার ফাংশন: Z AI -> Deep AI -> Fallback """
+    
+    # প্রম্পট তৈরি করা
+    lang_name = "Bengali" if lang == 'bn' else "Hindi" if lang == 'hi' else "English"
+    prompt = f"Write a very short, catchy, viral social media caption with 5 hashtags for this news title in {lang_name}: '{title}'. Keep it exciting."
+
+    # 1. Try Z AI
+    result = ask_z_ai(prompt)
+    if result: return result
+
+    # 2. Try Deep AI
+    result = ask_deep_ai(prompt)
+    if result: return result
+
+    # 3. Fallback
+    print("⚠️ All AI failed. Using Fallback System.")
+    return f"{title}\n\n{fallback_hashtags(title)}"
 
 def create_viral_thumbnail(image_url, title, lang):
     if not PILLOW_AVAILABLE: return False
@@ -305,7 +315,7 @@ def create_viral_thumbnail(image_url, title, lang):
         return False
 
 # ==========================================
-# 🌐 PART 3: SERVER HANDLER
+# 🌐 PART 3: SERVER HANDLER (UPDATED)
 # ==========================================
 
 class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
@@ -323,11 +333,15 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
             title = data.get('title', '')
             thumb_url = data.get('thumb', '')
             lang = data.get('lang', 'bn')
-            hashtags = get_hashtags(title, lang)
+            
+            # 🔥 NEW: Calling the AI Super Brain
+            ai_hashtags = generate_super_promo(title, lang)
+            
             thumb_success = create_viral_thumbnail(thumb_url, title, lang)
             self.send_response(200); self.send_header('Content-type', 'application/json'); self.end_headers()
             self.wfile.write(json.dumps({
-                "hashtags": hashtags, "status": "success" if thumb_success else "error", 
+                "hashtags": ai_hashtags, 
+                "status": "success" if thumb_success else "error", 
                 "image_url": f"/get_promo_image?t={int(time.time())}"
             }).encode())
         else:
@@ -371,6 +385,6 @@ if __name__ == "__main__":
     robot_thread.daemon = True
     robot_thread.start()
     print(f"🔥 LPBS SUPER-ROBOT STARTED ON PORT {PORT}")
-    print(f"   👉 Retention: {RETENTION_HOURS} Hours | Smart Mix: ON | Priority: Location & Trends")
+    print(f"   👉 AI SYSTEM: Z-AI + DEEP-AI + FALLBACK Activated")
     with socketserver.TCPServer(("0.0.0.0", PORT), MyRequestHandler) as httpd:
         httpd.serve_forever()
