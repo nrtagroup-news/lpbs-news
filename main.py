@@ -10,7 +10,7 @@ import random
 from datetime import datetime, timedelta
 import io
 
-# --- 1. সেফটি ইমপোর্ট (যাতে সার্ভার ক্র্যাশ না করে) ---
+# --- 1. লাইব্রেরি ইমপোর্ট (সেফটি মোড) ---
 PILLOW_AVAILABLE = False
 MOVIEPY_AVAILABLE = False
 
@@ -21,11 +21,11 @@ except Exception as e:
     print(f"⚠️ Image Module Error: {e}")
 
 try:
-    # ভিডিও এডিটিং লাইব্রেরি লোড করার চেষ্টা
+    # ভিডিও এডিটিং লাইব্রেরি
     from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
     MOVIEPY_AVAILABLE = True
 except Exception as e:
-    print(f"⚠️ Video Module Error (Site will still run): {e}")
+    print(f"⚠️ Video Module Error (Site will run without editing): {e}")
 
 # --- 2. কনফিগারেশন ---
 PORT = int(os.environ.get("PORT", 8080))
@@ -35,6 +35,7 @@ PROMO_IMAGE_FILE = "promo_image.jpg"
 PROMO_VIDEO_FILE = "promo_video.mp4"
 RETENTION_HOURS = 48 
 
+# ফন্ট কনফিগারেশন (ব্লক সমস্যা সমাধানের জন্য)
 FONTS = { 'bn': 'bn.ttf', 'hi': 'hn.ttf', 'en': 'en.ttf' }
 
 # --- 3. AI KEYS ---
@@ -71,6 +72,7 @@ def download_and_cut_video(url):
             ydl.download([url])
         
         # কাটিং (৩০ সেকেন্ড)
+        print("✂️ Cutting 30 seconds...")
         ffmpeg_extract_subclip(temp_raw, 0, 30, targetname=PROMO_VIDEO_FILE)
         
         if os.path.exists(temp_raw): os.remove(temp_raw)
@@ -80,13 +82,19 @@ def download_and_cut_video(url):
         return False
 
 # ==========================================
-# 🧠 ROBOT & SYSTEM
+# 🩺 SYSTEM DOCTOR
 # ==========================================
+SERVER_START_TIME = time.time()
+ERROR_LOGS = []
+
 def get_system_report():
     uptime = str(timedelta(seconds=int(time.time() - SERVER_START_TIME)))
-    vid_status = "Active ✅" if MOVIEPY_AVAILABLE else "Disabled (Lib Missing) ⚠️"
-    return f"Uptime: {uptime} | Video Engine: {vid_status}"
+    vid_status = "Active ✅" if MOVIEPY_AVAILABLE else "Disabled (Missing Libs) ⚠️"
+    return f"Uptime: {uptime} | Video Engine: {vid_status} | Errors: {len(ERROR_LOGS)}"
 
+# ==========================================
+# 🧠 ROBOT DATA COLLECTION
+# ==========================================
 def load_config():
     if not os.path.exists(CONFIG_FILE): return {}
     with open(CONFIG_FILE, 'r') as f: return json.load(f)
@@ -96,6 +104,15 @@ def load_db():
     try:
         with open(DB_FILE, 'r') as f: return json.load(f).get("news", [])
     except: return []
+
+def clean_old_news(news_list):
+    current_time = time.time()
+    retention_seconds = RETENTION_HOURS * 3600
+    cleaned_list = []
+    for n in news_list:
+        if (current_time - n.get('timestamp', 0)) < retention_seconds:
+            cleaned_list.append(n)
+    return cleaned_list
 
 def fetch_social_videos(channels):
     video_news = []
@@ -155,16 +172,40 @@ def ask_ai(prompt):
         if r.status_code == 200: return r.json()['output']
     except: pass
     
-    return f"{prompt} #Viral #News"
+    return f"{prompt} #Viral #News #LPBS"
 
-def create_thumbnail(img_url, title):
+def create_thumbnail(img_url, title, lang='bn'):
     if not PILLOW_AVAILABLE: return False
     try:
         r = requests.get(img_url, timeout=10)
         img = Image.open(io.BytesIO(r.content)).convert("RGB")
+        img = img.resize((1280, 720))
+        draw = ImageDraw.Draw(img)
+        
+        # ব্ল্যাক শেড (যাতে লেখা পড়া যায়)
+        draw.rectangle([(0, 500), (1280, 720)], fill=(0,0,0,200))
+        
+        # --- ফন্ট ফিক্সিং (ব্লক সমস্যা সমাধান) ---
+        font_file = FONTS.get(lang, 'en.ttf') # ভাষা অনুযায়ী ফন্ট সিলেক্ট
+        try:
+            if os.path.exists(font_file):
+                font = ImageFont.truetype(font_file, 50)
+            else:
+                # ফন্ট না পেলে ডিফল্ট (এটাই ব্লক দেখায়, তাই ওয়ার্নিং দিচ্ছি)
+                print(f"⚠️ Font file {font_file} missing! Upload it to fix blocks.")
+                font = ImageFont.load_default()
+        except:
+            font = ImageFont.load_default()
+
+        # টেক্সট লেখা
+        draw.text((40, 550), "LPBS NEWS", fill="red", font=font)
+        draw.text((40, 600), title[:60]+"...", fill="white", font=font)
+        
         img.save(PROMO_IMAGE_FILE)
         return True
-    except: return False
+    except Exception as e: 
+        print(f"Thumbnail Error: {e}")
+        return False
 
 # ==========================================
 # 🌐 SERVER HANDLER
@@ -181,9 +222,11 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
             length = int(self.headers['Content-Length'])
             data = json.loads(self.rfile.read(length))
             
+            # AI & Image
             ai_text = ask_ai(f"Viral caption for: {data.get('title')}")
-            create_thumbnail(data.get('thumb'), data.get('title'))
+            create_thumbnail(data.get('thumb'), data.get('title'), data.get('lang', 'bn'))
             
+            # Video Cut
             vid_ok = False
             if data.get('video_url'):
                 vid_ok = download_and_cut_video(data.get('video_url'))
@@ -251,9 +294,7 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
         data["total"] += 1; data["today"] += 1
         with open(s_file, 'w') as f: json.dump(data, f)
 
-SERVER_START_TIME = time.time()
 if __name__ == "__main__":
     t = threading.Thread(target=robot_loop); t.daemon = True; t.start()
     with socketserver.TCPServer(("0.0.0.0", PORT), MyRequestHandler) as httpd:
         print(f"🔥 SERVER ON {PORT}"); httpd.serve_forever()
-
