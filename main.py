@@ -38,6 +38,7 @@ RETENTION_HOURS = 48
 FONTS = { 'bn': 'bn.ttf', 'hi': 'hn.ttf', 'en': 'en.ttf' }
 
 # --- 3. AI KEYS ---
+Sambanova_AI_KEY = "0ad2fc42-5d7f-41c0-b923-78d71d671790"
 Z_AI_KEY = "cf5a27b9240b49b9a398094d440889e5.5RDCyrw5XLRVJEiH"
 DEEP_AI_KEY = "7bc72502-db85-4dd2-9038-c3811d69ff7c"
 
@@ -255,3 +256,4 @@ if __name__ == "__main__":
     t = threading.Thread(target=robot_loop); t.daemon = True; t.start()
     with socketserver.TCPServer(("0.0.0.0", PORT), MyRequestHandler) as httpd:
         print(f"🔥 SERVER ON {PORT}"); httpd.serve_forever()
+
