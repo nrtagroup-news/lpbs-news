@@ -71,7 +71,7 @@
         <div class="login-box">
             <h2 style="color:#d32f2f; margin:0 0 10px 0;"><i class="fa-solid fa-lock"></i> SECURE ACCESS</h2>
             <p style="color:#666; font-size:14px; margin-bottom:20px;">Tamal Dey's Control Room</p>
-            <input type="password" id="pass-input" class="login-input" placeholder="ENTER PIN">
+            <input type="password" id="pass-input" class="login-input" placeholder="ENTER PIN" onkeydown="if(event.key === 'Enter') checkPass()">
             <button class="btn-unlock" onclick="checkPass()">UNLOCK PANEL</button>
             <p id="err-msg" style="color:#d32f2f; margin-top:15px; display:none; font-weight:bold;">⛔ WRONG PIN</p>
         </div>
@@ -90,57 +90,36 @@
                 LAUNCH AI VIDEO PROMO BOT
             </a>
         </div>
+
+        <div class="card" style="border: 1px solid #00bcd4;">
+            <div class="card-header" style="color: #008ba3;">
+                <i class="fa-solid fa-user-doctor card-icon"></i> AI System Doctor
+            </div>
+            <p style="font-size: 13px; color: #666;">
+                রোবটকে বলুন পুরো সিস্টেম চেক করে রিপোর্ট দিতে। কোথায় সমস্যা আছে বা কী আপডেট করা যায়, AI বলে দেবে।
+            </p>
+            <button class="btn" style="background: #00bcd4; color: white; width: 100%; font-weight: bold;" onclick="checkSystemHealth()">
+                <i class="fa-solid fa-stethoscope"></i> RUN DIAGNOSIS & GET ADVICE
+            </button>
+            
+            <div id="health-result" style="display:none; margin-top: 15px; background: #e0f7fa; padding: 15px; border-radius: 8px;">
+                <strong>📋 System Status:</strong>
+                <pre id="sys-report" style="font-size: 11px; margin-bottom: 10px;"></pre>
+                <hr>
+                <strong>🤖 AI Engineer Says:</strong>
+                <p id="ai-advice" style="color: #006064; font-weight: bold;"></p>
+            </div>
+        </div>
+
         <div class="card">
             <div class="card-header"><i class="fa-solid fa-chart-line card-icon"></i> Real-Time Traffic</div>
-            <div class="card" style="border: 1px solid #00bcd4;">
-    <div class="card-header" style="color: #008ba3;">
-        <i class="fa-solid fa-user-doctor card-icon"></i> AI System Doctor
-    </div>
-    <p style="font-size: 13px; color: #666;">
-        রোবটকে বলুন পুরো সিস্টেম চেক করে রিপোর্ট দিতে। কোথায় সমস্যা আছে বা কী আপডেট করা যায়, AI বলে দেবে।
-    </p>
-    <button class="btn" style="background: #00bcd4; color: white; width: 100%; font-weight: bold;" onclick="checkSystemHealth()">
-        <i class="fa-solid fa-stethoscope"></i> RUN DIAGNOSIS & GET ADVICE
-    </button>
-    
-    <div id="health-result" style="display:none; margin-top: 15px; background: #e0f7fa; padding: 15px; border-radius: 8px;">
-        <strong>📋 System Status:</strong>
-        <pre id="sys-report" style="font-size: 11px; margin-bottom: 10px;"></pre>
-        <hr>
-        <strong>🤖 AI Engineer Says:</strong>
-        <p id="ai-advice" style="color: #006064; font-weight: bold;"></p>
-    </div>
-</div>
-
-<script>
-    async function checkSystemHealth() {
-        const btn = document.querySelector('button[onclick="checkSystemHealth()"]');
-        const originalText = btn.innerHTML;
-        btn.innerHTML = '<div class="loader"></div> Checking Vitals...';
-        btn.disabled = true;
-
-        try {
-            const res = await fetch('/check_health');
-            const data = await res.json();
-            
-            document.getElementById('health-result').style.display = 'block';
-            document.getElementById('sys-report').innerText = data.report;
-            document.getElementById('ai-advice').innerText = data.ai_advice;
-        } catch (e) {
-            alert("Doctor is offline! (Server Error)");
-        }
-
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-    }
-</script>
             <div class="stats-grid">
                 <div class="stat-box">
-                    <div class="stat-num" id="count-today">0</div>
+                    <div class="stat-num" id="count-today">...</div>
                     <div class="stat-label">Visitors Today</div>
                 </div>
                 <div class="stat-box" style="border-color:#d32f2f;">
-                    <div class="stat-num" id="count-total">0</div>
+                    <div class="stat-num" id="count-total">...</div>
                     <div class="stat-label">Total Views (Lifetime)</div>
                 </div>
             </div>
@@ -204,12 +183,14 @@
         let newsData = [];
 
         // --- AUTH ---
+        // পিন চেক করার কোড
         if(sessionStorage.getItem('lpbs_admin') === 'ok') {
             document.getElementById('login-overlay').style.display = 'none';
             document.getElementById('main-panel').style.display = 'block';
         }
 
         function checkPass() {
+            // আপনার দেওয়া পিন: 33982625
             if(document.getElementById('pass-input').value === '33982625') { 
                 sessionStorage.setItem('lpbs_admin', 'ok');
                 document.getElementById('login-overlay').style.display = 'none';
@@ -252,7 +233,7 @@
                 const res = await fetch('config.json?v=' + Date.now());
                 if(res.ok) config = await res.json();
                 if(!config.channels) config.channels = {};
-                if(!config.apis) config.apis = {}; // Ensure API object exists
+                if(!config.apis) config.apis = {}; 
                 
                 document.getElementById('loc-input').value = config.location_override || "";
                 
@@ -264,7 +245,8 @@
 
             } catch(e) { console.error(e); }
 
-            // 👇👇👇 Render URL INTEGRATED HERE for Real-Time Stats 👇👇👇
+            // 👇👇👇 Render URL INTEGRATED HERE for Real-Time Stats (FIXED) 👇👇👇
+            // আপনার আগের কোডে এখানে একটা ভুল লিংক ছিল, সেটা সরিয়ে শুধু আসলটা রাখা হয়েছে।
             try {
                 const renderURL = "https://lpbs-news.onrender.com"; 
                 const res = await fetch(renderURL + '/get_stats');
@@ -273,6 +255,8 @@
                 document.getElementById('count-total').innerText = data.total;
             } catch(e) {
                 console.log("Stats loading error:", e);
+                document.getElementById('count-today').innerText = "Offline";
+                document.getElementById('count-total').innerText = "Offline";
             }
             // 👆👆👆 End of Stats Update 👆👆👆
 
@@ -438,4 +422,3 @@
     </script>
 </body>
 </html>
-
