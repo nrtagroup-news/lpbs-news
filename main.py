@@ -35,6 +35,41 @@ Z_AI_KEY = "cf5a27b9240b49b9a398094d440889e5.5RDCyrw5XLRVJEiH"
 DEEP_AI_KEY = "7bc72502-db85-4dd2-9038-c3811d69ff7c"
 
 # ==========================================
+# 🩺 PART 0: HELPER FUNCTIONS (System Doctor)
+# ==========================================
+SERVER_START_TIME = time.time()
+ERROR_LOGS = []
+
+def get_system_report():
+    """ সিস্টেমের বর্তমান অবস্থা চেক করার ফাংশন """
+    uptime_seconds = int(time.time() - SERVER_START_TIME)
+    uptime = str(timedelta(seconds=uptime_seconds))
+    
+    # ডাটাবেস সাইজ চেক
+    db_size = 0
+    news_count = 0
+    if os.path.exists(DB_FILE):
+        db_size = os.path.getsize(DB_FILE) / 1024 # KB তে
+        with open(DB_FILE, 'r') as f:
+            try: news_count = len(json.load(f).get('news', []))
+            except: pass
+
+    # কনফিগ চেক
+    config = load_config()
+    active_channels = sum(len(v) for v in config.get('channels', {}).values())
+
+    report = f"""
+    SYSTEM HEALTH REPORT:
+    - Server Uptime: {uptime}
+    - Total Errors Logged: {len(ERROR_LOGS)}
+    - Database Size: {db_size:.2f} KB
+    - Active News Articles: {news_count}
+    - Active Source Channels: {active_channels}
+    - Last 3 Errors: {', '.join(ERROR_LOGS[-3:]) if ERROR_LOGS else "None"}
+    """
+    return report
+
+# ==========================================
 # 🧠 PART 1: THE ROBOT BRAIN (EXISTING LOGIC PRESERVED)
 # ==========================================
 
@@ -195,17 +230,12 @@ def ask_z_ai(prompt):
     """ ধাপ ১: Z AI (6 সেকেন্ড সময় পাবে) """
     print("🤖 AI: Asking Z AI...")
     try:
-        # Z AI (Assuming standard OpenAI Compatible or Direct Completion)
-        # Note: Since specific endpoint isn't provided, trying standard completion structure
         headers = { "Authorization": f"Bearer {Z_AI_KEY}", "Content-Type": "application/json" }
         payload = {
-            "model": "gpt-3.5-turbo", # Or "z-ai-model" if known
+            "model": "gpt-3.5-turbo",
             "messages": [{"role": "user", "content": prompt}],
-            "max_tokens": 100
+            "max_tokens": 150
         }
-        # Using a generic endpoint. If Z AI has a specific URL, replace it here.
-        # For now, using a common proxy pattern or OpenAI default if compatible.
-        # If this fails, it goes to DeepAI anyway.
         response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload, timeout=6)
         
         if response.status_code == 200:
@@ -237,8 +267,6 @@ def ask_deep_ai(prompt):
 
 def generate_super_promo(title, lang):
     """ মাস্টার ফাংশন: Z AI -> Deep AI -> Fallback """
-    
-    # প্রম্পট তৈরি করা
     lang_name = "Bengali" if lang == 'bn' else "Hindi" if lang == 'hi' else "English"
     prompt = f"Write a very short, catchy, viral social media caption with 5 hashtags for this news title in {lang_name}: '{title}'. Keep it exciting."
 
@@ -315,7 +343,31 @@ def create_viral_thumbnail(image_url, title, lang):
         return False
 
 # ==========================================
-# 🌐 PART 3: SERVER HANDLER (UPDATED)
+# 🩺 PART 3: AI DIAGNOSIS & CHAT LOGIC
+# ==========================================
+
+def analyze_system_with_ai():
+    """ AI কে রিপোর্ট পাঠিয়ে পরামর্শ নেওয়া """
+    report = get_system_report()
+    prompt = f"""
+    Act as a Senior Python DevOps Engineer. Here is the health status of my news automation server:
+    {report}
+    
+    Review this data. If there are errors, explain them. If the database is too large (>500KB), suggest cleaning. 
+    Give me 1 specific tip to improve performance or add a cool feature based on this status.
+    Keep the answer short and technical but friendly.
+    """
+    
+    advice = ask_z_ai(prompt)
+    if not advice:
+        advice = ask_deep_ai(prompt)
+    
+    if not advice:
+        advice = "⚠️ AI Servers are busy. But mechanically: System looks stable. Check logs manually."
+    return advice
+
+# ==========================================
+# 🌐 PART 4: SERVER HANDLER (FIXED & UPDATED)
 # ==========================================
 
 class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
@@ -334,16 +386,36 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
             thumb_url = data.get('thumb', '')
             lang = data.get('lang', 'bn')
             
-            # 🔥 NEW: Calling the AI Super Brain
             ai_hashtags = generate_super_promo(title, lang)
-            
             thumb_success = create_viral_thumbnail(thumb_url, title, lang)
+            
             self.send_response(200); self.send_header('Content-type', 'application/json'); self.end_headers()
             self.wfile.write(json.dumps({
                 "hashtags": ai_hashtags, 
                 "status": "success" if thumb_success else "error", 
                 "image_url": f"/get_promo_image?t={int(time.time())}"
             }).encode())
+
+        # 🔥 NEW: Chat with AI Doctor Endpoint 🔥
+        elif self.path == '/chat_with_doctor':
+            length = int(self.headers['Content-Length'])
+            data = json.loads(self.rfile.read(length))
+            user_msg = data.get('message', '')
+            
+            # System context for the AI
+            sys_context = get_system_report()
+            full_prompt = f"System Context:\n{sys_context}\n\nUser Question: {user_msg}\n\nAnswer as a helpful AI Engineer:"
+            
+            # Try Z AI first, then Deep AI
+            reply = ask_z_ai(full_prompt)
+            if not reply:
+                reply = ask_deep_ai(full_prompt)
+            if not reply:
+                reply = "⚠️ Connection to AI Brain failed. Please check my logs."
+                
+            self.send_response(200); self.send_header('Content-type', 'application/json'); self.end_headers()
+            self.wfile.write(json.dumps({"reply": reply}).encode())
+
         else:
             self.send_error(404)
 
@@ -351,27 +423,23 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
         if self.path == '/track_visit':
             self.update_stats()
             self.send_response(200); self.end_headers()
+            
         elif self.path == '/get_stats':
-            elif self.path == '/check_health':
-            # AI Doctor কে কল করা হচ্ছে
-            advice = analyze_system_with_ai()
-            report = get_system_report()
-            
-            response_data = {
-                "report": report,
-                "ai_advice": advice
-            }
-            
-            self.send_response(200)
-            self.send_header('Content-type', 'application/json')
-            self.end_headers()
-            self.wfile.write(json.dumps(response_data).encode())
             if os.path.exists("stats.json"):
                 with open("stats.json", 'r') as f:
                     self.send_response(200); self.send_header('Content-type', 'application/json'); self.end_headers()
                     self.wfile.write(f.read().encode())
             else:
                 self.send_response(200); self.wfile.write(b'{"total":0,"today":0}')
+
+        # 🩺 Health Check Endpoint (Correctly Placed)
+        elif self.path == '/check_health':
+            advice = analyze_system_with_ai()
+            report = get_system_report()
+            response_data = { "report": report, "ai_advice": advice }
+            self.send_response(200); self.send_header('Content-type', 'application/json'); self.end_headers()
+            self.wfile.write(json.dumps(response_data).encode())
+
         elif self.path.startswith('/get_promo_image'):
             if os.path.exists(PROMO_IMAGE_FILE):
                 self.send_response(200); self.send_header('Content-type', 'image/jpeg'); self.end_headers()
@@ -393,68 +461,7 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
         if data["date"] != today: data["date"] = today; data["today"] = 0
         data["total"] += 1; data["today"] += 1
         with open(s_file, 'w') as f: json.dump(data, f)
-# ==========================================
-# 🩺 PART 4: AI SYSTEM DOCTOR (NEW FEATURE)
-# ==========================================
 
-SERVER_START_TIME = time.time()
-ERROR_LOGS = []
-
-def get_system_report():
-    """ সিস্টেমের বর্তমান অবস্থা চেক করার ফাংশন """
-    uptime_seconds = int(time.time() - SERVER_START_TIME)
-    uptime = str(timedelta(seconds=uptime_seconds))
-    
-    # ডাটাবেস সাইজ চেক
-    db_size = 0
-    news_count = 0
-    if os.path.exists(DB_FILE):
-        db_size = os.path.getsize(DB_FILE) / 1024 # KB তে
-        with open(DB_FILE, 'r') as f:
-            try: news_count = len(json.load(f).get('news', []))
-            except: pass
-
-    # কনফিগ চেক
-    config = load_config()
-    active_channels = sum(len(v) for v in config.get('channels', {}).values())
-
-    report = f"""
-    SYSTEM HEALTH REPORT:
-    - Server Uptime: {uptime}
-    - Total Errors Logged: {len(ERROR_LOGS)}
-    - Database Size: {db_size:.2f} KB
-    - Active News Articles: {news_count}
-    - Active Source Channels: {active_channels}
-    - Last 3 Errors: {', '.join(ERROR_LOGS[-3:]) if ERROR_LOGS else "None"}
-    """
-    return report
-
-def analyze_system_with_ai():
-    """ AI কে রিপোর্ট পাঠিয়ে পরামর্শ নেওয়া """
-    report = get_system_report()
-    prompt = f"""
-    Act as a Senior Python DevOps Engineer. Here is the health status of my news automation server:
-    {report}
-    
-    Review this data. If there are errors, explain them. If the database is too large (>500KB), suggest cleaning. 
-    Give me 1 specific tip to improve performance or add a cool feature based on this status.
-    Keep the answer short and technical but friendly.
-    """
-    
-    # প্রথমে Z AI দিয়ে চেষ্টা
-    advice = ask_z_ai(prompt)
-    if not advice:
-        # না হলে Deep AI
-        advice = ask_deep_ai(prompt)
-    
-    if not advice:
-        advice = "⚠️ AI Servers are busy. But mechanically: System looks stable. Check logs manually."
-        
-    return advice
-
-# ----------------------------------------------------
-# 👇 এই অংশটুকু তোমার MyRequestHandler ক্লাসের ভেতরে do_GET এর মধ্যে ঢোকাতে হবে
-# ----------------------------------------------------
 if __name__ == "__main__":
     robot_thread = threading.Thread(target=robot_loop)
     robot_thread.daemon = True
@@ -463,4 +470,3 @@ if __name__ == "__main__":
     print(f"   👉 AI SYSTEM: Z-AI + DEEP-AI + FALLBACK Activated")
     with socketserver.TCPServer(("0.0.0.0", PORT), MyRequestHandler) as httpd:
         httpd.serve_forever()
-
