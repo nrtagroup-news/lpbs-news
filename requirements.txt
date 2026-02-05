@@ -4,3 +4,8 @@ requests
 yt-dlp
 Pillow
 moviepy
+decorator
+imageio
+imageio-ffmpeg
+proglog
+tqdm
