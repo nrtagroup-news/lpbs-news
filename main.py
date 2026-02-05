@@ -352,6 +352,20 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
             self.update_stats()
             self.send_response(200); self.end_headers()
         elif self.path == '/get_stats':
+            elif self.path == '/check_health':
+            # AI Doctor কে কল করা হচ্ছে
+            advice = analyze_system_with_ai()
+            report = get_system_report()
+            
+            response_data = {
+                "report": report,
+                "ai_advice": advice
+            }
+            
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps(response_data).encode())
             if os.path.exists("stats.json"):
                 with open("stats.json", 'r') as f:
                     self.send_response(200); self.send_header('Content-type', 'application/json'); self.end_headers()
@@ -379,7 +393,68 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
         if data["date"] != today: data["date"] = today; data["today"] = 0
         data["total"] += 1; data["today"] += 1
         with open(s_file, 'w') as f: json.dump(data, f)
+# ==========================================
+# 🩺 PART 4: AI SYSTEM DOCTOR (NEW FEATURE)
+# ==========================================
 
+SERVER_START_TIME = time.time()
+ERROR_LOGS = []
+
+def get_system_report():
+    """ সিস্টেমের বর্তমান অবস্থা চেক করার ফাংশন """
+    uptime_seconds = int(time.time() - SERVER_START_TIME)
+    uptime = str(timedelta(seconds=uptime_seconds))
+    
+    # ডাটাবেস সাইজ চেক
+    db_size = 0
+    news_count = 0
+    if os.path.exists(DB_FILE):
+        db_size = os.path.getsize(DB_FILE) / 1024 # KB তে
+        with open(DB_FILE, 'r') as f:
+            try: news_count = len(json.load(f).get('news', []))
+            except: pass
+
+    # কনফিগ চেক
+    config = load_config()
+    active_channels = sum(len(v) for v in config.get('channels', {}).values())
+
+    report = f"""
+    SYSTEM HEALTH REPORT:
+    - Server Uptime: {uptime}
+    - Total Errors Logged: {len(ERROR_LOGS)}
+    - Database Size: {db_size:.2f} KB
+    - Active News Articles: {news_count}
+    - Active Source Channels: {active_channels}
+    - Last 3 Errors: {', '.join(ERROR_LOGS[-3:]) if ERROR_LOGS else "None"}
+    """
+    return report
+
+def analyze_system_with_ai():
+    """ AI কে রিপোর্ট পাঠিয়ে পরামর্শ নেওয়া """
+    report = get_system_report()
+    prompt = f"""
+    Act as a Senior Python DevOps Engineer. Here is the health status of my news automation server:
+    {report}
+    
+    Review this data. If there are errors, explain them. If the database is too large (>500KB), suggest cleaning. 
+    Give me 1 specific tip to improve performance or add a cool feature based on this status.
+    Keep the answer short and technical but friendly.
+    """
+    
+    # প্রথমে Z AI দিয়ে চেষ্টা
+    advice = ask_z_ai(prompt)
+    if not advice:
+        # না হলে Deep AI
+        advice = ask_deep_ai(prompt)
+    
+    if not advice:
+        advice = "⚠️ AI Servers are busy. But mechanically: System looks stable. Check logs manually."
+        
+    return advice
+
+# ----------------------------------------------------
+# 👇 এই অংশটুকু তোমার MyRequestHandler ক্লাসের ভেতরে do_GET এর মধ্যে ঢোকাতে হবে
+# ----------------------------------------------------
 if __name__ == "__main__":
     robot_thread = threading.Thread(target=robot_loop)
     robot_thread.daemon = True
@@ -388,3 +463,4 @@ if __name__ == "__main__":
     print(f"   👉 AI SYSTEM: Z-AI + DEEP-AI + FALLBACK Activated")
     with socketserver.TCPServer(("0.0.0.0", PORT), MyRequestHandler) as httpd:
         httpd.serve_forever()
+
