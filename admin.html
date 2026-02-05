@@ -92,6 +92,48 @@
         </div>
         <div class="card">
             <div class="card-header"><i class="fa-solid fa-chart-line card-icon"></i> Real-Time Traffic</div>
+            <div class="card" style="border: 1px solid #00bcd4;">
+    <div class="card-header" style="color: #008ba3;">
+        <i class="fa-solid fa-user-doctor card-icon"></i> AI System Doctor
+    </div>
+    <p style="font-size: 13px; color: #666;">
+        রোবটকে বলুন পুরো সিস্টেম চেক করে রিপোর্ট দিতে। কোথায় সমস্যা আছে বা কী আপডেট করা যায়, AI বলে দেবে।
+    </p>
+    <button class="btn" style="background: #00bcd4; color: white; width: 100%; font-weight: bold;" onclick="checkSystemHealth()">
+        <i class="fa-solid fa-stethoscope"></i> RUN DIAGNOSIS & GET ADVICE
+    </button>
+    
+    <div id="health-result" style="display:none; margin-top: 15px; background: #e0f7fa; padding: 15px; border-radius: 8px;">
+        <strong>📋 System Status:</strong>
+        <pre id="sys-report" style="font-size: 11px; margin-bottom: 10px;"></pre>
+        <hr>
+        <strong>🤖 AI Engineer Says:</strong>
+        <p id="ai-advice" style="color: #006064; font-weight: bold;"></p>
+    </div>
+</div>
+
+<script>
+    async function checkSystemHealth() {
+        const btn = document.querySelector('button[onclick="checkSystemHealth()"]');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = '<div class="loader"></div> Checking Vitals...';
+        btn.disabled = true;
+
+        try {
+            const res = await fetch('/check_health');
+            const data = await res.json();
+            
+            document.getElementById('health-result').style.display = 'block';
+            document.getElementById('sys-report').innerText = data.report;
+            document.getElementById('ai-advice').innerText = data.ai_advice;
+        } catch (e) {
+            alert("Doctor is offline! (Server Error)");
+        }
+
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+</script>
             <div class="stats-grid">
                 <div class="stat-box">
                     <div class="stat-num" id="count-today">0</div>
@@ -396,3 +438,4 @@
     </script>
 </body>
 </html>
+
