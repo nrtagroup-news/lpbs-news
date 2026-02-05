@@ -222,13 +222,17 @@
 
             } catch(e) { console.error(e); }
 
-            // Load Stats
+            // 👇👇👇 Render URL INTEGRATED HERE for Real-Time Stats 👇👇👇
             try {
-                const res = await fetch('/get_stats');
+                const renderURL = "https://lpbs-news.onrender.com"; 
+                const res = await fetch(renderURL + '/get_stats');
                 const data = await res.json();
                 document.getElementById('count-today').innerText = data.today;
                 document.getElementById('count-total').innerText = data.total;
-            } catch(e) {}
+            } catch(e) {
+                console.log("Stats loading error:", e);
+            }
+            // 👆👆👆 End of Stats Update 👆👆👆
 
             // Load News for Promo
             try {
