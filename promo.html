@@ -7,38 +7,80 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
         body { font-family: 'Segoe UI', sans-serif; background-color: #f4f6f8; padding: 20px; color: #333; }
-        .container { max-width: 700px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         h2 { text-align: center; color: #6200ea; margin-bottom: 25px; }
         
+        /* Form Elements */
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
-        
-        select, input[type="text"], input[type="file"] { 
+        select, input[type="text"], input[type="file"], textarea { 
             width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 8px; 
-            font-size: 14px; box-sizing: border-box; transition: 0.3s;
+            font-size: 14px; box-sizing: border-box; transition: 0.3s; font-family: inherit;
         }
-        select:focus, input:focus { border-color: #6200ea; outline: none; }
+        select:focus, input:focus, textarea:focus { border-color: #6200ea; outline: none; }
 
+        /* Magic Button */
         .btn-magic { 
             width: 100%; padding: 15px; background: linear-gradient(135deg, #6200ea, #b388ff); 
             color: white; border: none; border-radius: 8px; cursor: pointer; 
-            font-size: 18px; font-weight: bold; margin-top: 20px; 
+            font-size: 18px; font-weight: bold; margin-top: 10px; 
             box-shadow: 0 5px 15px rgba(98, 0, 234, 0.3); transition: 0.3s;
         }
         .btn-magic:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(98, 0, 234, 0.4); }
 
+        /* Social Buttons */
+        .btn-social {
+            width: 48%; padding: 12px; border: none; border-radius: 6px; cursor: pointer; 
+            font-weight: bold; margin-top: 10px; color: white; display: inline-flex; 
+            align-items: center; justify-content: center; gap: 8px; font-size: 14px;
+        }
+        .btn-fb { background: #1877F2; }
+        .btn-fb:hover { background: #155db2; }
+        .btn-yt { background: #FF0000; }
+        .btn-yt:hover { background: #cc0000; }
+
+        /* Copy Button */
+        .btn-copy {
+            background: #333; color: white; border: none; padding: 8px 15px; 
+            border-radius: 5px; cursor: pointer; font-size: 12px; margin-top: 5px;
+        }
+        .btn-copy:hover { background: #555; }
+
+        /* Preview & Result */
         .preview-area {
             background: #fafafa; border: 1px dashed #ccc; padding: 15px; 
             border-radius: 8px; margin-top: 10px; display: none; text-align: center;
         }
         .preview-area img { max-width: 100%; height: auto; border-radius: 8px; margin-bottom: 10px; }
-        .preview-title { font-weight: bold; color: #333; font-size: 14px; }
         
+        .result-box {
+            display: none; margin-top: 30px; background: #e8f5e9; padding: 20px; 
+            border-radius: 10px; border: 1px solid #c8e6c9;
+        }
+
+        /* 🩺 AI DOCTOR SECTION STYLES */
+        .doctor-section {
+            margin-top: 40px; border-top: 2px dashed #ddd; padding-top: 20px;
+        }
+        .chat-box {
+            background: #f0f4f8; border-radius: 10px; padding: 15px; height: 150px; 
+            overflow-y: auto; border: 1px solid #d1d9e6; margin-bottom: 10px;
+        }
+        .chat-msg { margin-bottom: 8px; padding: 8px; border-radius: 5px; font-size: 13px; }
+        .msg-user { background: #e3f2fd; text-align: right; color: #1565c0; }
+        .msg-ai { background: #fff; border-left: 3px solid #ff9800; color: #333; }
+        
+        .mic-btn {
+            background: #f44336; color: white; border: none; width: 40px; height: 40px; 
+            border-radius: 50%; cursor: pointer; font-size: 18px; box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .mic-active { animation: pulse 1.5s infinite; background: #d32f2f; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
         .loader { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; }
         @keyframes spin { to { transform: rotate(360deg); } }
 
         .back-link { display: block; text-align: center; margin-top: 20px; color: #666; text-decoration: none; font-weight: bold; }
-        .back-link:hover { color: #6200ea; }
     </style>
 </head>
 <body>
@@ -49,25 +91,19 @@
     <form id="promoForm">
         
         <div class="form-group">
-            <label><i class="fa-solid fa-list"></i> Select News from Robot Database:</label>
+            <label><i class="fa-solid fa-film"></i> Select Video Source:</label>
             <select id="news-selector" onchange="loadPreview()">
-                <option value="">-- Loading News List... --</option>
+                <option value="">-- Loading Robot Database... --</option>
             </select>
-            <p style="font-size: 12px; color: #888; margin-top: 5px;">* রোবট লাস্ট ৪৮ ঘণ্টায় যা কালেক্ট করেছে তা এখানে আসবে।</p>
         </div>
 
         <div id="selected-preview" class="preview-area">
             <img id="prev-thumb" src="" alt="Thumbnail">
-            <div id="prev-title" class="preview-title"></div>
-            <input type="hidden" id="video-url"> <input type="hidden" id="video-title">
+            <div id="prev-title" style="font-weight:bold; margin-bottom:5px;"></div>
+            <span style="font-size:12px; background:#eee; padding:2px 8px; border-radius:4px;">Original Video Detected</span>
         </div>
 
-        <div class="form-group" style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
-            <label>Or, Upload Manually (যদি লিস্টে না থাকে):</label>
-            <input type="file" id="manual-file" accept="video/*">
-        </div>
-
-        <div class="form-group">
+        <div class="form-group" style="margin-top:20px;">
             <label>Target Audience Language:</label>
             <select id="lang-select">
                 <option value="bn">Bangla (বাংলা)</option>
@@ -77,16 +113,59 @@
         </div>
 
         <button type="button" class="btn-magic" onclick="startProcessing()">
-            <i class="fa-solid fa-wand-magic-sparkles"></i> GENERATE VIRAL PROMO
+            <i class="fa-solid fa-wand-magic-sparkles"></i> GENERATE VIRAL PACKAGE
         </button>
+    </form>
 
-        <div id="result-area" style="display:none; margin-top: 20px; background: #e8f5e9; padding: 15px; border-radius: 8px; border: 1px solid #c8e6c9;">
-            <h4 style="margin-top:0; color:#2e7d32;">✅ AI Generated Result:</h4>
-            <p id="ai-hashtags" style="white-space: pre-wrap; font-family: monospace; color:#333;"></p>
-            <img id="ai-promo-img" src="" style="width:100%; margin-top:10px; border-radius:8px;">
+    <div id="result-area" class="result-box">
+        <h3 style="color:#2e7d32; margin-top:0;"><i class="fa-solid fa-check-circle"></i> Promo Ready!</h3>
+        
+        <label>1. Viral Thumbnail:</label>
+        <img id="ai-promo-img" src="" style="width:100%; border-radius:8px; margin-bottom:15px; border:1px solid #ddd;">
+
+        <label>2. Facebook Caption (SEO Optimized):</label>
+        <textarea id="ai-caption" rows="5"></textarea>
+        <button class="btn-copy" onclick="copyText('ai-caption')"><i class="fa-regular fa-copy"></i> Copy Caption</button>
+
+        <div style="margin-top:15px;">
+            <label>3. First Comment Link:</label>
+            <input type="text" id="video-link-display" style="background:#fff;">
+            <button class="btn-copy" onclick="copyText('video-link-display')"><i class="fa-solid fa-link"></i> Copy Link</button>
         </div>
 
-    </form>
+        <div style="margin-top: 25px; padding-top: 20px; border-top: 2px solid #ddd;">
+            <label style="color: #6200ea;"><i class="fa-solid fa-rocket"></i> Auto Publisher (Beta)</label>
+            <p style="font-size:12px; color:#666;">One-click to open studio or auto-post (needs API key).</p>
+            
+            <div style="display: flex; justify-content: space-between;">
+                <button class="btn-social btn-fb" onclick="postToFacebook()">
+                    <i class="fa-brands fa-facebook"></i> Post to Page
+                </button>
+                <button class="btn-social btn-yt" onclick="openYouTubeStudio()">
+                    <i class="fa-brands fa-youtube"></i> Upload Video
+                </button>
+            </div>
+            
+            <div id="fb-status" style="font-size:12px; margin-top:5px; font-weight:bold;"></div>
+        </div>
+    </div>
+
+    <div class="doctor-section">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <h3 style="margin:0; color:#008ba3;"><i class="fa-solid fa-user-doctor"></i> Talk to System Doctor</h3>
+            <span style="font-size:12px; color:#777;">Powered by Z-AI & DeepAI</span>
+        </div>
+        
+        <div class="chat-box" id="chat-history">
+            <div class="chat-msg msg-ai">Hello Admin! I am monitoring the server. Ask me anything via voice or text.</div>
+        </div>
+        
+        <div style="display:flex; gap:10px;">
+            <input type="text" id="chat-input" placeholder="Type or use Mic..." onkeydown="if(event.key==='Enter') sendMessage()">
+            <button class="mic-btn" onclick="startDictation()" title="Speak Now"><i class="fa-solid fa-microphone"></i></button>
+            <button class="btn-copy" style="background:#008ba3; margin:0;" onclick="sendMessage()"><i class="fa-solid fa-paper-plane"></i></button>
+        </div>
+    </div>
 
     <a href="admin.html" class="back-link">← Back to Dashboard</a>
 </div>
@@ -94,108 +173,179 @@
 <script>
     let newsData = [];
 
-    // ১. পেজ লোড হলেই ডাটাবেস থেকে নিউজ আনবে
+    // --- 1. LOAD DATA ---
     window.onload = async function() {
         const selector = document.getElementById('news-selector');
         try {
-            // রেন্ডার থেকে news_db.json ফাইলটা কল করছি
             const res = await fetch('news_db.json?v=' + Date.now());
             const data = await res.json();
-            newsData = data.news || []; // ডাটা গ্লোবাল ভেরিয়েবলে রাখলাম
-
-            selector.innerHTML = '<option value="">-- Select a Video for Promo --</option>';
-            
-            // লুপ চালিয়ে অপশন বানাচ্ছি
+            newsData = data.news || [];
+            selector.innerHTML = '<option value="">-- Select a Video --</option>';
             newsData.forEach((item, index) => {
-                const title = item.title.substring(0, 60) + '...';
-                const opt = document.createElement('option');
-                opt.value = index; // আমরা array index ব্যবহার করব ট্র্যাক করার জন্য
-                opt.innerText = `[${item.platform || 'WEB'}] ${title}`;
-                selector.appendChild(opt);
+                selector.innerHTML += `<option value="${index}">[${item.platform || 'WEB'}] ${item.title.substring(0, 50)}...</option>`;
             });
-
-        } catch (error) {
-            console.error(error);
-            selector.innerHTML = '<option>⚠️ Error loading news list!</option>';
-        }
+        } catch (e) { selector.innerHTML = '<option>⚠️ DB Error</option>'; }
     };
 
-    // ২. নিউজ সিলেক্ট করলে প্রিভিউ দেখাবে
     function loadPreview() {
         const index = document.getElementById('news-selector').value;
-        const previewBox = document.getElementById('selected-preview');
+        const box = document.getElementById('selected-preview');
+        if(!index) { box.style.display = 'none'; return; }
         
-        if (index === "") {
-            previewBox.style.display = 'none';
-            return;
-        }
-
         const item = newsData[index];
         document.getElementById('prev-thumb').src = item.thumb;
         document.getElementById('prev-title').innerText = item.title;
-        document.getElementById('video-url').value = item.original_link || item.video_url; // ভিডিও লিংক ধরা হলো
-        document.getElementById('video-title').value = item.title;
-        
-        previewBox.style.display = 'block';
+        box.style.display = 'block';
     }
 
-    // ৩. বাটনে ক্লিক করলে প্রসেসিং শুরু (Z AI + Deep AI)
+    // --- 2. GENERATE PROMO ---
     async function startProcessing() {
         const btn = document.querySelector('.btn-magic');
-        const originalText = btn.innerHTML;
         const index = document.getElementById('news-selector').value;
-        const manualFile = document.getElementById('manual-file').files[0];
+        const lang = document.getElementById('lang-select').value;
         
-        if (index === "" && !manualFile) {
-            alert("Please select a news from the list OR upload a video!");
-            return;
-        }
+        if (index === "") { alert("Please select a video first!"); return; }
 
-        btn.innerHTML = '<div class="loader"></div> AI Robot is Working...';
+        const originalBtn = btn.innerHTML;
+        btn.innerHTML = '<div class="loader"></div> Creating Viral Content...';
         btn.disabled = true;
 
-        let payload = {};
-
-        // ডাটা রেডি করা
-        if (index !== "") {
-            const item = newsData[index];
-            payload = {
-                title: item.title,
-                thumb: item.thumb,
-                video_url: item.original_link, // ভিডিও কাটার জন্য এই লিংকটা পরে লাগবে
-                lang: document.getElementById('lang-select').value
-            };
-        } else {
-            // ম্যানুয়াল ফাইলের জন্য লজিক (আপাতত টাইটেল ডামি দিচ্ছি)
-            payload = {
-                title: "Manual Upload Video",
-                thumb: "",
-                lang: document.getElementById('lang-select').value
-            };
-        }
+        const item = newsData[index];
 
         try {
-            // সার্ভারে পাঠানো
             const res = await fetch('/create_promo', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify(payload)
+                body: JSON.stringify({ title: item.title, thumb: item.thumb, lang: lang })
             });
-
             const result = await res.json();
 
-            // রেজাল্ট দেখানো
+            // UI Update
             document.getElementById('result-area').style.display = 'block';
-            document.getElementById('ai-hashtags').innerText = result.hashtags;
             document.getElementById('ai-promo-img').src = result.image_url;
+            
+            // Generate Smart Caption
+            let captionHeader = lang === 'bn' ? "🔥 ব্রেকিং নিউজ:" : "🚨 BREAKING NEWS:";
+            let clickText = lang === 'bn' ? "ভিডিওটি দেখতে লিংকে ক্লিক করুন 👇" : "Watch Full Video Here 👇";
+            
+            const fullCaption = `${captionHeader} ${item.title}\n\n${clickText}\n(Link is in the First Comment)\n\n${result.hashtags}`;
+            
+            document.getElementById('ai-caption').value = fullCaption;
+            document.getElementById('video-link-display').value = item.original_link || item.video_url;
 
-        } catch (e) {
-            alert("Server Error! Check console.");
-            console.log(e);
-        }
+        } catch (e) { alert("Server Error!"); }
 
-        btn.innerHTML = originalText;
+        btn.innerHTML = originalBtn;
         btn.disabled = false;
+    }
+
+    function copyText(id) {
+        const el = document.getElementById(id);
+        el.select(); document.execCommand('copy');
+        alert("Copied to clipboard!");
+    }
+
+    // --- 3. AUTO PUBLISHER FUNCTIONS (NEW) ---
+    
+    function openYouTubeStudio() {
+        // Copy caption first
+        copyText('ai-caption');
+        // Open Studio in new tab
+        window.open("https://studio.youtube.com/channel/UC/videos/upload?d=ud", "_blank");
+        alert("Caption Copied! Paste it in YouTube description.");
+    }
+
+    async function postToFacebook() {
+        // এই ফাংশনটি সার্ভারে রিকোয়েস্ট পাঠাবে পোস্ট করার জন্য
+        const statusDiv = document.getElementById('fb-status');
+        const caption = document.getElementById('ai-caption').value;
+        const link = document.getElementById('video-link-display').value;
+
+        statusDiv.innerHTML = '<span style="color:orange;">⏳ Trying to Auto-Post to Facebook...</span>';
+        
+        try {
+            // Note: This requires Python backend update (which I'm giving you)
+            const res = await fetch('/publish_social', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ platform: 'facebook', message: caption, link: link })
+            });
+            const data = await res.json();
+            
+            if(data.status === 'success') {
+                statusDiv.innerHTML = '<span style="color:green;">✅ Posted Successfully! Check Page.</span>';
+            } else {
+                // If API fails (no token), fallback to manual share
+                statusDiv.innerHTML = '<span style="color:red;">⚠️ Auto-Post Failed (No Token). Opening Manual Share...</span>';
+                setTimeout(() => {
+                    const fbShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}&quote=${encodeURIComponent(caption)}`;
+                    window.open(fbShareUrl, '_blank');
+                }, 1500);
+            }
+        } catch(e) {
+            statusDiv.innerHTML = '<span style="color:red;">❌ Server Error. Sharing Manually...</span>';
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(link)}`, '_blank');
+        }
+    }
+
+    // --- 4. AI DOCTOR CHAT ---
+    async function sendMessage() {
+        const input = document.getElementById('chat-input');
+        const msg = input.value.trim();
+        if(!msg) return;
+
+        addChatLog(msg, 'user');
+        input.value = "";
+
+        try {
+            const res = await fetch('/chat_with_doctor', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ message: msg })
+            });
+            const data = await res.json();
+            addChatLog(data.reply, 'ai');
+        } catch (e) {
+            addChatLog("⚠️ Doctor is offline.", 'ai');
+        }
+    }
+
+    function addChatLog(text, sender) {
+        const box = document.getElementById('chat-history');
+        const div = document.createElement('div');
+        div.className = `chat-msg msg-${sender}`;
+        div.innerText = text;
+        box.appendChild(div);
+        box.scrollTop = box.scrollHeight;
+    }
+
+    // --- 5. VOICE RECOGNITION ---
+    function startDictation() {
+        if (window.hasOwnProperty('webkitSpeechRecognition')) {
+            const micBtn = document.querySelector('.mic-btn');
+            const recognition = new webkitSpeechRecognition();
+            
+            recognition.continuous = false;
+            recognition.interimResults = false;
+            recognition.lang = document.getElementById('lang-select').value === 'bn' ? "bn-BD" : "en-US";
+            
+            recognition.start();
+            micBtn.classList.add('mic-active');
+
+            recognition.onresult = function(e) {
+                document.getElementById('chat-input').value = e.results[0][0].transcript;
+                recognition.stop();
+                micBtn.classList.remove('mic-active');
+                sendMessage(); 
+            };
+
+            recognition.onerror = function(e) {
+                recognition.stop();
+                micBtn.classList.remove('mic-active');
+            };
+        } else {
+            alert("Mic not supported in this browser. Use Chrome.");
+        }
     }
 </script>
 
