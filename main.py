@@ -18,13 +18,13 @@ try:
     from PIL import Image, ImageDraw, ImageFont
     PILLOW_AVAILABLE = True
 except Exception as e:
-    print(f"⚠️ Image Lib Error: {e}")
+    print(f"⚠️ Image Module Error: {e}")
 
 try:
     from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
     MOVIEPY_AVAILABLE = True
 except Exception as e:
-    print(f"⚠️ Video Lib Error: {e}")
+    print(f"⚠️ Video Module Error: {e}")
 
 # --- 2. কনফিগারেশন ---
 PORT = int(os.environ.get("PORT", 8080))
@@ -37,14 +37,15 @@ RETENTION_HOURS = 48
 FONTS = { 'bn': 'bn.ttf', 'hi': 'hn.ttf', 'en': 'en.ttf' }
 
 # --- 3. AI KEYS ---
-Z_AI_KEY = "cf5a27b9240b49b9a398094d440889e5.5RDCyrw5XLRVJEiH"
+SAMBANOVA_KEY = "0ad2fc42-5d7f-41c0-b923-78d71d671790"
 DEEP_AI_KEY = "7bc72502-db85-4dd2-9038-c3811d69ff7c"
 
 # ==========================================
-# ✂️ VIDEO ENGINE (Video Cutting)
+# ✂️ VIDEO ENGINE (SPEED OPTIMIZED)
 # ==========================================
 def download_and_cut_video(url):
     if not MOVIEPY_AVAILABLE:
+        print("❌ Video Engine Missing")
         return False
     
     print(f"🎬 Processing: {url}")
@@ -54,8 +55,9 @@ def download_and_cut_video(url):
     if os.path.exists(temp_raw): os.remove(temp_raw)
     if os.path.exists(PROMO_VIDEO_FILE): os.remove(PROMO_VIDEO_FILE)
 
+    # 🔥 SPEED HACK: লো কোয়ালিটি ডাউনলোড (দ্রুত হবে)
     ydl_opts = {
-        'format': 'best[ext=mp4]/best',
+        'format': 'worst[ext=mp4]', # HD এর বদলে লো কোয়ালিটি (Super Fast)
         'outtmpl': temp_raw,
         'quiet': True,
         'no_warnings': True,
@@ -63,9 +65,11 @@ def download_and_cut_video(url):
     }
     
     try:
+        # ডাউনলোড
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
         
+        # কাটিং (৩০ সেকেন্ড)
         print("✂️ Cutting 30s...")
         ffmpeg_extract_subclip(temp_raw, 0, 30, targetname=PROMO_VIDEO_FILE)
         
@@ -94,12 +98,13 @@ def get_system_report():
 
     config = load_config()
     active_ch = sum(len(v) for v in config.get('channels', {}).values())
-    vid_status = "OK" if MOVIEPY_AVAILABLE else "Missing"
     
-    return f"Uptime: {uptime} | DB: {db_count} | VideoEngine: {vid_status} | Errors: {len(ERROR_LOGS)}"
+    vid_status = "Active ✅" if MOVIEPY_AVAILABLE else "Disabled ⚠️"
+    
+    return f"Uptime: {uptime} | DB: {db_count} | Video: {vid_status} | Errors: {len(ERROR_LOGS)}"
 
 # ==========================================
-# 🧠 ROBOT LOGIC (Data Collection)
+# 🧠 ROBOT LOGIC
 # ==========================================
 def load_config():
     if not os.path.exists(CONFIG_FILE): return {}
@@ -146,6 +151,7 @@ def robot_loop():
         try:
             config = load_config()
             existing = load_db()
+            existing = clean_old_news(existing)
             fresh = fetch_social_videos(config.get("channels", {}))
             
             seen = {i['id'] for i in existing}
@@ -156,32 +162,43 @@ def robot_loop():
                 json.dump({"news": existing, "updated": str(datetime.now())}, f)
             time.sleep(600)
         except Exception as e:
+            print(f"Robot Error: {e}")
             ERROR_LOGS.append(str(e))
             time.sleep(60)
 
 # ==========================================
-# 🚀 AI ENGINE (Z-AI + DeepAI Backup)
+# 🚀 AI ENGINE (SambaNova + DeepAI)
 # ==========================================
 def ask_ai(prompt):
-    print(f"🤖 Sending to AI: {prompt[:30]}...")
+    print(f"🤖 User asks: {prompt[:30]}...")
     
-    # 1. Z-AI Attempt
+    # 1. SambaNova
     try:
-        h = { "Authorization": f"Bearer {Z_AI_KEY}", "Content-Type": "application/json" }
-        d = { "model": "gpt-3.5-turbo", "messages": [{"role": "user", "content": prompt}], "max_tokens": 150 }
-        r = requests.post("https://api.openai.com/v1/chat/completions", headers=h, json=d, timeout=30)
-        if r.status_code == 200: 
+        url = "https://api.sambanova.ai/v1/chat/completions"
+        headers = { "Authorization": f"Bearer {SAMBANOVA_KEY}", "Content-Type": "application/json" }
+        data = {
+            "model": "Meta-Llama-3.1-8B-Instruct",
+            "messages": [{"role": "user", "content": prompt}],
+            "max_tokens": 100
+        }
+        r = requests.post(url, headers=headers, json=data, timeout=10)
+        if r.status_code == 200:
             return r.json()['choices'][0]['message']['content']
     except: pass
 
     # 2. DeepAI Backup
     try:
-        r = requests.post("https://api.deepai.org/api/text-generator", data={'text': prompt}, headers={'api-key': DEEP_AI_KEY}, timeout=30)
-        if r.status_code == 200: 
+        r = requests.post(
+            "https://api.deepai.org/api/text-generator",
+            data={'text': prompt},
+            headers={'api-key': DEEP_AI_KEY},
+            timeout=15
+        )
+        if r.status_code == 200:
             return r.json()['output']
     except: pass
 
-    return "AI is sleeping. Check logs."
+    return f"Latest Update: {prompt} #Viral #News"
 
 def create_thumbnail(img_url, title, lang='bn'):
     if not PILLOW_AVAILABLE: return False
@@ -190,10 +207,13 @@ def create_thumbnail(img_url, title, lang='bn'):
         img = Image.open(io.BytesIO(r.content)).convert("RGB")
         img = img.resize((1280, 720))
         draw = ImageDraw.Draw(img)
+        
         draw.rectangle([(0, 500), (1280, 720)], fill=(0,0,0,200))
         
         font_file = FONTS.get(lang, 'en.ttf')
-        try: font = ImageFont.truetype(font_file, 50)
+        try: 
+            if os.path.exists(font_file): font = ImageFont.truetype(font_file, 50)
+            else: font = ImageFont.load_default()
         except: font = ImageFont.load_default()
 
         draw.text((40, 550), "LPBS NEWS", fill="red", font=font)
@@ -201,30 +221,25 @@ def create_thumbnail(img_url, title, lang='bn'):
         
         img.save(PROMO_IMAGE_FILE)
         return True
-    except: return False
+    except Exception as e: 
+        print(f"Thumbnail Error: {e}")
+        return False
 
 # ==========================================
-# 🌐 SERVER HANDLER (All Features Included)
+# 🌐 SERVER HANDLER
 # ==========================================
 class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
-    def _send_json(self, data):
-        self.send_response(200)
-        self.send_header('Content-type', 'application/json')
-        self.end_headers()
-        self.wfile.write(json.dumps(data).encode())
-
     def do_POST(self):
-        length = int(self.headers.get('Content-Length', 0))
-        try:
-            data = json.loads(self.rfile.read(length))
-        except:
-            data = {}
-
         if self.path == '/save_config':
+            length = int(self.headers['Content-Length'])
+            data = json.loads(self.rfile.read(length))
             with open(CONFIG_FILE, 'w') as f: json.dump(data, f)
             self.send_response(200); self.end_headers(); self.wfile.write(b"Saved")
 
         elif self.path == '/create_promo':
+            length = int(self.headers['Content-Length'])
+            data = json.loads(self.rfile.read(length))
+            
             ai_text = ask_ai(f"Viral caption for: {data.get('title')}")
             create_thumbnail(data.get('thumb'), data.get('title'), data.get('lang', 'bn'))
             
@@ -232,50 +247,59 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
             if data.get('video_url'):
                 vid_ok = download_and_cut_video(data.get('video_url'))
             
-            self._send_json({
+            self.send_response(200)
+            self.send_header('Content-type', 'application/json')
+            self.end_headers()
+            self.wfile.write(json.dumps({
                 "hashtags": ai_text,
                 "image_url": f"/get_promo_image?t={int(time.time())}",
                 "video_url": f"/get_promo_video?t={int(time.time())}" if vid_ok else None,
                 "status": "success"
-            })
+            }).encode())
 
         elif self.path == '/chat_with_doctor':
-            msg = data.get('message', '')
+            length = int(self.headers['Content-Length'])
+            data = json.loads(self.rfile.read(length))
             report = get_system_report()
-            reply = ask_ai(f"System: {report}. User: {msg}. Reply short.")
-            self._send_json({"reply": reply})
+            reply = ask_ai(f"System: {report}. User: {data.get('message')}. Reply short.")
+            self.send_response(200); self.send_header('Content-type', 'application/json'); self.end_headers()
+            self.wfile.write(json.dumps({"reply": reply}).encode())
             
         elif self.path == '/publish_social':
-             self._send_json({"status": "manual"})
+             self.send_response(200); self.send_header('Content-type', 'application/json'); self.end_headers()
+             self.wfile.write(json.dumps({"status": "manual"}).encode())
 
         else: self.send_error(404)
 
     def do_GET(self):
-        # 404 Fix
-        if self.path == '/': self.path = '/index.html'
+        # 404 ফিক্স
+        if self.path == '/':
+            self.path = '/index.html'
 
         if self.path == '/get_stats':
             if os.path.exists("stats.json"):
-                self.send_response(200)
-                self.send_header('Content-type', 'application/json')
-                self.end_headers()
-                self.wfile.write(open("stats.json", "rb").read())
-            else:
-                self.send_response(200); self.wfile.write(b'{"total":0}')
+                try:
+                    with open("stats.json", 'r') as f:
+                        self.send_response(200); self.send_header('Content-type', 'application/json'); self.end_headers()
+                        self.wfile.write(f.read().encode())
+                        return
+                except: pass
+            self.send_response(200); self.wfile.write(b'{"total":0,"today":0}')
             
         elif self.path == '/check_health':
-            self._send_json({"report": get_system_report()})
+            self.send_response(200); self.send_header('Content-type', 'application/json'); self.end_headers()
+            self.wfile.write(json.dumps({"report": get_system_report(), "ai_advice": "Check Logs"}).encode())
 
         elif self.path.startswith('/get_promo_image'):
             if os.path.exists(PROMO_IMAGE_FILE):
                 self.send_response(200); self.send_header('Content-type', 'image/jpeg'); self.end_headers()
-                self.wfile.write(open(PROMO_IMAGE_FILE, "rb").read())
+                with open(PROMO_IMAGE_FILE, 'rb') as f: self.wfile.write(f.read())
             else: self.send_error(404)
 
         elif self.path.startswith('/get_promo_video'):
             if os.path.exists(PROMO_VIDEO_FILE):
                 self.send_response(200); self.send_header('Content-type', 'video/mp4'); self.end_headers()
-                self.wfile.write(open(PROMO_VIDEO_FILE, "rb").read())
+                with open(PROMO_VIDEO_FILE, 'rb') as f: self.wfile.write(f.read())
             else: self.send_error(404)
             
         elif self.path == '/track_visit':
@@ -287,15 +311,12 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
         s_file = "stats.json"
         data = {"total": 0, "today": 0, "date": ""}
         if os.path.exists(s_file):
-            try: data = json.load(open(s_file))
+            try: with open(s_file, 'r') as f: data = json.load(f)
             except: pass
-        
         today = datetime.now().strftime("%Y-%m-%d")
-        if data["date"] != today:
-            data["date"] = today; data["today"] = 0
+        if data["date"] != today: data["date"] = today; data["today"] = 0
         data["total"] += 1; data["today"] += 1
-        
-        try: json.dump(data, open(s_file, 'w'))
+        try: with open(s_file, 'w') as f: json.dump(data, f)
         except: pass
 
 if __name__ == "__main__":
