@@ -4,53 +4,200 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI Promo Manager - LPBS News</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; background-color: #f4f4f9; padding: 20px; }
-        .container { max-width: 600px; margin: 0 auto; background: white; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        h2 { text-align: center; color: #333; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input[type="text"], input[type="file"] { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; box-sizing: border-box; }
-        button { width: 100%; padding: 15px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; }
-        button:hover { background-color: #218838; }
-        .note { font-size: 12px; color: #666; margin-top: 5px; }
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f6f8; padding: 20px; color: #333; }
+        .container { max-width: 700px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        h2 { text-align: center; color: #6200ea; margin-bottom: 25px; }
+        
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
+        
+        select, input[type="text"], input[type="file"] { 
+            width: 100%; padding: 12px; border: 2px solid #eee; border-radius: 8px; 
+            font-size: 14px; box-sizing: border-box; transition: 0.3s;
+        }
+        select:focus, input:focus { border-color: #6200ea; outline: none; }
+
+        .btn-magic { 
+            width: 100%; padding: 15px; background: linear-gradient(135deg, #6200ea, #b388ff); 
+            color: white; border: none; border-radius: 8px; cursor: pointer; 
+            font-size: 18px; font-weight: bold; margin-top: 20px; 
+            box-shadow: 0 5px 15px rgba(98, 0, 234, 0.3); transition: 0.3s;
+        }
+        .btn-magic:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(98, 0, 234, 0.4); }
+
+        .preview-area {
+            background: #fafafa; border: 1px dashed #ccc; padding: 15px; 
+            border-radius: 8px; margin-top: 10px; display: none; text-align: center;
+        }
+        .preview-area img { max-width: 100%; height: auto; border-radius: 8px; margin-bottom: 10px; }
+        .preview-title { font-weight: bold; color: #333; font-size: 14px; }
+        
+        .loader { display: inline-block; width: 20px; height: 20px; border: 3px solid rgba(255,255,255,0.3); border-radius: 50%; border-top-color: #fff; animation: spin 1s ease-in-out infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .back-link { display: block; text-align: center; margin-top: 20px; color: #666; text-decoration: none; font-weight: bold; }
+        .back-link:hover { color: #6200ea; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>🤖 AI Promo Bot</h2>
-    <p style="text-align:center;">ভিডিও দাও, বাকি কাজ রোবট করবে!</p>
+    <h2><i class="fa-solid fa-robot"></i> AI Promo Studio</h2>
     
-    <form action="/process-promo" method="POST" enctype="multipart/form-data">
+    <form id="promoForm">
         
         <div class="form-group">
-            <label for="videoFile">ভিডিও ফাইল আপলোড করো (Viral Video Source)</label>
-            <input type="file" id="videoFile" name="video_file" accept="video/*" required>
-            <p class="note">* রোবট এখান থেকে প্রথম ৩০ সেকেন্ড কেটে নেবে।</p>
+            <label><i class="fa-solid fa-list"></i> Select News from Robot Database:</label>
+            <select id="news-selector" onchange="loadPreview()">
+                <option value="">-- Loading News List... --</option>
+            </select>
+            <p style="font-size: 12px; color: #888; margin-top: 5px;">* রোবট লাস্ট ৪৮ ঘণ্টায় যা কালেক্ট করেছে তা এখানে আসবে।</p>
+        </div>
+
+        <div id="selected-preview" class="preview-area">
+            <img id="prev-thumb" src="" alt="Thumbnail">
+            <div id="prev-title" class="preview-title"></div>
+            <input type="hidden" id="video-url"> <input type="hidden" id="video-title">
+        </div>
+
+        <div class="form-group" style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
+            <label>Or, Upload Manually (যদি লিস্টে না থাকে):</label>
+            <input type="file" id="manual-file" accept="video/*">
         </div>
 
         <div class="form-group">
-            <label for="fbLink">Facebook Page Link</label>
-            <input type="text" id="fbLink" name="fb_link" placeholder="ফেসবুক পেজের লিংক দাও...">
+            <label>Target Audience Language:</label>
+            <select id="lang-select">
+                <option value="bn">Bangla (বাংলা)</option>
+                <option value="hi">Hindi (हिंदी)</option>
+                <option value="en">English</option>
+            </select>
         </div>
 
-        <div class="form-group">
-            <label for="instaLink">Instagram Link</label>
-            <input type="text" id="instaLink" name="insta_link" placeholder="ইন্সটাগ্রাম লিংক দাও...">
+        <button type="button" class="btn-magic" onclick="startProcessing()">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> GENERATE VIRAL PROMO
+        </button>
+
+        <div id="result-area" style="display:none; margin-top: 20px; background: #e8f5e9; padding: 15px; border-radius: 8px; border: 1px solid #c8e6c9;">
+            <h4 style="margin-top:0; color:#2e7d32;">✅ AI Generated Result:</h4>
+            <p id="ai-hashtags" style="white-space: pre-wrap; font-family: monospace; color:#333;"></p>
+            <img id="ai-promo-img" src="" style="width:100%; margin-top:10px; border-radius:8px;">
         </div>
 
-        <div class="form-group">
-            <label for="ytLink">YouTube Channel Link</label>
-            <input type="text" id="ytLink" name="yt_link" placeholder="ইউটিউব চ্যানেলের লিংক দাও...">
-        </div>
-
-        <button type="submit">🚀 Start AI Promotion</button>
     </form>
 
-    <br>
-    <a href="admin.html" style="display:block; text-align:center; text-decoration:none; color: #333;">← ব্যাক টু অ্যাডমিন প্যানেল</a>
+    <a href="admin.html" class="back-link">← Back to Dashboard</a>
 </div>
+
+<script>
+    let newsData = [];
+
+    // ১. পেজ লোড হলেই ডাটাবেস থেকে নিউজ আনবে
+    window.onload = async function() {
+        const selector = document.getElementById('news-selector');
+        try {
+            // রেন্ডার থেকে news_db.json ফাইলটা কল করছি
+            const res = await fetch('news_db.json?v=' + Date.now());
+            const data = await res.json();
+            newsData = data.news || []; // ডাটা গ্লোবাল ভেরিয়েবলে রাখলাম
+
+            selector.innerHTML = '<option value="">-- Select a Video for Promo --</option>';
+            
+            // লুপ চালিয়ে অপশন বানাচ্ছি
+            newsData.forEach((item, index) => {
+                const title = item.title.substring(0, 60) + '...';
+                const opt = document.createElement('option');
+                opt.value = index; // আমরা array index ব্যবহার করব ট্র্যাক করার জন্য
+                opt.innerText = `[${item.platform || 'WEB'}] ${title}`;
+                selector.appendChild(opt);
+            });
+
+        } catch (error) {
+            console.error(error);
+            selector.innerHTML = '<option>⚠️ Error loading news list!</option>';
+        }
+    };
+
+    // ২. নিউজ সিলেক্ট করলে প্রিভিউ দেখাবে
+    function loadPreview() {
+        const index = document.getElementById('news-selector').value;
+        const previewBox = document.getElementById('selected-preview');
+        
+        if (index === "") {
+            previewBox.style.display = 'none';
+            return;
+        }
+
+        const item = newsData[index];
+        document.getElementById('prev-thumb').src = item.thumb;
+        document.getElementById('prev-title').innerText = item.title;
+        document.getElementById('video-url').value = item.original_link || item.video_url; // ভিডিও লিংক ধরা হলো
+        document.getElementById('video-title').value = item.title;
+        
+        previewBox.style.display = 'block';
+    }
+
+    // ৩. বাটনে ক্লিক করলে প্রসেসিং শুরু (Z AI + Deep AI)
+    async function startProcessing() {
+        const btn = document.querySelector('.btn-magic');
+        const originalText = btn.innerHTML;
+        const index = document.getElementById('news-selector').value;
+        const manualFile = document.getElementById('manual-file').files[0];
+        
+        if (index === "" && !manualFile) {
+            alert("Please select a news from the list OR upload a video!");
+            return;
+        }
+
+        btn.innerHTML = '<div class="loader"></div> AI Robot is Working...';
+        btn.disabled = true;
+
+        let payload = {};
+
+        // ডাটা রেডি করা
+        if (index !== "") {
+            const item = newsData[index];
+            payload = {
+                title: item.title,
+                thumb: item.thumb,
+                video_url: item.original_link, // ভিডিও কাটার জন্য এই লিংকটা পরে লাগবে
+                lang: document.getElementById('lang-select').value
+            };
+        } else {
+            // ম্যানুয়াল ফাইলের জন্য লজিক (আপাতত টাইটেল ডামি দিচ্ছি)
+            payload = {
+                title: "Manual Upload Video",
+                thumb: "",
+                lang: document.getElementById('lang-select').value
+            };
+        }
+
+        try {
+            // সার্ভারে পাঠানো
+            const res = await fetch('/create_promo', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(payload)
+            });
+
+            const result = await res.json();
+
+            // রেজাল্ট দেখানো
+            document.getElementById('result-area').style.display = 'block';
+            document.getElementById('ai-hashtags').innerText = result.hashtags;
+            document.getElementById('ai-promo-img').src = result.image_url;
+
+        } catch (e) {
+            alert("Server Error! Check console.");
+            console.log(e);
+        }
+
+        btn.innerHTML = originalText;
+        btn.disabled = false;
+    }
+</script>
 
 </body>
 </html>
