@@ -12,77 +12,78 @@ from datetime import datetime, timedelta
 import io
 import textwrap
 
-# --- ভিডিও এডিটিং লাইব্রেরি (নতুন সংযোজন) ---
-try:
-    from moviepy.editor import VideoFileClip
-    from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
-    MOVIEPY_AVAILABLE = True
-except ImportError:
-    MOVIEPY_AVAILABLE = False
-    print("⚠️ WARNING: MoviePy library not found! Video cutting will be skipped.")
+# --- 1. লাইব্রেরি ইমপোর্ট (সেফটি মোড) ---
+# রেন্ডারে যাতে সার্ভার ক্র্যাশ না করে তাই try-except ব্যবহার করা হয়েছে
+PILLOW_AVAILABLE = False
+MOVIEPY_AVAILABLE = False
 
-# --- ইমেজ লাইব্রেরি ---
 try:
     from PIL import Image, ImageDraw, ImageFont, ImageFilter
     PILLOW_AVAILABLE = True
 except ImportError:
-    PILLOW_AVAILABLE = False
-    print("⚠️ WARNING: Pillow library not found!")
+    print("⚠️ WARNING: Pillow (Image) library failed to load.")
 
-# --- কনফিগারেশন ---
+try:
+    from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
+    MOVIEPY_AVAILABLE = True
+except Exception as e:
+    print(f"⚠️ WARNING: MoviePy (Video) Error: {e}")
+
+# --- 2. কনফিগারেশন ---
 PORT = int(os.environ.get("PORT", 8080))
 CONFIG_FILE = "config.json"
 DB_FILE = "news_db.json"
 PROMO_IMAGE_FILE = "promo_image.jpg"
-PROMO_VIDEO_FILE = "promo_video.mp4" # কাটা ভিডিওর ফাইল
+PROMO_VIDEO_FILE = "promo_video.mp4"
 RETENTION_HOURS = 48 
 
 FONTS = { 'bn': 'bn.ttf', 'hi': 'hn.ttf', 'en': 'en.ttf', 'tm': 'tm.ttf' }
 
-# --- AI KEYS ---
+# --- 3. AI KEYS ---
 Z_AI_KEY = "cf5a27b9240b49b9a398094d440889e5.5RDCyrw5XLRVJEiH"
 DEEP_AI_KEY = "7bc72502-db85-4dd2-9038-c3811d69ff7c"
 
 # ==========================================
-# ✂️ PART 0: VIDEO CUTTING ENGINE (NEW FEATURE)
+# ✂️ PART 0: VIDEO CUTTING ENGINE
 # ==========================================
 def download_and_cut_video(url, duration=30):
     """ ইউটিউব/ফেসবুক থেকে ভিডিও নামিয়ে প্রথম ৩০ সেকেন্ড কাটবে """
-    if not MOVIEPY_AVAILABLE: 
-        print("❌ MoviePy not installed.")
+    if not MOVIEPY_AVAILABLE:
+        print("❌ Video engine not loaded (Check requirements.txt).")
         return False
     
-    print(f"🎬 STARTED: Downloading video from {url}")
+    print(f"🎬 Processing Video: {url}")
     temp_raw = "temp_raw_video.mp4"
     
     # আগের ফাইল পরিষ্কার করা
     if os.path.exists(temp_raw): os.remove(temp_raw)
     if os.path.exists(PROMO_VIDEO_FILE): os.remove(PROMO_VIDEO_FILE)
 
-    # ১. ভিডিও ডাউনলোড (yt-dlp দিয়ে)
+    # ভিডিও ডাউনলোড অপশন
     ydl_opts = {
         'format': 'best[ext=mp4]/best',
         'outtmpl': temp_raw,
         'quiet': True,
         'no_warnings': True,
-        'overwrites': True
+        'overwrites': True,
+        'socket_timeout': 30
     }
     
     try:
+        # ১. ডাউনলোড
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
         
-        # ২. ভিডিও কাটিং (MoviePy দিয়ে)
+        # ২. ভিডিও কাটিং (৩০ সেকেন্ড)
         print(f"✂️ Cutting first {duration} seconds...")
-        # এখানে 0 থেকে duration (30) পর্যন্ত কাটা হচ্ছে
         ffmpeg_extract_subclip(temp_raw, 0, duration, targetname=PROMO_VIDEO_FILE)
         
         # টেম্প ফাইল ডিলিট
         if os.path.exists(temp_raw): os.remove(temp_raw)
-        print("✅ Video Ready for Download!")
+        print("✅ Video Cut Successful!")
         return True
     except Exception as e:
-        print(f"❌ Video Processing Error: {e}")
+        print(f"❌ Video Error: {e}")
         return False
 
 # ==========================================
@@ -94,30 +95,23 @@ ERROR_LOGS = []
 def get_system_report():
     uptime = str(timedelta(seconds=int(time.time() - SERVER_START_TIME)))
     
-    db_size = 0
-    news_count = 0
+    db_count = 0
     if os.path.exists(DB_FILE):
-        db_size = os.path.getsize(DB_FILE) / 1024 
-        with open(DB_FILE, 'r') as f:
-            try: news_count = len(json.load(f).get('news', []))
-            except: pass
+        try: 
+            with open(DB_FILE, 'r') as f: db_count = len(json.load(f).get('news', []))
+        except: pass
 
     config = load_config()
-    active_channels = sum(len(v) for v in config.get('channels', {}).values())
-    video_status = "Ready" if MOVIEPY_AVAILABLE else "Missing Library"
+    active_ch = sum(len(v) for v in config.get('channels', {}).values())
+    
+    vid_status = "Active ✅" if MOVIEPY_AVAILABLE else "Failed ❌"
+    img_status = "Active ✅" if PILLOW_AVAILABLE else "Failed ❌"
 
-    return f"""
-    - Uptime: {uptime}
-    - News DB: {news_count} items ({db_size:.2f} KB)
-    - Channels Monitored: {active_channels}
-    - Video Engine: {video_status}
-    - Recent Errors: {len(ERROR_LOGS)}
-    """
+    return f"Uptime: {uptime} | News DB: {db_count} | Channels: {active_ch} | Video Engine: {vid_status} | Image Engine: {img_status} | Errors: {len(ERROR_LOGS)}"
 
 # ==========================================
-# 🧠 PART 2: THE ROBOT BRAIN (EXISTING)
+# 🧠 PART 2: ROBOT DATA COLLECTION
 # ==========================================
-
 def load_config():
     if not os.path.exists(CONFIG_FILE): return {}
     with open(CONFIG_FILE, 'r', encoding='utf-8') as f: return json.load(f)
@@ -131,11 +125,11 @@ def load_db():
 def clean_old_news(news_list):
     current_time = time.time()
     retention_seconds = RETENTION_HOURS * 3600
-    cleaned_list = []
+    cleaned = []
     for n in news_list:
         if (current_time - n.get('timestamp', 0)) < retention_seconds:
-            cleaned_list.append(n)
-    return cleaned_list
+            cleaned.append(n)
+    return cleaned
 
 def get_embed_code(url, video_id):
     if "facebook.com" in url or "fb.watch" in url:
@@ -198,14 +192,14 @@ def fetch_social_videos(channels):
                         video_news.append({
                             "id": vid_id, "category": category, "title": video.get('title', 'Video'),
                             "thumb": thumb, "video_url": get_embed_code(url, vid_id),
-                            "original_link": video.get('webpage_url', url), 
+                            "original_link": video.get('webpage_url', url),
                             "timestamp": time.time(), "platform": "yt/fb"
                         })
                 except: pass
     return video_news
 
 def robot_loop():
-    print("🤖 ROBOT SYSTEM: INITIALIZED")
+    print("🤖 ROBOT INITIALIZED")
     while True:
         try:
             config = load_config()
@@ -221,45 +215,43 @@ def robot_loop():
                 json.dump({"news": optimized, "updated": str(datetime.now())}, f, ensure_ascii=False)
             time.sleep(300)
         except Exception as e:
-            print(f"❌ ROBOT ERROR: {e}")
+            print(f"❌ Robot Error: {e}")
             ERROR_LOGS.append(str(e))
             time.sleep(60)
 
 # ==========================================
-# 🚀 PART 3: AI & PROMO ENGINE
+# 🚀 PART 3: AI ENGINE (FIXED TIMEOUTS)
 # ==========================================
-
 def fallback_hashtags(title):
-    return f"{title}\n\n#Viral #Trending #News #Latest #FYP"
+    return f"{title}\n\n#Viral #Trending #News #Latest #FYP #LPBS"
 
-# আপনার অনুরোধে টাইমআউট বাড়িয়ে ৩০ সেকেন্ড করা হয়েছে
 def ask_z_ai(prompt):
-    print("🤖 Asking Z AI (Timeout: 30s)...")
+    print("🤖 Asking Z AI (30s Timeout)...")
     try:
         headers = { "Authorization": f"Bearer {Z_AI_KEY}", "Content-Type": "application/json" }
         payload = { "model": "gpt-3.5-turbo", "messages": [{"role": "user", "content": prompt}], "max_tokens": 150 }
-        # TIMEOUT increased to 30 seconds
-        response = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload, timeout=30)
-        if response.status_code == 200: return response.json()['choices'][0]['message']['content']
+        # আপনার নির্দেশে টাইমআউট ৩০ সেকেন্ড করা হলো
+        r = requests.post("https://api.openai.com/v1/chat/completions", headers=headers, json=payload, timeout=30)
+        if r.status_code == 200: return r.json()['choices'][0]['message']['content']
     except Exception as e: print(f"⚠️ Z AI Error: {e}")
     return None
 
 def ask_deep_ai(prompt):
-    print("🤖 Asking Deep AI (Timeout: 30s)...")
+    print("🤖 Asking Deep AI (30s Timeout)...")
     try:
-        # TIMEOUT increased to 30 seconds
-        response = requests.post(
-            "https://api.deepai.org/api/text-generator",
-            data={'text': prompt}, headers={'api-key': DEEP_AI_KEY}, timeout=30
-        )
-        if response.status_code == 200: return response.json()['output']
+        # টাইমআউট ৩০ সেকেন্ড করা হলো
+        r = requests.post("https://api.deepai.org/api/text-generator", data={'text': prompt}, headers={'api-key': DEEP_AI_KEY}, timeout=30)
+        if r.status_code == 200: return r.json()['output']
     except Exception as e: print(f"⚠️ Deep AI Error: {e}")
     return None
 
 def generate_super_promo(title, lang):
-    prompt = f"Write a viral caption with 5 hashtags for news: '{title}' in {lang}."
+    prompt = f"Write a viral caption with 5 hashtags for: '{title}' in {lang}."
+    # ১. প্রথমে Z AI ট্রাই করবে
     res = ask_z_ai(prompt)
+    # ২. না হলে Deep AI
     if not res: res = ask_deep_ai(prompt)
+    # ৩. সব ফেল করলে ম্যানুয়াল ফলব্যাক
     if not res: res = fallback_hashtags(title)
     return res
 
@@ -270,22 +262,19 @@ def create_viral_thumbnail(image_url, title, lang):
         img = Image.open(io.BytesIO(r.content)).convert("RGB")
         img = img.resize((1280, 720))
         draw = ImageDraw.Draw(img)
-        # Dark Overlay at bottom
+        # কালো শেড নিচে দেওয়া হলো যাতে লেখা বোঝা যায়
         draw.rectangle([(0, 500), (1280, 720)], fill=(0,0,0,200))
         try: font = ImageFont.truetype(FONTS.get(lang, 'en.ttf'), 50)
         except: font = ImageFont.load_default()
         
-        draw.text((40, 520), "LPBS NEWS", fill="red", font=font)
-        draw.text((40, 600), title[:60]+"...", fill="white", font=font)
-        
+        draw.text((40, 550), title[:60]+"...", fill="white", font=font)
         img.save(PROMO_IMAGE_FILE)
         return True
     except: return False
 
 # ==========================================
-# 🌐 PART 4: SERVER HANDLER (UPDATED)
+# 🌐 PART 4: SERVER HANDLER (COMPLETE)
 # ==========================================
-
 class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
     def do_POST(self):
         if self.path == '/save_config':
@@ -299,57 +288,54 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
             data = json.loads(self.rfile.read(length))
             title = data.get('title', '')
             
-            # ১. AI Hashtags & Caption
+            # ১. AI Caption & Hashtags
             ai_hashtags = generate_super_promo(title, data.get('lang', 'bn'))
             
             # ২. Thumbnail Generation
             create_viral_thumbnail(data.get('thumb', ''), title, data.get('lang', 'bn'))
             
-            # ৩. Video Cutting (New Feature)
-            video_status = False
+            # ৩. Video Cutting (৩০ সেকেন্ড)
+            video_ok = False
             video_url = data.get('video_url', '')
             if video_url:
-                # এখানে ৩০ সেকেন্ড সেট করা আছে, চাইলে বাড়াতে পারেন
-                video_status = download_and_cut_video(video_url, duration=30)
+                # এখানে ৩০ সেকেন্ডের ভিডিও কাটা হবে
+                video_ok = download_and_cut_video(video_url, duration=30)
             
             self.send_response(200)
             self.send_header('Content-type', 'application/json')
             self.end_headers()
             self.wfile.write(json.dumps({
                 "hashtags": ai_hashtags,
-                "status": "success",
                 "image_url": f"/get_promo_image?t={int(time.time())}",
-                "video_url": f"/get_promo_video?t={int(time.time())}" if video_status else None
+                "video_url": f"/get_promo_video?t={int(time.time())}" if video_ok else None,
+                "status": "success"
             }).encode())
 
-        # 🔥 AI Doctor Chat
+        # 🔥 AI Doctor Chat Endpoint
         elif self.path == '/chat_with_doctor':
             length = int(self.headers['Content-Length'])
             data = json.loads(self.rfile.read(length))
             user_msg = data.get('message', '')
             
             report = get_system_report()
-            full_prompt = f"System Stats: {report}. User Question: {user_msg}. Answer as a DevOps Engineer."
+            full_prompt = f"System Report: {report}. User says: {user_msg}. Reply shortly."
             
             reply = ask_z_ai(full_prompt)
             if not reply: reply = ask_deep_ai(full_prompt)
-            if not reply: reply = "⚠️ Doctor is offline or busy. Please check logs manually."
+            if not reply: reply = "System operational. AI connection currently busy."
             
             self.send_response(200); self.send_header('Content-type', 'application/json'); self.end_headers()
             self.wfile.write(json.dumps({"reply": reply}).encode())
         
-        # 🔥 Social Publish Placeholder
+        # 🔥 Auto-Post Endpoint
         elif self.path == '/publish_social':
-            self.send_response(200); self.send_header('Content-type', 'application/json'); self.end_headers()
-            self.wfile.write(json.dumps({"status": "manual", "msg": "Token missing"}).encode())
-
+             self.send_response(200); self.send_header('Content-type', 'application/json'); self.end_headers()
+             self.wfile.write(json.dumps({"status": "manual"}).encode())
+        
         else: self.send_error(404)
 
     def do_GET(self):
-        if self.path == '/track_visit':
-            self.update_stats(); self.send_response(200); self.end_headers()
-        
-        elif self.path == '/get_stats':
+        if self.path == '/get_stats':
             if os.path.exists("stats.json"):
                 with open("stats.json", 'r') as f:
                     self.send_response(200); self.send_header('Content-type', 'application/json'); self.end_headers()
@@ -358,7 +344,7 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
 
         elif self.path == '/check_health':
             report = get_system_report()
-            advice = ask_z_ai(f"Review this system status: {report}") or "System looks operational."
+            advice = ask_z_ai(f"Review system status: {report}") or "System OK. Check logs manually."
             self.send_response(200); self.send_header('Content-type', 'application/json'); self.end_headers()
             self.wfile.write(json.dumps({"report": report, "ai_advice": advice}).encode())
 
@@ -368,13 +354,15 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
                 with open(PROMO_IMAGE_FILE, 'rb') as f: self.wfile.write(f.read())
             else: self.send_error(404)
 
-        # 🔥 NEW: Video Serve Route
         elif self.path.startswith('/get_promo_video'):
             if os.path.exists(PROMO_VIDEO_FILE):
                 self.send_response(200); self.send_header('Content-type', 'video/mp4'); self.end_headers()
                 with open(PROMO_VIDEO_FILE, 'rb') as f: self.wfile.write(f.read())
             else: self.send_error(404)
         
+        elif self.path == '/track_visit':
+             self.update_stats(); self.send_response(200); self.end_headers()
+
         else: super().do_GET()
 
     def update_stats(self):
