@@ -9,7 +9,8 @@ import yt_dlp
 import random
 from datetime import datetime, timedelta
 import io
-import textwrap # [NEW] টেক্সট সুন্দরভাবে র‍্যাপ (wrap) করার জন্য
+import textwrap # টেক্সট সুন্দরভাবে র‍্যাপ (wrap) করার জন্য
+import subprocess # [NEW] ভিডিওতে টেক্সট (Watermark) অ্যাড করার জন্য
 
 # --- 1. লাইব্রেরি ইমপোর্ট (সেফটি মোড) ---
 PILLOW_AVAILABLE = False
@@ -37,7 +38,7 @@ RETENTION_HOURS = 48
 
 FONTS = { 'bn': 'bn.ttf', 'hi': 'hn.ttf', 'en': 'en.ttf' }
 
-# [NEW] ডেটাবেস করাপশন ঠেকানোর জন্য থ্রেড লক 
+# ডেটাবেস করাপশন ঠেকানোর জন্য থ্রেড লক 
 FILE_LOCK = threading.Lock()
 
 # --- 3. AI KEYS ---
@@ -45,7 +46,7 @@ SAMBANOVA_KEY = "0ad2fc42-5d7f-41c0-b923-78d71d671790"
 DEEP_AI_KEY = "7bc72502-db85-4dd2-9038-c3811d69ff7c"
 
 # ==========================================
-# ✂️ VIDEO ENGINE (SPEED OPTIMIZED)
+# ✂️ VIDEO ENGINE (SPEED OPTIMIZED WITH TEXT OVERLAY)
 # ==========================================
 def download_and_cut_video(url):
     if not MOVIEPY_AVAILABLE:
@@ -73,9 +74,22 @@ def download_and_cut_video(url):
         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
             ydl.download([url])
         
-        # কাটিং (৩০ সেকেন্ড)
-        print("✂️ Cutting 30s...")
-        ffmpeg_extract_subclip(temp_raw, 0, 30, targetname=PROMO_VIDEO_FILE)
+        print("✂️ Cutting 30s & Adding LPBS News Watermark...")
+        
+        # [NEW] FFmpeg কমান্ড ব্যবহার করে ভিডিও কাটা এবং কোনায় দুই লাইনের টেক্সট বসানো
+        cmd = [
+            "ffmpeg", "-y", "-i", temp_raw, "-t", "30",
+            "-vf", "drawtext=text='LPBS News':fontcolor=white:fontsize=36:x=w-tw-20:y=20:box=1:boxcolor=red@0.8:boxborderw=5,drawtext=text='Sabse Aage Sabse tez':fontcolor=yellow:fontsize=22:x=w-tw-20:y=70:box=1:boxcolor=black@0.6:boxborderw=5",
+            "-c:a", "copy", PROMO_VIDEO_FILE
+        ]
+        
+        try:
+            # সাবপ্রসেস রান করানো
+            subprocess.run(cmd, check=True, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except Exception as ffmpeg_err:
+            print(f"⚠️ FFmpeg Watermark Failed, falling back to simple cut: {ffmpeg_err}")
+            # যদি কোনো কারণে ফন্ট বা সিস্টেম এরর হয়, তাহলে নরমাল কাট করবে (যাতে প্রোসেস না থামে)
+            ffmpeg_extract_subclip(temp_raw, 0, 30, targetname=PROMO_VIDEO_FILE)
         
         if os.path.exists(temp_raw): os.remove(temp_raw)
         return True
@@ -95,7 +109,7 @@ def get_system_report():
     db_count = 0
     if os.path.exists(DB_FILE):
         try:
-            with FILE_LOCK: # [FIXED] লক ব্যবহার করা হয়েছে
+            with FILE_LOCK: 
                 with open(DB_FILE, 'r') as f:
                     data = json.load(f)
                     db_count = len(data.get('news', []))
@@ -113,13 +127,13 @@ def get_system_report():
 # ==========================================
 def load_config():
     if not os.path.exists(CONFIG_FILE): return {}
-    with FILE_LOCK: # [FIXED] লক ব্যবহার করা হয়েছে
+    with FILE_LOCK: 
         with open(CONFIG_FILE, 'r') as f: return json.load(f)
 
 def load_db():
     if not os.path.exists(DB_FILE): return []
     try:
-        with FILE_LOCK: # [FIXED] লক ব্যবহার করা হয়েছে
+        with FILE_LOCK: 
             with open(DB_FILE, 'r') as f: return json.load(f).get("news", [])
     except: return []
 
@@ -136,23 +150,27 @@ def fetch_social_videos(channels):
     video_news = []
     ydl_opts = {'quiet': True, 'ignoreerrors': True, 'extract_flat': True, 'playlistend': 10}
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        for cat, urls in channels.items():
+        for cat, urls in channels.items(): # cat হলো ক্যাটাগরি (Sports, Tech etc.)
             for url in urls:
                 try:
                     info = ydl.extract_info(url, download=False)
                     entries = list(info['entries']) if 'entries' in info else [info]
                     for vid in entries:
                         if vid:
-                            # [FIXED] বেস্ট থাম্বনেল বের করার লজিক ইম্প্রুভ করা হয়েছে
+                            # বেস্ট থাম্বনেল বের করার লজিক
                             best_thumb = vid.get('thumbnail', '')
                             if not best_thumb and 'thumbnails' in vid and len(vid['thumbnails']) > 0:
-                                best_thumb = vid['thumbnails'][-1]['url'] # শেষেরটা সাধারণত হাই কোয়ালিটি হয়
+                                best_thumb = vid['thumbnails'][-1]['url'] 
                                 
                             video_news.append({
-                                "id": vid['id'], "title": vid.get('title', 'Video'),
-                                "thumb": best_thumb, # [FIXED]
-                                "original_link": vid.get('webpage_url', url),
-                                "timestamp": time.time(), "platform": "yt/fb"
+                                "id": vid.get('id', str(random.randint(1000, 999999))), 
+                                "title": vid.get('title', 'Video'),
+                                "thumb": best_thumb, 
+                                "original_link": vid.get('webpage_url', vid.get('url', url)),
+                                "timestamp": time.time(), 
+                                "platform": "yt/fb",
+                                "category": cat, # [FIXED] ক্যাটাগরি সেভ করা হচ্ছে, ফলে সব পেজে নিউজ যাবে
+                                "channel_name": vid.get('uploader', vid.get('channel', 'LPBS News')) # [FIXED] undefined এরর ফিক্সড
                             })
                 except: pass
     return video_news
@@ -170,7 +188,7 @@ def robot_loop():
             for item in fresh:
                 if item['id'] not in seen: existing.append(item)
             
-            with FILE_LOCK: # [FIXED] লক ব্যবহার করা হয়েছে যাতে ডেটা করাপ্ট না হয়
+            with FILE_LOCK: 
                 with open(DB_FILE, 'w') as f:
                     json.dump({"news": existing, "updated": str(datetime.now())}, f)
             time.sleep(600)
@@ -192,7 +210,7 @@ def ask_ai(prompt):
         data = {
             "model": "Meta-Llama-3.1-8B-Instruct",
             "messages": [{"role": "user", "content": prompt}],
-            "max_tokens": 150 # [FIXED] টোকেন বাড়ানো হয়েছে যাতে বেশি হ্যাশট্যাগ আসতে পারে
+            "max_tokens": 150 
         }
         r = requests.post(url, headers=headers, json=data, timeout=10)
         if r.status_code == 200:
@@ -216,7 +234,6 @@ def ask_ai(prompt):
 def create_thumbnail(img_url, title, lang='bn'):
     if not PILLOW_AVAILABLE: return False
     try:
-        # [FIXED] URL না থাকলে এরর এড়ানোর জন্য চেক
         if not img_url:
              print("⚠️ No image URL provided for thumbnail.")
              return False
@@ -226,23 +243,21 @@ def create_thumbnail(img_url, title, lang='bn'):
         img = img.resize((1280, 720))
         draw = ImageDraw.Draw(img)
         
-        # একটু বেশি ডার্ক করা হয়েছে যাতে লেখা ভালো বোঝা যায়
         draw.rectangle([(0, 450), (1280, 720)], fill=(0,0,0,220)) 
         
         font_file = FONTS.get(lang, 'en.ttf')
         try: 
             if os.path.exists(font_file): 
-                font = ImageFont.truetype(font_file, 65) # [FIXED] ফন্ট সাইজ ৫০ থেকে ৬৫ করা হয়েছে
+                font = ImageFont.truetype(font_file, 65) 
             else: 
                 print(f"⚠️ Font file {font_file} not found. Falling back to default.")
                 font = ImageFont.load_default()
         except: 
             font = ImageFont.load_default()
 
-        # [FIXED] লেখাকে আরও বোল্ড (stroke) করা হয়েছে এবং textwrap দিয়ে মাল্টি-লাইন করা হয়েছে
         draw.text((40, 480), "LPBS NEWS", fill="red", font=font, stroke_width=2, stroke_fill="white")
         
-        wrapped_title = textwrap.fill(title, width=45) # লাইন ভেঙে নিচে নামানোর জন্য
+        wrapped_title = textwrap.fill(title, width=45) 
         draw.text((40, 560), wrapped_title, fill="white", font=font, stroke_width=1, stroke_fill="black")
         
         img.save(PROMO_IMAGE_FILE)
@@ -259,7 +274,7 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
         if self.path == '/save_config':
             length = int(self.headers['Content-Length'])
             data = json.loads(self.rfile.read(length))
-            with FILE_LOCK: # [FIXED]
+            with FILE_LOCK: 
                 with open(CONFIG_FILE, 'w') as f: json.dump(data, f)
             self.send_response(200); self.end_headers(); self.wfile.write(b"Saved")
 
@@ -267,7 +282,6 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
             length = int(self.headers['Content-Length'])
             data = json.loads(self.rfile.read(length))
             
-            # [FIXED] AI প্রম্পট আপডেট করা হয়েছে যাতে অনেক বেশি ভাইরাল ট্যাগ দেয়
             ai_prompt = f"Write a catchy viral caption and generate at least 15-20 highly relevant trending hashtags for this news video title: '{data.get('title')}'. Context: News/Viral. Language: {'Bengali' if data.get('lang')=='bn' else 'English'}."
             ai_text = ask_ai(ai_prompt)
             
@@ -309,7 +323,7 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
         if self.path == '/get_stats':
             if os.path.exists("stats.json"):
                 try:
-                    with FILE_LOCK: # [FIXED]
+                    with FILE_LOCK: 
                         with open("stats.json", 'r') as f:
                             self.send_response(200); self.send_header('Content-type', 'application/json'); self.end_headers()
                             self.wfile.write(f.read().encode())
@@ -343,14 +357,14 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
         data = {"total": 0, "today": 0, "date": ""}
         if os.path.exists(s_file):
             try: 
-                with FILE_LOCK: # [FIXED]
+                with FILE_LOCK: 
                     with open(s_file, 'r') as f: data = json.load(f)
             except: pass
         today = datetime.now().strftime("%Y-%m-%d")
         if data["date"] != today: data["date"] = today; data["today"] = 0
         data["total"] += 1; data["today"] += 1
         try: 
-            with FILE_LOCK: # [FIXED]
+            with FILE_LOCK: 
                 with open(s_file, 'w') as f: json.dump(data, f)
         except: pass
 
