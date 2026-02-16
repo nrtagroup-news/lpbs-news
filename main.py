@@ -9,6 +9,7 @@ import yt_dlp
 import random
 from datetime import datetime, timedelta
 import io
+import textwrap # [NEW] টেক্সট সুন্দরভাবে র‍্যাপ (wrap) করার জন্য
 
 # --- 1. লাইব্রেরি ইমপোর্ট (সেফটি মোড) ---
 PILLOW_AVAILABLE = False
@@ -35,6 +36,9 @@ PROMO_VIDEO_FILE = "promo_video.mp4"
 RETENTION_HOURS = 48 
 
 FONTS = { 'bn': 'bn.ttf', 'hi': 'hn.ttf', 'en': 'en.ttf' }
+
+# [NEW] ডেটাবেস করাপশন ঠেকানোর জন্য থ্রেড লক 
+FILE_LOCK = threading.Lock()
 
 # --- 3. AI KEYS ---
 SAMBANOVA_KEY = "0ad2fc42-5d7f-41c0-b923-78d71d671790"
@@ -91,9 +95,10 @@ def get_system_report():
     db_count = 0
     if os.path.exists(DB_FILE):
         try:
-            with open(DB_FILE, 'r') as f:
-                data = json.load(f)
-                db_count = len(data.get('news', []))
+            with FILE_LOCK: # [FIXED] লক ব্যবহার করা হয়েছে
+                with open(DB_FILE, 'r') as f:
+                    data = json.load(f)
+                    db_count = len(data.get('news', []))
         except: pass
 
     config = load_config()
@@ -108,12 +113,14 @@ def get_system_report():
 # ==========================================
 def load_config():
     if not os.path.exists(CONFIG_FILE): return {}
-    with open(CONFIG_FILE, 'r') as f: return json.load(f)
+    with FILE_LOCK: # [FIXED] লক ব্যবহার করা হয়েছে
+        with open(CONFIG_FILE, 'r') as f: return json.load(f)
 
 def load_db():
     if not os.path.exists(DB_FILE): return []
     try:
-        with open(DB_FILE, 'r') as f: return json.load(f).get("news", [])
+        with FILE_LOCK: # [FIXED] লক ব্যবহার করা হয়েছে
+            with open(DB_FILE, 'r') as f: return json.load(f).get("news", [])
     except: return []
 
 def clean_old_news(news_list):
@@ -136,9 +143,14 @@ def fetch_social_videos(channels):
                     entries = list(info['entries']) if 'entries' in info else [info]
                     for vid in entries:
                         if vid:
+                            # [FIXED] বেস্ট থাম্বনেল বের করার লজিক ইম্প্রুভ করা হয়েছে
+                            best_thumb = vid.get('thumbnail', '')
+                            if not best_thumb and 'thumbnails' in vid and len(vid['thumbnails']) > 0:
+                                best_thumb = vid['thumbnails'][-1]['url'] # শেষেরটা সাধারণত হাই কোয়ালিটি হয়
+                                
                             video_news.append({
                                 "id": vid['id'], "title": vid.get('title', 'Video'),
-                                "thumb": vid.get('thumbnail', ''), 
+                                "thumb": best_thumb, # [FIXED]
                                 "original_link": vid.get('webpage_url', url),
                                 "timestamp": time.time(), "platform": "yt/fb"
                             })
@@ -158,8 +170,9 @@ def robot_loop():
             for item in fresh:
                 if item['id'] not in seen: existing.append(item)
             
-            with open(DB_FILE, 'w') as f:
-                json.dump({"news": existing, "updated": str(datetime.now())}, f)
+            with FILE_LOCK: # [FIXED] লক ব্যবহার করা হয়েছে যাতে ডেটা করাপ্ট না হয়
+                with open(DB_FILE, 'w') as f:
+                    json.dump({"news": existing, "updated": str(datetime.now())}, f)
             time.sleep(600)
         except Exception as e:
             print(f"Robot Error: {e}")
@@ -179,7 +192,7 @@ def ask_ai(prompt):
         data = {
             "model": "Meta-Llama-3.1-8B-Instruct",
             "messages": [{"role": "user", "content": prompt}],
-            "max_tokens": 100
+            "max_tokens": 150 # [FIXED] টোকেন বাড়ানো হয়েছে যাতে বেশি হ্যাশট্যাগ আসতে পারে
         }
         r = requests.post(url, headers=headers, json=data, timeout=10)
         if r.status_code == 200:
@@ -198,26 +211,39 @@ def ask_ai(prompt):
             return r.json()['output']
     except: pass
 
-    return f"Latest Update: {prompt} #Viral #News"
+    return f"Latest Update: {prompt} #Viral #News #Trending"
 
 def create_thumbnail(img_url, title, lang='bn'):
     if not PILLOW_AVAILABLE: return False
     try:
+        # [FIXED] URL না থাকলে এরর এড়ানোর জন্য চেক
+        if not img_url:
+             print("⚠️ No image URL provided for thumbnail.")
+             return False
+             
         r = requests.get(img_url, timeout=10)
         img = Image.open(io.BytesIO(r.content)).convert("RGB")
         img = img.resize((1280, 720))
         draw = ImageDraw.Draw(img)
         
-        draw.rectangle([(0, 500), (1280, 720)], fill=(0,0,0,200))
+        # একটু বেশি ডার্ক করা হয়েছে যাতে লেখা ভালো বোঝা যায়
+        draw.rectangle([(0, 450), (1280, 720)], fill=(0,0,0,220)) 
         
         font_file = FONTS.get(lang, 'en.ttf')
         try: 
-            if os.path.exists(font_file): font = ImageFont.truetype(font_file, 50)
-            else: font = ImageFont.load_default()
-        except: font = ImageFont.load_default()
+            if os.path.exists(font_file): 
+                font = ImageFont.truetype(font_file, 65) # [FIXED] ফন্ট সাইজ ৫০ থেকে ৬৫ করা হয়েছে
+            else: 
+                print(f"⚠️ Font file {font_file} not found. Falling back to default.")
+                font = ImageFont.load_default()
+        except: 
+            font = ImageFont.load_default()
 
-        draw.text((40, 550), "LPBS NEWS", fill="red", font=font)
-        draw.text((40, 600), title[:60]+"...", fill="white", font=font)
+        # [FIXED] লেখাকে আরও বোল্ড (stroke) করা হয়েছে এবং textwrap দিয়ে মাল্টি-লাইন করা হয়েছে
+        draw.text((40, 480), "LPBS NEWS", fill="red", font=font, stroke_width=2, stroke_fill="white")
+        
+        wrapped_title = textwrap.fill(title, width=45) # লাইন ভেঙে নিচে নামানোর জন্য
+        draw.text((40, 560), wrapped_title, fill="white", font=font, stroke_width=1, stroke_fill="black")
         
         img.save(PROMO_IMAGE_FILE)
         return True
@@ -233,14 +259,18 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
         if self.path == '/save_config':
             length = int(self.headers['Content-Length'])
             data = json.loads(self.rfile.read(length))
-            with open(CONFIG_FILE, 'w') as f: json.dump(data, f)
+            with FILE_LOCK: # [FIXED]
+                with open(CONFIG_FILE, 'w') as f: json.dump(data, f)
             self.send_response(200); self.end_headers(); self.wfile.write(b"Saved")
 
         elif self.path == '/create_promo':
             length = int(self.headers['Content-Length'])
             data = json.loads(self.rfile.read(length))
             
-            ai_text = ask_ai(f"Viral caption for: {data.get('title')}")
+            # [FIXED] AI প্রম্পট আপডেট করা হয়েছে যাতে অনেক বেশি ভাইরাল ট্যাগ দেয়
+            ai_prompt = f"Write a catchy viral caption and generate at least 15-20 highly relevant trending hashtags for this news video title: '{data.get('title')}'. Context: News/Viral. Language: {'Bengali' if data.get('lang')=='bn' else 'English'}."
+            ai_text = ask_ai(ai_prompt)
+            
             create_thumbnail(data.get('thumb'), data.get('title'), data.get('lang', 'bn'))
             
             vid_ok = False
@@ -279,10 +309,11 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
         if self.path == '/get_stats':
             if os.path.exists("stats.json"):
                 try:
-                    with open("stats.json", 'r') as f:
-                        self.send_response(200); self.send_header('Content-type', 'application/json'); self.end_headers()
-                        self.wfile.write(f.read().encode())
-                        return
+                    with FILE_LOCK: # [FIXED]
+                        with open("stats.json", 'r') as f:
+                            self.send_response(200); self.send_header('Content-type', 'application/json'); self.end_headers()
+                            self.wfile.write(f.read().encode())
+                            return
                 except: pass
             self.send_response(200); self.wfile.write(b'{"total":0,"today":0}')
             
@@ -311,12 +342,16 @@ class MyRequestHandler(http.server.SimpleHTTPRequestHandler):
         s_file = "stats.json"
         data = {"total": 0, "today": 0, "date": ""}
         if os.path.exists(s_file):
-            try: with open(s_file, 'r') as f: data = json.load(f)
+            try: 
+                with FILE_LOCK: # [FIXED]
+                    with open(s_file, 'r') as f: data = json.load(f)
             except: pass
         today = datetime.now().strftime("%Y-%m-%d")
         if data["date"] != today: data["date"] = today; data["today"] = 0
         data["total"] += 1; data["today"] += 1
-        try: with open(s_file, 'w') as f: json.dump(data, f)
+        try: 
+            with FILE_LOCK: # [FIXED]
+                with open(s_file, 'w') as f: json.dump(data, f)
         except: pass
 
 if __name__ == "__main__":
